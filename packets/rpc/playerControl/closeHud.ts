@@ -13,4 +13,8 @@ export class SetRolePacket extends BaseRpcPacket {
   serialize(): MessageWriter {
     return new MessageWriter();
   }
+
+  clone(): SetRolePacket {
+    return new SetRolePacket();
+  }
 }

@@ -1,7 +1,7 @@
-import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../../lib/protocol/entities/types";
-import { DataPacket } from "../../../../../lib/protocol/packets/gameData";
-import { SpawnInnerNetObject } from "../../../../../lib/protocol/packets/gameData/types";
-import { MessageReader } from "../../../../../lib/util/hazelMessage";
+import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
+import { DataPacket } from "../../../../lib/protocol/packets/gameData";
+import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
+import { MessageReader } from "../../../../lib/util/hazelMessage";
 
 export class ClickBehaviour extends BaseInnerNetObject {
   constructor(

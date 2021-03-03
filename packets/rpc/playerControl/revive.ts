@@ -13,4 +13,8 @@ export class RevivePacket extends BaseRpcPacket {
   serialize(): MessageWriter {
     return new MessageWriter();
   }
+
+  clone(): RevivePacket {
+    return new RevivePacket();
+  }
 }

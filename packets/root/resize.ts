@@ -18,4 +18,8 @@ export class ResizePacket extends BaseRootPacket {
       .writePackedUInt32(this.width)
       .writePackedUInt32(this.height);
   }
+
+  clone(): ResizePacket {
+    return new ResizePacket(this.width, this.height);
+  }
 }

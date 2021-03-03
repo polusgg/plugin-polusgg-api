@@ -13,4 +13,8 @@ export class ClickPacket extends BaseRpcPacket {
   serialize(): MessageWriter {
     return new MessageWriter();
   }
+
+  clone(): ClickPacket {
+    return new ClickPacket();
+  }
 }

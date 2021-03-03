@@ -24,4 +24,8 @@ export class PlaySoundPacket extends BaseRpcPacket {
       .writeFloat32(this.pitch)
       .writeByte(this.volume);
   }
+
+  clone(): PlaySoundPacket {
+    return new PlaySoundPacket(this.resourceId, this.pitch, this.volume);
+  }
 }

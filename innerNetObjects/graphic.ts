@@ -1,7 +1,7 @@
-import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../../lib/protocol/entities/types";
-import { DataPacket } from "../../../../../lib/protocol/packets/gameData";
-import { SpawnInnerNetObject } from "../../../../../lib/protocol/packets/gameData/types";
-import { MessageReader, MessageWriter } from "../../../../../lib/util/hazelMessage";
+import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
+import { DataPacket } from "../../../../lib/protocol/packets/gameData";
+import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
+import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
 
 export class Graphic extends BaseInnerNetObject {
   constructor(

@@ -15,4 +15,8 @@ export class ChatVisibilityPacket extends BaseRpcPacket {
   serialize(): MessageWriter {
     return new MessageWriter().writeBoolean(this.isVisible);
   }
+
+  clone(): ChatVisibilityPacket {
+    return new ChatVisibilityPacket(this.isVisible);
+  }
 }

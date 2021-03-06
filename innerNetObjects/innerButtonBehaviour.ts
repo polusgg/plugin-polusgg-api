@@ -1,9 +1,11 @@
 import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
-import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
 import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
+import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 
-export class ButtonBehaviour extends BaseInnerNetObject {
+// TODO: Rewrite to not suck ass
+
+export class InnerButtonBehaviour extends BaseInnerNetObject {
   constructor(
     netId: number,
     parent: BaseInnerNetEntity,
@@ -37,7 +39,7 @@ export class ButtonBehaviour extends BaseInnerNetObject {
     return this.getData() as SpawnInnerNetObject;
   }
 
-  clone(): ButtonBehaviour {
-    return new ButtonBehaviour(this.netId, this.parent, this.maxTimer, this.currentTime, this.isCountingDown, this.color);
+  clone(): InnerButtonBehaviour {
+    return new InnerButtonBehaviour(this.netId, this.parent, this.maxTimer, this.currentTime, this.isCountingDown, this.color);
   }
 }

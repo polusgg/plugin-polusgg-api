@@ -1,29 +1,28 @@
-import { LobbyInstance } from "../../../../lib/api/lobby";
+import { InnerButtonBehaviour, InnerClickBehaviour, InnerCustomNetworkTransform, InnerGraphic } from "../innerNetObjects";
 import { InnerPlayerControl, InnerPlayerPhysics } from "../../../../lib/protocol/entities/player";
 import { BaseInnerNetEntity } from "../../../../lib/protocol/entities/types";
-import { Vector2 } from "../../../../lib/types";
+import { LobbyInstance } from "../../../../lib/api/lobby";
 import { SpawnFlag } from "../../../../lib/types/enums";
-import { ButtonBehaviour } from "../innerNetObjects/buttonBehaviour";
-import { ClickBehaviour } from "../innerNetObjects/clickBehaviour";
-import { InnerCustomNetworkTransform } from "../innerNetObjects/customNetworkTransform";
-import { Graphic } from "../innerNetObjects/graphic";
+import { Vector2 } from "../../../../lib/types";
 
-export class Button extends BaseInnerNetEntity {
-  public innerNetObjects: [InnerCustomNetworkTransform, Graphic] | [InnerCustomNetworkTransform, Graphic, ClickBehaviour] | [InnerCustomNetworkTransform, Graphic, ClickBehaviour, ButtonBehaviour]
+// TODO: Rewrite to not suck ass
+
+export class EntityButton extends BaseInnerNetEntity {
+  public innerNetObjects: [InnerCustomNetworkTransform, InnerGraphic] | [InnerCustomNetworkTransform, InnerGraphic, InnerClickBehaviour] | [InnerCustomNetworkTransform, InnerGraphic, InnerClickBehaviour, InnerButtonBehaviour]
 
   get customNetworkTransform(): InnerCustomNetworkTransform {
     return this.innerNetObjects[0];
   }
 
-  get graphic(): Graphic {
+  get graphic(): InnerGraphic {
     return this.innerNetObjects[1];
   }
 
-  get clickBehaviour(): ClickBehaviour | undefined {
+  get clickBehaviour(): InnerClickBehaviour | undefined {
     return this.innerNetObjects[2];
   }
 
-  get buttonBehaviour(): ButtonBehaviour | undefined {
+  get buttonBehaviour(): InnerButtonBehaviour | undefined {
     return this.innerNetObjects[3];
   }
 
@@ -58,21 +57,21 @@ export class Button extends BaseInnerNetEntity {
     if (clickBehaviourNetId === undefined) {
       this.innerNetObjects = [
         new InnerCustomNetworkTransform(customNetworkTransformNetId, this, sequenceId, position, velocity),
-        new Graphic(graphicNetId, this, graphicResourceId, graphicWidth, graphicHeight),
+        new InnerGraphic(graphicNetId, this, graphicResourceId, graphicWidth, graphicHeight),
       ]
     } else {
       if (buttonBehaviourNetId === undefined) {
         this.innerNetObjects = [
           new InnerCustomNetworkTransform(customNetworkTransformNetId, this, sequenceId, position, velocity),
-          new Graphic(graphicNetId, this, graphicResourceId, graphicWidth, graphicHeight),
-          new ClickBehaviour(clickBehaviourNetId, this),
+          new InnerGraphic(graphicNetId, this, graphicResourceId, graphicWidth, graphicHeight),
+          new InnerClickBehaviour(clickBehaviourNetId, this),
         ]
       } else {
         this.innerNetObjects = [
           new InnerCustomNetworkTransform(customNetworkTransformNetId, this, sequenceId, position, velocity),
-          new Graphic(graphicNetId, this, graphicResourceId, graphicWidth, graphicHeight),
-          new ClickBehaviour(clickBehaviourNetId, this),
-          new ButtonBehaviour(buttonBehaviourNetId, this, buttonBehaviourMaxTimer!, buttonBehaviourCurrentTime!, buttonBehaviourIsCountingDown!, buttonBehaviourColor!)
+          new InnerGraphic(graphicNetId, this, graphicResourceId, graphicWidth, graphicHeight),
+          new InnerClickBehaviour(clickBehaviourNetId, this),
+          new InnerButtonBehaviour(buttonBehaviourNetId, this, buttonBehaviourMaxTimer!, buttonBehaviourCurrentTime!, buttonBehaviourIsCountingDown!, buttonBehaviourColor!)
         ]
       }
     }

@@ -3,9 +3,9 @@ import { BaseRpcPacket } from "../../../../../../lib/protocol/packets/rpc";
 
 export class PlaySoundPacket extends BaseRpcPacket {
   constructor(
-    public readonly resourceId: number,
-    public readonly pitch: number,
-    public readonly volume: number,
+    public resourceId: number,
+    public pitch: number,
+    public volume: number,
   ) {
     super(0x8c);
   }

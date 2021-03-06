@@ -1,25 +1,16 @@
-import { BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
-import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
 import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
-import { DeadBodyEntity } from "../entities/deadBody";
+import { BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
+import { DataPacket } from "../../../../lib/protocol/packets/gameData";
+import { BodyDirection, BodyState } from "../types/enums";
+import { EntityDeadBody } from "../entities";
 
-export enum BodyState {
-  Standing,
-  Falling,
-  Lying,
-}
+// TODO: Rewrite to not suck ass
 
-export enum BodyDirection {
-  FacingLeft  = 0,
-  FacingRight = 1,
-  // Note: BodyDirections are serialized as booleans, so more than two can not exist. anything after 1 will be cast down to 1
-}
-
-export class DeadBodyObject extends BaseInnerNetObject {
+export class InnerDeadBody extends BaseInnerNetObject {
   constructor(
     netId: number,
-    parent: DeadBodyEntity,
+    parent: EntityDeadBody,
     public bodyState: BodyState,
     public bodyDirection: BodyDirection,
     public color: [number, number, number, number],
@@ -38,7 +29,7 @@ export class DeadBodyObject extends BaseInnerNetObject {
         .writeBytes(this.shadowColor),
     );
   }
-  
+
   setData(packet: MessageReader | MessageWriter): void {
     const reader = MessageReader.fromRawBytes(packet);
 
@@ -52,7 +43,7 @@ export class DeadBodyObject extends BaseInnerNetObject {
     return this.getData() as SpawnInnerNetObject;
   }
 
-  clone(): DeadBodyObject {
-    return new DeadBodyObject(this.netId, this.parent, this.bodyState, this.bodyDirection, this.color, this.shadowColor);
+  clone(): InnerDeadBody {
+    return new InnerDeadBody(this.netId, this.parent, this.bodyState, this.bodyDirection, this.color, this.shadowColor);
   }
 }

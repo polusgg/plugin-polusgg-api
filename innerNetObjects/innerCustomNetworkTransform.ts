@@ -1,11 +1,13 @@
-import { Connection } from "../../../../lib/protocol/connection";
 import { BaseInnerNetObject, BaseInnerNetEntity } from "../../../../lib/protocol/entities/types";
-import { InnerNetObjectType } from "../../../../lib/protocol/entities/types/enums";
-import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
-import { SnapToPacket } from "../../../../lib/protocol/packets/rpc";
-import { Vector2 } from "../../../../lib/types";
+import { InnerNetObjectType } from "../../../../lib/protocol/entities/types/enums";
 import { MessageWriter, MessageReader } from "../../../../lib/util/hazelMessage";
+import { DataPacket } from "../../../../lib/protocol/packets/gameData";
+import { SnapToPacket } from "../../../../lib/protocol/packets/rpc";
+import { Connection } from "../../../../lib/protocol/connection";
+import { Vector2 } from "../../../../lib/types";
+
+// TODO: Rewrite to not suck ass
 
 export class InnerCustomNetworkTransform extends BaseInnerNetObject {
   constructor(

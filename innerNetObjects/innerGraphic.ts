@@ -1,9 +1,11 @@
 import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
-import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
 import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
+import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 
-export class Graphic extends BaseInnerNetObject {
+// TODO: Rewrite to not suck ass
+
+export class InnerGraphic extends BaseInnerNetObject {
   constructor(
     netId: number,
     parent: BaseInnerNetEntity,
@@ -14,8 +16,8 @@ export class Graphic extends BaseInnerNetObject {
     super(0x80, netId, parent);
   }
 
-  clone(): Graphic {
-    return new Graphic(this.netId, this.parent, this.resourceId, this.width, this.height);
+  clone(): InnerGraphic {
+    return new InnerGraphic(this.netId, this.parent, this.resourceId, this.width, this.height);
   }
 
   getData(): DataPacket {

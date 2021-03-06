@@ -1,7 +1,7 @@
 import { MessageReader, MessageWriter } from "../../../../../lib/util/hazelMessage";
 import { BaseRootPacket } from "../../../../../lib/protocol/packets/root";
 
-export class DisplayStartGameScreen extends BaseRootPacket {
+export class DisplayStartGameScreenPacket extends BaseRootPacket {
   constructor(
     public readonly titleText: string,
     public readonly subtitleText: string,
@@ -11,8 +11,13 @@ export class DisplayStartGameScreen extends BaseRootPacket {
     super(0x80);
   }
 
-  static deserialize(reader: MessageReader): DisplayStartGameScreen {
-    return new DisplayStartGameScreen(reader.readString(), reader.readString(), [...reader.readBytes(4).getBuffer()] as [number, number, number, number], [...reader.readRemainingBytes().getBuffer()]);
+  static deserialize(reader: MessageReader): DisplayStartGameScreenPacket {
+    return new DisplayStartGameScreenPacket(
+      reader.readString(),
+      reader.readString(),
+      [...reader.readBytes(4).getBuffer()] as [number, number, number, number],
+      [...reader.readRemainingBytes().getBuffer()],
+    );
   }
 
   serialize(): MessageWriter {
@@ -23,7 +28,12 @@ export class DisplayStartGameScreen extends BaseRootPacket {
       .writeBytes(this.yourTeam);
   }
 
-  clone(): DisplayStartGameScreen {
-    return new DisplayStartGameScreen(this.titleText, this.subtitleText, [...this.backgroundColor], [...this.yourTeam]);
+  clone(): DisplayStartGameScreenPacket {
+    return new DisplayStartGameScreenPacket(
+      this.titleText,
+      this.subtitleText,
+      [...this.backgroundColor],
+      [...this.yourTeam],
+    );
   }
 }

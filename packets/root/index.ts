@@ -1,5 +1,7 @@
-export { FetchResourcePacket, FetchResourceResponseStartedPacket } from "./fetchResource";
+export { DisplayStartGameScreenPacket } from "./displayStartGameScreenPacket";
 
-export { ResizePacket } from "./resize";
+export { FetchResourcePacket, FetchResourceResponsePacket } from "./fetchResourcePacket";
 
-export { CustomRootPacketType } from "./customRootPacketType";
+export { OverwriteGameOver } from "./overwriteGameOverPacket";
+
+export { ResizePacket } from "./resizePacket";

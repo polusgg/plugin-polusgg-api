@@ -1,13 +1,16 @@
-import { LobbyInstance } from "../../../../lib/api/lobby";
 import { BaseInnerNetEntity } from "../../../../lib/protocol/entities/types";
-import { SpawnFlag } from "../../../../lib/types/enums";
 import { GLOBAL_OWNER } from "../../../../lib/util/constants";
-import { BodyDirection, BodyState, DeadBodyObject } from "../innerNetObjects/deadBody";
+import { BodyDirection, BodyState } from "../types/enums";
+import { LobbyInstance } from "../../../../lib/api/lobby";
+import { SpawnFlag } from "../../../../lib/types/enums";
+import { InnerDeadBody } from "../innerNetObjects";
 
-export class DeadBodyEntity extends BaseInnerNetEntity {
-  public innerNetObjects: [ DeadBodyObject ];
+// TODO: Rewrite to not suck ass
 
-  get deadBody(): DeadBodyObject {
+export class EntityDeadBody extends BaseInnerNetEntity {
+  public innerNetObjects: [ InnerDeadBody ];
+
+  get deadBody(): InnerDeadBody {
     return this.innerNetObjects[0];
   }
 
@@ -15,7 +18,7 @@ export class DeadBodyEntity extends BaseInnerNetEntity {
     super(0x81, lobby, GLOBAL_OWNER, SpawnFlag.None)
 
     this.innerNetObjects = [
-      new DeadBodyObject(netId, this, bodyState, bodyDirection, color, shadowColor),
+      new InnerDeadBody(netId, this, bodyState, bodyDirection, color, shadowColor),
     ]
   }
 

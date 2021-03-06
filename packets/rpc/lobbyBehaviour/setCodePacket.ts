@@ -3,7 +3,7 @@ import { BaseRpcPacket } from "../../../../../../lib/protocol/packets/rpc";
 
 export class SetCodePacket extends BaseRpcPacket {
   constructor(
-    public readonly code: string,
+    public code: string,
   ) {
     super(0x8b);
   }

@@ -3,7 +3,7 @@ import { BaseRpcPacket } from "../../../../../../lib/protocol/packets/rpc";
 
 export class ChatVisibilityPacket extends BaseRpcPacket {
   constructor(
-    public readonly isVisible: boolean,
+    public isVisible: boolean,
   ) {
     super(0x8d);
   }

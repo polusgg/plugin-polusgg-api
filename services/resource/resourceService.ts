@@ -1,27 +1,18 @@
+import { FetchResourceResponseEndedPacket, FetchResourceResponseFailedPacket } from "../../packets/root/fetchResource";
+import { FetchResourcePacket, FetchResourceResponsePacket } from "../../packets/root";
+import { CustomRootPacketType, ResourceState } from "../../types/enums";
 import { Connection } from "../../../../../lib/protocol/connection";
 import { MaxValue } from "../../../../../lib/util/constants";
-import { CustomRootPacketType, FetchResourcePacket } from "../../packets/root";
-import { FetchResourceResponseEndedPacket, FetchResourceResponseFailedPacket, FetchResourceResponsePacket } from "../../packets/root/fetchResource";
+import { Resource, ResourceResponse } from "../../types";
+import { ServiceInstance } from "..";
 
-enum ResourceState {
-  AwaitingResponse,
-  Downloading,
-}
-
-interface Resource {
-  location: string;
-  state: ResourceState;
-  hash: Buffer;
-}
-
-export class ResourceService {
+export class ResourceService implements ServiceInstance {
   private readonly resourceIds: Map<Connection, Map<number, Resource>> = new Map();
 
-  async load(connection: Connection, location: URL | string, hash: Buffer): Promise<{isCached: boolean; resourceId: number}> {
-    const connectionResourceMap = this.getResourceMapForConnection(connection);
+  async load(connection: Connection, location: URL | string, hash: Buffer): Promise<ResourceResponse> {
     const resourceId = Math.random() * MaxValue.UInt32;
 
-    connectionResourceMap.set(resourceId, {
+    this.getResourceMapForConnection(connection).set(resourceId, {
       location: location.toString(),
       state: ResourceState.AwaitingResponse,
       hash,
@@ -33,9 +24,9 @@ export class ResourceService {
       hash,
     ));
 
-    const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number &&
-      (p as FetchResourceResponsePacket).resourceId == resourceId &&
-      (p as FetchResourceResponsePacket).response.getType() !== 0x00,
+    const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number
+      && (p as FetchResourceResponsePacket).resourceId == resourceId
+      && (p as FetchResourceResponsePacket).response.getType() !== 0x00,
     ) as FetchResourceResponsePacket;
 
     if (response.getType() == 0x01) {

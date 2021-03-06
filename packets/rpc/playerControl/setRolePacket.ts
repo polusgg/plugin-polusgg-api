@@ -3,7 +3,7 @@ import { BaseRpcPacket } from "../../../../../../lib/protocol/packets/rpc";
 
 export class SetRolePacket extends BaseRpcPacket {
   constructor(
-    public readonly roleId: number,
+    public roleId: number,
   ) {
     super(0x88);
   }

@@ -1,9 +1,11 @@
 import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
-import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
+import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 import { MessageReader } from "../../../../lib/util/hazelMessage";
 
-export class ClickBehaviour extends BaseInnerNetObject {
+// TODO: Rewrite to not suck ass
+
+export class InnerClickBehaviour extends BaseInnerNetObject {
   constructor(
     netId: number,
     parent: BaseInnerNetEntity,
@@ -22,7 +24,7 @@ export class ClickBehaviour extends BaseInnerNetObject {
     return this.getData() as SpawnInnerNetObject;
   }
 
-  clone(): ClickBehaviour {
-    return new ClickBehaviour(this.netId, this.parent);
+  clone(): InnerClickBehaviour {
+    return new InnerClickBehaviour(this.netId, this.parent);
   }
 }

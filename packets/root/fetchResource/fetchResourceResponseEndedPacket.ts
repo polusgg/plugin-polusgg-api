@@ -1,6 +1,6 @@
 import { MessageReader, MessageWriter } from "../../../../../lib/util/hazelMessage";
 import { BaseRootPacket } from "../../../../../lib/protocol/packets/root";
-import { BaseResponse } from "./baseResponse";
+import { BaseResponse } from ".";
 
 export class FetchResourceResponseEndedPacket extends BaseRootPacket implements BaseResponse {
   constructor(

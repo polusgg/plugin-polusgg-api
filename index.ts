@@ -1,6 +1,6 @@
 import { RootPacket } from "../../../lib/protocol/packets/hazel";
-import { ResizePacket } from "./packets/root/resize";
 import { BasePlugin } from "../../../lib/api/plugin";
+import { ResizePacket } from "./packets/root";
 import { Server } from "../../../lib/server";
 
 declare const server: Server;

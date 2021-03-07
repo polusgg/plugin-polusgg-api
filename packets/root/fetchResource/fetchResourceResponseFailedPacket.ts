@@ -1,6 +1,6 @@
 import { MessageReader, MessageWriter } from "../../../../../lib/util/hazelMessage";
 import { BaseRootPacket } from "../../../../../lib/protocol/packets/root";
-import { DownloadFailureReason } from "../../../../enums";
+import { DownloadFailureReason } from "../../../types/enums";
 import { BaseResponse } from ".";
 
 export class FetchResourceResponseFailedPacket extends BaseRootPacket implements BaseResponse {

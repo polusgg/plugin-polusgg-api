@@ -1,8 +1,8 @@
 import { MessageReader, MessageWriter } from "../../../../../lib/util/hazelMessage";
 import { BaseRootPacket } from "../../../../../lib/protocol/packets/root";
 import { CustomRootPacketType } from "../../types/enums";
-import { BaseResponse } from "./fetchResource";
 import {
+  BaseResponse,
   FetchResourceResponseEndedPacket,
   FetchResourceResponseFailedPacket,
   FetchResourceResponseStartedPacket,

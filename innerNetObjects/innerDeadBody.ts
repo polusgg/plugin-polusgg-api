@@ -1,7 +1,6 @@
-import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
+import { DataPacket, SpawnPacketObject } from "../../../../lib/protocol/packets/gameData";
+import { BaseInnerNetObject } from "../../../../lib/protocol/entities/baseEntity";
 import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
-import { BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
-import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 import { BodyDirection, BodyState } from "../types/enums";
 import { EntityDeadBody } from "../entities";
 
@@ -9,17 +8,17 @@ import { EntityDeadBody } from "../entities";
 
 export class InnerDeadBody extends BaseInnerNetObject {
   constructor(
-    netId: number,
     parent: EntityDeadBody,
-    public bodyState: BodyState,
-    public bodyDirection: BodyDirection,
     public color: [number, number, number, number],
     public shadowColor: [number, number, number, number],
+    public bodyState: BodyState = BodyState.Lying,
+    public bodyDirection: BodyDirection = BodyDirection.FacingRight,
+    netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
-    super(0x81, netId, parent);
+    super(0x81, parent, netId);
   }
 
-  getData(): DataPacket {
+  serializeData(): DataPacket {
     return new DataPacket(
       this.netId,
       new MessageWriter()
@@ -28,6 +27,10 @@ export class InnerDeadBody extends BaseInnerNetObject {
         .writeBytes(this.color)
         .writeBytes(this.shadowColor),
     );
+  }
+
+  getParent(): EntityDeadBody {
+    return this.parent as EntityDeadBody;
   }
 
   setData(packet: MessageReader | MessageWriter): void {
@@ -39,11 +42,13 @@ export class InnerDeadBody extends BaseInnerNetObject {
     this.shadowColor = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
   }
 
-  serializeSpawn(): SpawnInnerNetObject {
-    return this.getData() as SpawnInnerNetObject;
+  serializeSpawn() {
+    return this.serializeData() as unknown as SpawnPacketObject;
   }
 
   clone(): InnerDeadBody {
-    return new InnerDeadBody(this.netId, this.parent, this.bodyState, this.bodyDirection, this.color, this.shadowColor);
+    return new InnerDeadBody(this.getParent(), this.color, this.shadowColor, this.bodyState, this.bodyDirection, this.netId);
   }
+
+  handleRpc(connection, type, packet, sendTo) {}
 }

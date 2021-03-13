@@ -1,8 +1,6 @@
-export { InnerButtonBehaviour } from "./innerButtonBehaviour";
+export { InnerCooldownBehaviour } from "./innerCooldownBehaviour";
 
 export { InnerClickBehaviour } from "./innerClickBehaviour";
-
-export { InnerCustomNetworkTransform } from "./innerCustomNetworkTransform";
 
 export { InnerDeadBody } from "./innerDeadBody";
 

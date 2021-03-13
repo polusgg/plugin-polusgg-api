@@ -1,26 +1,25 @@
-import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/types";
-import { SpawnInnerNetObject } from "../../../../lib/protocol/packets/gameData/types";
+import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/baseEntity";
+import { DataPacket, SpawnPacketObject } from "../../../../lib/protocol/packets/gameData";
 import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
-import { DataPacket } from "../../../../lib/protocol/packets/gameData";
 
 // TODO: Rewrite to not suck ass
 
 export class InnerGraphic extends BaseInnerNetObject {
   constructor(
-    netId: number,
     parent: BaseInnerNetEntity,
     public resourceId: number,
     public width: number,
     public height: number,
+    netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
-    super(0x80, netId, parent);
+    super(0x80, parent, netId);
   }
 
   clone(): InnerGraphic {
-    return new InnerGraphic(this.netId, this.parent, this.resourceId, this.width, this.height);
+    return new InnerGraphic(this.parent, this.resourceId, this.width, this.height, this.netId);
   }
 
-  getData(): DataPacket {
+  serializeData(): DataPacket {
     return new DataPacket(
       this.netId,
       new MessageWriter()
@@ -38,7 +37,13 @@ export class InnerGraphic extends BaseInnerNetObject {
     this.height = reader.readPackedUInt32();
   }
 
-  serializeSpawn(): SpawnInnerNetObject {
-    return this.getData() as SpawnInnerNetObject;
+  serializeSpawn(): SpawnPacketObject {
+    return this.serializeData() as unknown as SpawnPacketObject;
   }
+
+  getParent(): BaseInnerNetEntity {
+    return this.parent;
+  }
+
+  handleRpc(connection, type, packet, sendTo) {}
 }

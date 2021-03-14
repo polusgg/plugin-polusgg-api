@@ -10,9 +10,8 @@ export class CloseHudPacket extends BaseRpcPacket {
     return new CloseHudPacket();
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter();
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  serialize(_writer: MessageWriter): void {}
 
   clone(): CloseHudPacket {
     return new CloseHudPacket();

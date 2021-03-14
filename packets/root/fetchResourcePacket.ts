@@ -63,8 +63,8 @@ export class FetchResourceResponsePacket extends BaseRootPacket {
     }
   }
 
-  serialize(): MessageWriter {
-    const writer = new MessageWriter()
+  serialize(writer: MessageWriter): MessageWriter {
+    writer
       .writePackedUInt32(this.resourceId)
       .writeByte(this.response.getType());
 

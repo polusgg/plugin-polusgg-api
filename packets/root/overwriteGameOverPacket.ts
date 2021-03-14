@@ -24,8 +24,8 @@ export class OverwriteGameOver extends BaseRootPacket {
     );
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter()
+  serialize(writer: MessageWriter): void {
+    writer
       .writeString(this.titleText)
       .writeString(this.subtitleText)
       .writeBytes(this.backgroundColor)

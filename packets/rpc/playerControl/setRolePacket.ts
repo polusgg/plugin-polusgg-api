@@ -12,8 +12,8 @@ export class SetRolePacket extends BaseRpcPacket {
     return new SetRolePacket(reader.readByte());
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter().writeByte(this.roleId);
+  serialize(writer: MessageWriter): void {
+    writer.writeByte(this.roleId);
   }
 
   clone(): SetRolePacket {

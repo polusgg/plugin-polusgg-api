@@ -18,11 +18,10 @@ export class PlaySoundPacket extends BaseRpcPacket {
     );
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter()
-      .writePackedUInt32(this.resourceId)
-      .writeFloat32(this.pitch)
-      .writeByte(this.volume);
+  serialize(writer: MessageWriter): void {
+    writer.writePackedUInt32(this.resourceId);
+    writer.writeFloat32(this.pitch);
+    writer.writeByte(this.volume);
   }
 
   clone(): PlaySoundPacket {

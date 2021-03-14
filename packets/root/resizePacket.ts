@@ -13,8 +13,8 @@ export class ResizePacket extends BaseRootPacket {
     return new ResizePacket(reader.readPackedUInt32(), reader.readPackedUInt32());
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter()
+  serialize(writer: MessageWriter): void {
+    writer
       .writePackedUInt32(this.width)
       .writePackedUInt32(this.height);
   }

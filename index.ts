@@ -3,14 +3,12 @@ import { RootPacket } from "../../../lib/protocol/packets/hazel";
 import { BasePlugin } from "../../../lib/api/plugin";
 import { ResizePacket } from "./packets/root";
 import { Server } from "../../../lib/server";
-// import { Player } from "../../../lib/player";
 import { EntityDeadBody } from "./entities";
 import { Lobby } from "../../../lib/lobby";
 import { BodyDirection, BodyState, ServiceType } from "./types/enums";
 import { Services } from "./services";
-// import { ChatVisibilityPacket } from "./packets/rpc/gameData";
-import { CloseHudPacket } from "./packets/rpc/playerControl";
-import { GameDataPacket, StartGamePacket } from "../../../lib/protocol/packets/root";
+import { GameDataPacket } from "../../../lib/protocol/packets/root";
+import { ChatVisibilityPacket } from "./packets/rpc/gameData";
 
 declare const server: Server;
 
@@ -26,7 +24,7 @@ RootPacket.registerPacket(0x80, ResizePacket.deserialize, (connection, packet) =
 const elloworld = "Leaderboards: 53,060,503 scores set by 922,015 users on 141,658 leaderboards                              ";
 // const maxLength = 15;
 let i = 0;
-let lol = false;
+// let lol = false;
 
 const resource = Services.get(ServiceType.Resource);
 
@@ -38,6 +36,8 @@ export default class extends BasePlugin {
     });
 
     server.on("player.joined", event => {
+      const lobby = event.getPlayer().getLobby() as Lobby;
+
       event.getPlayer().setMeta({
         closeHud: setInterval(() => {
           i = (i + 1) % elloworld.length;
@@ -46,7 +46,11 @@ export default class extends BasePlugin {
           //     (elloworld.substring(i) + elloworld.substring(0, i)).substring(0, maxLength),
           //   ),
           // );
-          lol = !lol;
+          lobby.sendRpcPacket(lobby.getGameData()!.getGameData(),
+            new ChatVisibilityPacket(
+              true,
+            ),
+          );
         }, 100),
       });
     });
@@ -83,11 +87,6 @@ export default class extends BasePlugin {
           case "start":
             lobby.disableActingHosts(false);
             lobby.getHostInstance().startGame();
-            lobby.sendRpcPacket(lobby.getLobbyBehaviour()!.getLobbyBehaviour(),
-              new CloseHudPacket(
-                // lol,
-              ),
-            );
             break;
           default: event.getPlayer().sendChat("Lol not valid");
         }

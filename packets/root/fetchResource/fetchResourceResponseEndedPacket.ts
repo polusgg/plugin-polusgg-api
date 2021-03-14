@@ -12,8 +12,8 @@ export class FetchResourceResponseEndedPacket extends BaseRootPacket {
     return new FetchResourceResponseEndedPacket(reader.readBoolean());
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter().writeBoolean(this.didCache);
+  serialize(writer: MessageWriter): void {
+    writer.writeBoolean(this.didCache);
   }
 
   clone(): FetchResourceResponseEndedPacket {

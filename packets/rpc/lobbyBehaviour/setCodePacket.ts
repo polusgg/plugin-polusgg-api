@@ -12,8 +12,8 @@ export class SetCodePacket extends BaseRpcPacket {
     return new SetCodePacket(reader.readString());
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter().writeString(this.code);
+  serialize(writer: MessageWriter): void {
+    writer.writeString(this.code);
   }
 
   clone(): SetCodePacket {

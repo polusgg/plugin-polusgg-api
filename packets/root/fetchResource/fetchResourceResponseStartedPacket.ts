@@ -12,8 +12,8 @@ export class FetchResourceResponseStartedPacket extends BaseRootPacket {
     return new FetchResourceResponseStartedPacket(reader.readPackedUInt32());
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter().writePackedUInt32(this.size);
+  serialize(writer: MessageWriter): void {
+    writer.writePackedUInt32(this.size);
   }
 
   clone(): FetchResourceResponseStartedPacket {

@@ -10,9 +10,8 @@ export class RevivePacket extends BaseRpcPacket {
     return new RevivePacket();
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter();
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  serialize(_writer: MessageWriter): void {}
 
   clone(): RevivePacket {
     return new RevivePacket();

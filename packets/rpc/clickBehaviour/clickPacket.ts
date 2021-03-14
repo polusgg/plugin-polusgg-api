@@ -10,9 +10,8 @@ export class ClickPacket extends BaseRpcPacket {
     return new ClickPacket();
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter();
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  serialize(_writer: MessageWriter): void {}
 
   clone(): ClickPacket {
     return new ClickPacket();

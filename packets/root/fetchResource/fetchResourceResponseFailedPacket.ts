@@ -13,8 +13,8 @@ export class FetchResourceResponseFailedPacket extends BaseRootPacket {
     return new FetchResourceResponseFailedPacket(reader.readPackedUInt32());
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter().writePackedUInt32(this.reason);
+  serialize(writer: MessageWriter): void {
+    writer.writePackedUInt32(this.reason);
   }
 
   clone(): FetchResourceResponseFailedPacket {

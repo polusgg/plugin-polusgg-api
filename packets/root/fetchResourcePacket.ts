@@ -20,15 +20,14 @@ export class FetchResourcePacket extends BaseRootPacket {
     return new FetchResourcePacket(
       reader.readPackedUInt32(),
       reader.readString(),
-      Buffer.from(reader.readBytesAndSize()),
+      Buffer.from(reader.readBytesAndSize().getBuffer()),
     );
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter()
-      .writePackedUInt32(this.resourceId)
-      .writeString(this.resourceLocation)
-      .writeBytesAndSize(this.hash);
+  serialize(writer: MessageWriter): void {
+    writer.writePackedUInt32(this.resourceId);
+    writer.writeString(this.resourceLocation);
+    writer.writeBytesAndSize(this.hash);
   }
 
   clone(): FetchResourcePacket {

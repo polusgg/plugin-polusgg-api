@@ -6,7 +6,7 @@ export class ClickPacket extends BaseRpcPacket {
     super(0x84);
   }
 
-  static deserialize(reader: MessageReader): ClickPacket {
+  static deserialize(_reader: MessageReader): ClickPacket {
     return new ClickPacket();
   }
 

@@ -1,9 +1,8 @@
-import { MessageReader, MessageWriter } from "../../../../../lib/util/hazelMessage";
-import { BaseRootPacket } from "../../../../../lib/protocol/packets/root";
+import { MessageReader, MessageWriter } from "../../../../../../lib/util/hazelMessage";
+import { BaseRootPacket } from "../../../../../../lib/protocol/packets/root";
 import { DownloadFailureReason } from "../../../types/enums";
-import { BaseResponse } from ".";
 
-export class FetchResourceResponseFailedPacket extends BaseRootPacket implements BaseResponse {
+export class FetchResourceResponseFailedPacket extends BaseRootPacket {
   constructor(
     public readonly reason: DownloadFailureReason,
   ) {

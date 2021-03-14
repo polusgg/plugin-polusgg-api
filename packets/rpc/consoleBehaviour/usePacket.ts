@@ -6,7 +6,7 @@ export class UsePacket extends BaseRpcPacket {
     super(0x84);
   }
 
-  static deserialize(reader: MessageReader): UsePacket {
+  static deserialize(_reader: MessageReader): UsePacket {
     return new UsePacket();
   }
 

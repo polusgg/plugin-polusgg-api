@@ -4,4 +4,4 @@ export type Resource = {
   location: string;
   state: ResourceState;
   hash: Buffer;
-}
+};

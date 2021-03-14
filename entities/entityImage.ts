@@ -19,12 +19,12 @@ export class EntityImage extends BaseInnerNetEntity {
     graphicNetId: number = lobby.getHostInstance().getNextNetId(),
     sequenceId: number = 5,
   ) {
-    super(0x80, lobby, 0x42069, SpawnFlag.None)
+    super(0x80, lobby, 0x42069, SpawnFlag.None);
 
     this.innerNetObjects = [
       new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),
       new InnerGraphic(this, resourceId, resourceWidth, resourceHeight, graphicNetId),
-    ]
+    ];
   }
 
   getCustomNetworkTransform(): InnerCustomNetworkTransformGeneric {

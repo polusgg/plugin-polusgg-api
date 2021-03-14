@@ -32,9 +32,9 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
   }
 
   handleRpc(connection, type, packet, sendTo) {
-    switch(type) {
+    switch (type) {
       case 0x8e:
-        console.log("!!! [ ICB Use Fired. Figure out an API to interface with this event ] !!!")
+        console.log("!!! [ ICB Use Fired. Figure out an API to interface with this event ] !!!");
         break;
       default:
         break;

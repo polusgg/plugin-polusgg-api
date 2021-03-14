@@ -20,13 +20,13 @@ export class EntityButton extends BaseInnerNetEntity {
     clickBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
     sequenceId: number = 5,
   ) {
-    super(0x81, lobby, 0x42069, SpawnFlag.None)
+    super(0x81, lobby, 0x42069, SpawnFlag.None);
 
     this.innerNetObjects = [
       new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),
       new InnerGraphic(this, resourceId, resourceWidth, resourceHeight, graphicNetId),
       new InnerClickBehaviour(this, clickBehaviourNetId),
-    ]
+    ];
   }
 
   getCustomNetworkTransform(): InnerCustomNetworkTransformGeneric {

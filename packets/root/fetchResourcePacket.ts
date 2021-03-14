@@ -2,11 +2,10 @@ import { MessageReader, MessageWriter } from "../../../../../lib/util/hazelMessa
 import { BaseRootPacket } from "../../../../../lib/protocol/packets/root";
 import { CustomRootPacketType } from "../../types/enums";
 import {
-  BaseResponse,
   FetchResourceResponseEndedPacket,
   FetchResourceResponseFailedPacket,
   FetchResourceResponseStartedPacket,
- } from "./fetchResource";
+} from "./fetchResource";
 
 export class FetchResourcePacket extends BaseRootPacket {
   constructor(
@@ -44,7 +43,7 @@ export class FetchResourcePacket extends BaseRootPacket {
 export class FetchResourceResponsePacket extends BaseRootPacket {
   constructor(
     public readonly resourceId: number,
-    public readonly response: BaseResponse,
+    public readonly response: BaseRootPacket,
   ) {
     super(CustomRootPacketType.FetchResource as number);
   }
@@ -66,10 +65,13 @@ export class FetchResourceResponsePacket extends BaseRootPacket {
   }
 
   serialize(): MessageWriter {
-    return new MessageWriter()
+    const writer = new MessageWriter()
       .writePackedUInt32(this.resourceId)
-      .writeByte(this.response.getType())
-      .writeBytes(this.response.serialize());
+      .writeByte(this.response.getType());
+
+    this.response.serialize(writer);
+
+    return writer;
   }
 
   clone(): FetchResourceResponsePacket {

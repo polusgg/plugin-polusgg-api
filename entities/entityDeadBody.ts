@@ -16,11 +16,11 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     bodyDirection: BodyDirection = BodyDirection.FacingRight,
     deadBodyNetId: number = lobby.getHostInstance().getNextNetId(),
   ) {
-    super(0x83, lobby, GLOBAL_OWNER, SpawnFlag.None)
+    super(0x83, lobby, GLOBAL_OWNER, SpawnFlag.None);
 
     this.innerNetObjects = [
       new InnerDeadBody(this, color, shadowColor, bodyState, bodyDirection, deadBodyNetId),
-    ]
+    ];
   }
 
   getDeadBody(): InnerDeadBody {

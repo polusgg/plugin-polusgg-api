@@ -4,9 +4,8 @@ import { CustomRootPacketType, ResourceState } from "../../types/enums";
 import { Connection } from "../../../../../lib/protocol/connection";
 import { MaxValue } from "../../../../../lib/util/constants";
 import { Resource, ResourceResponse } from "../../types";
-import { ServiceInstance } from "..";
 
-export class ResourceService implements ServiceInstance {
+export class ResourceService {
   private readonly resourceIds: Map<Connection, Map<number, Resource>> = new Map();
 
   async load(connection: Connection, location: URL | string, hash: Buffer): Promise<ResourceResponse> {
@@ -39,7 +38,7 @@ export class ResourceService implements ServiceInstance {
     throw new Error((response as FetchResourceResponseFailedPacket).reason.toString());
   }
 
-  public getResourceMapForConnection(connection: Connection): Map<number, Resource> {
+  getResourceMapForConnection(connection: Connection): Map<number, Resource> {
     if (!this.resourceIds.has(connection)) {
       this.resourceIds.set(connection, new Map());
     }

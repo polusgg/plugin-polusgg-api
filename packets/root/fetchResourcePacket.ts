@@ -1,6 +1,6 @@
 import { MessageReader, MessageWriter } from "../../../../../lib/util/hazelMessage";
 import { BaseRootPacket } from "../../../../../lib/protocol/packets/root";
-import { CustomRootPacketType } from "../../types/enums";
+import { CustomRootPacketType, ResourceType } from "../../types/enums";
 import {
   FetchResourceResponseEndedPacket,
   FetchResourceResponseFailedPacket,
@@ -12,6 +12,7 @@ export class FetchResourcePacket extends BaseRootPacket {
     public readonly resourceId: number,
     public readonly resourceLocation: string,
     public readonly hash: Buffer,
+    public readonly resourceType: ResourceType,
   ) {
     super(CustomRootPacketType.FetchResource as number);
   }
@@ -20,14 +21,16 @@ export class FetchResourcePacket extends BaseRootPacket {
     return new FetchResourcePacket(
       reader.readPackedUInt32(),
       reader.readString(),
-      Buffer.from(reader.readBytesAndSize().getBuffer()),
+      Buffer.from(reader.readBytes(16).getBuffer()),
+      reader.readByte(),
     );
   }
 
   serialize(writer: MessageWriter): void {
     writer.writePackedUInt32(this.resourceId);
     writer.writeString(this.resourceLocation);
-    writer.writeBytesAndSize(this.hash);
+    writer.writeBytes(this.hash);
+    writer.writeByte(this.resourceType);
   }
 
   clone(): FetchResourcePacket {
@@ -35,6 +38,7 @@ export class FetchResourcePacket extends BaseRootPacket {
       this.resourceId,
       this.resourceLocation,
       this.hash,
+      this.resourceType,
     );
   }
 }

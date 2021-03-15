@@ -1,6 +1,6 @@
 import { FetchResourceResponseEndedPacket, FetchResourceResponseFailedPacket } from "../../packets/root/fetchResource";
 import { FetchResourcePacket, FetchResourceResponsePacket } from "../../packets/root";
-import { CustomRootPacketType, ResourceState } from "../../types/enums";
+import { CustomRootPacketType, ResourceState, ResourceType } from "../../types/enums";
 import { Connection } from "../../../../../lib/protocol/connection";
 import { MaxValue } from "../../../../../lib/util/constants";
 import { Resource, ResourceResponse } from "../../types";
@@ -21,6 +21,7 @@ export class ResourceService {
       resourceId,
       location.toString(),
       hash,
+      ResourceType.AssetBundle,
     ));
 
     const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number

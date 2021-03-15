@@ -20,7 +20,6 @@ export class InnerConsoleBehaviour extends BaseInnerNetObject {
     return new DataPacket(this.getNetId(), new MessageWriter().writeBytesAndSize(this.canUse));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   setData(reader: MessageReader): void {
     this.canUse = [...reader.readBytesAndSize().getBuffer()];
   }

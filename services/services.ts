@@ -1,13 +1,13 @@
 import { ServiceType } from "../types/enums";
-import { EndGameService } from "./endGame";
+import { RoleManagerService } from "./roleManager";
 import { ResourceService } from "./resource";
 
 const RESOURCE_SERVICE = new ResourceService();
-const END_GAME_SERVICE = new EndGameService();
+const END_GAME_SERVICE = new RoleManagerService();
 
 type ServiceFromType<T extends ServiceType> =
   T extends ServiceType.Resource ? ResourceService :
-    T extends ServiceType.EndGame ? EndGameService : undefined;
+    T extends ServiceType.EndGame ? RoleManagerService : undefined;
 
 export class Services {
   static get<T extends ServiceType>(serviceType: T): ServiceFromType<T> {

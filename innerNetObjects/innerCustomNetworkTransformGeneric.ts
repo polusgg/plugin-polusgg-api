@@ -53,7 +53,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     return this.sequenceId;
   }
 
-  async snapTo(position: Vector2, reason: TeleportReason, sendTo?: Connection[]): Promise<void> {
+  snapTo(position: Vector2, reason: TeleportReason, sendTo?: Connection[]): void {
     this.incrementSequenceId(5);
     this.sendRpcPacket(new SnapToPacket(this.position, this.sequenceId), sendTo);
   }

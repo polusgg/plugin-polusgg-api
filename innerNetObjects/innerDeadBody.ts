@@ -1,6 +1,9 @@
 import { DataPacket, SpawnPacketObject } from "../../../../lib/protocol/packets/gameData";
 import { BaseInnerNetObject } from "../../../../lib/protocol/entities/baseEntity";
 import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
+import { BaseRpcPacket } from "../../../../lib/protocol/packets/rpc";
+import { Connection } from "../../../../lib/protocol/connection";
+import { RpcPacketType } from "../../../../lib/types/enums";
 import { BodyDirection, BodyState } from "../types/enums";
 import { EntityDeadBody } from "../entities";
 
@@ -42,13 +45,21 @@ export class InnerDeadBody extends BaseInnerNetObject {
     this.shadowColor = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
   }
 
-  serializeSpawn() {
-    return this.serializeData() as unknown as SpawnPacketObject;
+  serializeSpawn(): SpawnPacketObject {
+    return new SpawnPacketObject(
+      this.netId,
+      new MessageWriter()
+        .writeByte(this.bodyState)
+        .writeBoolean(!!this.bodyDirection)
+        .writeBytes(this.color)
+        .writeBytes(this.shadowColor),
+    );
   }
 
   clone(): InnerDeadBody {
     return new InnerDeadBody(this.getParent(), this.color, this.shadowColor, this.bodyState, this.bodyDirection, this.netId);
   }
 
-  handleRpc(connection, type, packet, sendTo) {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  handleRpc(_connection: Connection, _type: RpcPacketType, _packet: BaseRpcPacket, _sendTo: Connection[]): void {}
 }

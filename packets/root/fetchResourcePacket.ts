@@ -67,14 +67,12 @@ export class FetchResourceResponsePacket extends BaseRootPacket {
     }
   }
 
-  serialize(writer: MessageWriter): MessageWriter {
+  serialize(writer: MessageWriter): void {
     writer
       .writePackedUInt32(this.resourceId)
       .writeByte(this.response.getType());
 
     this.response.serialize(writer);
-
-    return writer;
   }
 
   clone(): FetchResourceResponsePacket {

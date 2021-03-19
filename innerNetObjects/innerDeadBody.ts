@@ -4,8 +4,8 @@ import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage"
 import { BaseRpcPacket } from "../../../../lib/protocol/packets/rpc";
 import { Connection } from "../../../../lib/protocol/connection";
 import { RpcPacketType } from "../../../../lib/types/enums";
-import { BodyDirection, BodyState } from "../types/enums";
 import { EntityDeadBody } from "../entities";
+import { BodyDirection } from "../types/enums";
 
 // TODO: Rewrite to not suck ass
 
@@ -14,8 +14,8 @@ export class InnerDeadBody extends BaseInnerNetObject {
     parent: EntityDeadBody,
     public color: [number, number, number, number],
     public shadowColor: [number, number, number, number],
-    public bodyState: BodyState = BodyState.Lying,
-    public bodyDirection: BodyDirection = BodyDirection.FacingRight,
+    public hasFallen: boolean = false,
+    public bodyFacing: BodyDirection = BodyDirection.FacingLeft,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
     super(0x81, parent, netId);
@@ -25,8 +25,8 @@ export class InnerDeadBody extends BaseInnerNetObject {
     return new DataPacket(
       this.netId,
       new MessageWriter()
-        .writeByte(this.bodyState)
-        .writeBoolean(!!this.bodyDirection)
+        .writeBoolean(this.hasFallen)
+        .writeByte(this.bodyFacing)
         .writeBytes(this.color)
         .writeBytes(this.shadowColor),
     );
@@ -39,8 +39,8 @@ export class InnerDeadBody extends BaseInnerNetObject {
   setData(packet: MessageReader | MessageWriter): void {
     const reader = MessageReader.fromRawBytes(packet);
 
-    this.bodyState = reader.readByte();
-    this.bodyDirection = reader.readBoolean() ? 1 : 0;
+    this.hasFallen = reader.readBoolean();
+    this.bodyFacing = reader.readBoolean() ? BodyDirection.FacingRight : BodyDirection.FacingLeft;
     this.color = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
     this.shadowColor = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
   }
@@ -49,15 +49,15 @@ export class InnerDeadBody extends BaseInnerNetObject {
     return new SpawnPacketObject(
       this.netId,
       new MessageWriter()
-        .writeByte(this.bodyState)
-        .writeBoolean(!!this.bodyDirection)
+        .writeBoolean(this.hasFallen)
+        .writeByte(this.bodyFacing)
         .writeBytes(this.color)
         .writeBytes(this.shadowColor),
     );
   }
 
   clone(): InnerDeadBody {
-    return new InnerDeadBody(this.getParent(), this.color, this.shadowColor, this.bodyState, this.bodyDirection, this.netId);
+    return new InnerDeadBody(this.getParent(), this.color, this.shadowColor, this.hasFallen, this.bodyFacing, this.netId);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function

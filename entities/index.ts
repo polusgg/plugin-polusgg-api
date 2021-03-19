@@ -1,5 +1,3 @@
-export { EntityCooldownButton } from "./entityCooldownButton";
-
 export { EntityDeadBody } from "./entityDeadBody";
 
 export { EntityButton } from "./entityButton";

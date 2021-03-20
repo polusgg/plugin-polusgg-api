@@ -5,7 +5,7 @@ export class ChatVisibilityPacket extends BaseRpcPacket {
   constructor(
     public isVisible: boolean,
   ) {
-    super(0x8d);
+    super(0x80);
   }
 
   static deserialize(reader: MessageReader): ChatVisibilityPacket {

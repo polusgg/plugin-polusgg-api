@@ -21,7 +21,7 @@ export class EntityConsole extends BaseInnerNetEntity {
     consoleBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
     sequenceId: number = 5,
   ) {
-    super(0x84, lobby, 0x42069, SpawnFlag.None);
+    super(0x82, lobby, 0x42069, SpawnFlag.None);
 
     this.innerNetObjects = [
       new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),

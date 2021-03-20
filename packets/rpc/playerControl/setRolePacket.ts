@@ -5,7 +5,7 @@ export class SetRolePacket extends BaseRpcPacket {
   constructor(
     public roleId: number,
   ) {
-    super(0x88);
+    super(0x82);
   }
 
   static deserialize(reader: MessageReader): SetRolePacket {

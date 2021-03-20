@@ -3,7 +3,7 @@ import { BaseRpcPacket } from "../../../../../../lib/protocol/packets/rpc";
 
 export class CloseHudPacket extends BaseRpcPacket {
   constructor() {
-    super(0x89);
+    super(0x83);
   }
 
   static deserialize(_reader: MessageReader): CloseHudPacket {

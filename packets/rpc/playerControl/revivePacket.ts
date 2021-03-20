@@ -3,7 +3,7 @@ import { BaseRpcPacket } from "../../../../../../lib/protocol/packets/rpc";
 
 export class RevivePacket extends BaseRpcPacket {
   constructor() {
-    super(0x8a);
+    super(0x84);
   }
 
   static deserialize(_reader: MessageReader): RevivePacket {

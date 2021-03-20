@@ -7,7 +7,7 @@ export class PlaySoundPacket extends BaseRpcPacket {
     public pitch: number,
     public volume: number,
   ) {
-    super(0x8c);
+    super(0x85);
   }
 
   static deserialize(reader: MessageReader): PlaySoundPacket {

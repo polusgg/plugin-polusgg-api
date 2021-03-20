@@ -5,7 +5,7 @@ import { Server } from "../../../lib/server";
 
 declare const server: Server;
 
-RootPacket.registerPacket(0x80, ResizePacket.deserialize, (connection, packet) => {
+RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({
     displaySize: {
       width: packet.width,

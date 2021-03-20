@@ -11,24 +11,20 @@ export class InnerGraphic extends BaseInnerNetObject {
   constructor(
     parent: BaseInnerNetEntity,
     public resourceId: number,
-    public width: number,
-    public height: number,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
     super(0x80, parent, netId);
   }
 
   clone(): InnerGraphic {
-    return new InnerGraphic(this.parent, this.resourceId, this.width, this.height, this.netId);
+    return new InnerGraphic(this.parent, this.resourceId, this.netId);
   }
 
   serializeData(): DataPacket {
     return new DataPacket(
       this.netId,
       new MessageWriter()
-        .writePackedUInt32(this.resourceId)
-        .writePackedUInt32(this.width)
-        .writePackedUInt32(this.height),
+        .writePackedUInt32(this.resourceId),
     );
   }
 
@@ -36,17 +32,13 @@ export class InnerGraphic extends BaseInnerNetObject {
     const reader = MessageReader.fromRawBytes(packet);
 
     this.resourceId = reader.readPackedUInt32();
-    this.width = reader.readPackedUInt32();
-    this.height = reader.readPackedUInt32();
   }
 
   serializeSpawn(): SpawnPacketObject {
     return new SpawnPacketObject(
       this.netId,
       new MessageWriter()
-        .writePackedUInt32(this.resourceId)
-        .writePackedUInt32(this.width)
-        .writePackedUInt32(this.height),
+        .writePackedUInt32(this.resourceId),
     );
   }
 

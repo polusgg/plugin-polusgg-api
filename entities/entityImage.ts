@@ -11,8 +11,6 @@ export class EntityImage extends BaseInnerNetEntity {
   constructor(
     lobby: LobbyInstance,
     resourceId: number,
-    resourceWidth: number,
-    resourceHeight: number,
     position: Vector2,
     velocity: Vector2 = Vector2.zero(),
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
@@ -23,7 +21,7 @@ export class EntityImage extends BaseInnerNetEntity {
 
     this.innerNetObjects = [
       new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),
-      new InnerGraphic(this, resourceId, resourceWidth, resourceHeight, graphicNetId),
+      new InnerGraphic(this, resourceId, graphicNetId),
     ];
   }
 

@@ -12,8 +12,6 @@ export class EntityConsole extends BaseInnerNetEntity {
   constructor(
     lobby: LobbyInstance,
     resourceId: number,
-    resourceWidth: number,
-    resourceHeight: number,
     position: Vector2,
     canUse: number[],
     velocity: Vector2 = Vector2.zero(),
@@ -27,7 +25,7 @@ export class EntityConsole extends BaseInnerNetEntity {
 
     this.innerNetObjects = [
       new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),
-      new InnerGraphic(this, resourceId, resourceWidth, resourceHeight, graphicNetId),
+      new InnerGraphic(this, resourceId, graphicNetId),
       new InnerClickBehaviour(this, clickBehaviourNetId),
       new InnerConsoleBehaviour(this, canUse, consoleBehaviourNetId),
     ];

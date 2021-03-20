@@ -18,7 +18,7 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     velocity: Vector2 = Vector2.zero(),
     sequenceId: number = 5,
     hasFallen: boolean = false,
-    bodyFacing: BodyDirection = BodyDirection.FacingRight,
+    bodyFacing: BodyDirection = BodyDirection.FacingLeft,
     deadBodyNetId: number = lobby.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
   ) {

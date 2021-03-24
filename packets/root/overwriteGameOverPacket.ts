@@ -10,7 +10,7 @@ export class OverwriteGameOver extends BaseRootPacket {
     public readonly displayQuit: boolean,
     public readonly displayPlayAgain: boolean,
   ) {
-    super(0x80);
+    super(0x83);
   }
 
   static deserialize(reader: MessageReader): OverwriteGameOver {

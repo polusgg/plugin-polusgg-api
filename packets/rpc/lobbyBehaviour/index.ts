@@ -1,1 +1,1 @@
-export { SetCodePacket } from "./setStringPacket";
+export { SetStringPacket } from "./setStringPacket";

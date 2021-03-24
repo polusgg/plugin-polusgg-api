@@ -1,10 +1,11 @@
 import { InnerCustomNetworkTransformGeneric } from "../innerNetObjects/innerCustomNetworkTransformGeneric";
 import { BaseInnerNetEntity } from "../../../../lib/protocol/entities/baseEntity";
+import { InnerConsoleBehaviour } from "../innerNetObjects/innerConsoleBehaviour";
 import { InnerClickBehaviour, InnerGraphic } from "../innerNetObjects";
+import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { LobbyInstance } from "../../../../lib/api/lobby";
 import { SpawnFlag } from "../../../../lib/types/enums";
 import { Vector2 } from "../../../../lib/types";
-import { InnerConsoleBehaviour } from "../innerNetObjects/innerConsoleBehaviour";
 
 // TODO: Rewrite to not suck ass
 
@@ -12,22 +13,22 @@ export class EntityConsole extends BaseInnerNetEntity {
   constructor(
     lobby: LobbyInstance,
     resourceId: number,
-    position: Vector2,
     canUse: number[],
-    velocity: Vector2 = Vector2.zero(),
+    position: Vector2,
+    usesAlignment: boolean = true,
+    alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
     graphicNetId: number = lobby.getHostInstance().getNextNetId(),
     clickBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
     consoleBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
-    sequenceId: number = 5,
   ) {
     super(0x82, lobby, 0x42069, SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),
-      new InnerGraphic(this, resourceId, graphicNetId),
-      new InnerClickBehaviour(this, clickBehaviourNetId),
       new InnerConsoleBehaviour(this, canUse, consoleBehaviourNetId),
+      new InnerClickBehaviour(this, clickBehaviourNetId),
+      new InnerGraphic(this, resourceId, graphicNetId),
+      new InnerCustomNetworkTransformGeneric(this, usesAlignment, alignment, position, customNetworkTransformNetId),
     ];
   }
 

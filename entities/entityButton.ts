@@ -4,6 +4,7 @@ import { InnerClickBehaviour, InnerGraphic } from "../innerNetObjects";
 import { LobbyInstance } from "../../../../lib/api/lobby";
 import { SpawnFlag } from "../../../../lib/types/enums";
 import { Vector2 } from "../../../../lib/types";
+import { EdgeAlignments } from "../types/enums/edgeAlignment";
 
 // TODO: Rewrite to not suck ass
 
@@ -12,16 +13,16 @@ export class EntityButton extends BaseInnerNetEntity {
     lobby: LobbyInstance,
     resourceId: number,
     position: Vector2,
-    velocity: Vector2 = Vector2.zero(),
+    usesAlignment: boolean = true,
+    alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
     graphicNetId: number = lobby.getHostInstance().getNextNetId(),
     clickBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
-    sequenceId: number = 5,
   ) {
     super(0x81, lobby, 0x42069, SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, usesAlignment, alignment, position, customNetworkTransformNetId),
       new InnerGraphic(this, resourceId, graphicNetId),
       new InnerClickBehaviour(this, clickBehaviourNetId),
     ];

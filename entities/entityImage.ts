@@ -1,8 +1,9 @@
 import { InnerCustomNetworkTransformGeneric } from "../innerNetObjects/innerCustomNetworkTransformGeneric";
 import { BaseInnerNetEntity } from "../../../../lib/protocol/entities/baseEntity";
-import { InnerGraphic } from "../innerNetObjects";
+import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { LobbyInstance } from "../../../../lib/api/lobby";
 import { SpawnFlag } from "../../../../lib/types/enums";
+import { InnerGraphic } from "../innerNetObjects";
 import { Vector2 } from "../../../../lib/types";
 
 // TODO: Rewrite to not suck ass
@@ -12,16 +13,16 @@ export class EntityImage extends BaseInnerNetEntity {
     lobby: LobbyInstance,
     resourceId: number,
     position: Vector2,
-    velocity: Vector2 = Vector2.zero(),
+    usesAlignment: boolean = true,
+    alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
     graphicNetId: number = lobby.getHostInstance().getNextNetId(),
-    sequenceId: number = 5,
   ) {
     super(0x80, lobby, 0x42069, SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),
       new InnerGraphic(this, resourceId, graphicNetId),
+      new InnerCustomNetworkTransformGeneric(this, usesAlignment, alignment, position, customNetworkTransformNetId),
     ];
   }
 

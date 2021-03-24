@@ -8,7 +8,7 @@ export class DisplayStartGameScreenPacket extends BaseRootPacket {
     public readonly backgroundColor: [number, number, number, number],
     public readonly yourTeam: number[],
   ) {
-    super(0x80);
+    super(0x82);
   }
 
   static deserialize(reader: MessageReader): DisplayStartGameScreenPacket {

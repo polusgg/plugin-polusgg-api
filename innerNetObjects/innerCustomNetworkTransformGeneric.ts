@@ -1,20 +1,19 @@
 import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/baseEntity";
-import { InnerNetObjectType, RpcPacketType, TeleportReason } from "../../../../lib/types/enums";
+import { InnerNetObjectType, RpcPacketType } from "../../../../lib/types/enums";
 import { DataPacket, SpawnPacketObject } from "../../../../lib/protocol/packets/gameData";
-import { BaseRpcPacket, SnapToPacket } from "../../../../lib/protocol/packets/rpc";
+import { BaseRpcPacket } from "../../../../lib/protocol/packets/rpc";
 import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
-import { GameDataPacket } from "../../../../lib/protocol/packets/root";
 import { Connection } from "../../../../lib/protocol/connection";
-import { MaxValue } from "../../../../lib/util/constants";
 import { Vector2 } from "../../../../lib/types";
-import { Lobby } from "../../../../lib/lobby";
+import { EdgeAlignments } from "../types/enums/edgeAlignment";
+import { SnapToPacket } from "../packets/rpc/customNetworkTransform";
 
 export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   constructor(
     protected readonly parent: BaseInnerNetEntity,
+    protected usesAlignment: boolean = true,
+    protected alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
     protected position: Vector2 = Vector2.zero(),
-    protected velocity: Vector2 = Vector2.zero(),
-    protected sequenceId: number = 5,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
     super(InnerNetObjectType.CustomNetworkTransform, parent, netId);
@@ -30,38 +29,17 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     return this;
   }
 
-  getVelocity(): Vector2 {
-    return this.velocity;
-  }
+  // todo add get/set methods!!!
 
-  setVelocity(velocity: Vector2): this {
-    this.velocity = velocity;
-
-    return this;
-  }
-
-  walkTo(position: Vector2, velocity: Vector2 = Vector2.zero()): void {
-    this.setPosition(position);
-    this.setVelocity(velocity);
-    this.incrementSequenceId(1);
-    (this.parent.getLobby() as Lobby).sendRootGamePacket(new GameDataPacket([
-      this.serializeData(),
-    ], this.parent.getLobby().getCode()));
-  }
-
-  getSequenceId(): number {
-    return this.sequenceId;
-  }
-
-  snapTo(position: Vector2, reason: TeleportReason, sendTo?: Connection[]): void {
-    this.incrementSequenceId(5);
-    this.sendRpcPacket(new SnapToPacket(this.position, this.sequenceId), sendTo);
+  snapTo(position: Vector2, sendTo?: Connection[]): void {
+    this.position = position;
+    this.sendRpcPacket(new SnapToPacket(position), sendTo);
   }
 
   handleRpc(connection: Connection, type: RpcPacketType, packet: BaseRpcPacket, sendTo: Connection[]): void {
     switch (type) {
       case RpcPacketType.SnapTo:
-        this.snapTo((packet as SnapToPacket).position, TeleportReason.Unknown, sendTo);
+        this.snapTo((packet as SnapToPacket).position, sendTo);
         break;
       default:
         break;
@@ -73,63 +51,40 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   }
 
   serializeData(): DataPacket {
+    const writer = new MessageWriter()
+      .writeBoolean(this.usesAlignment);
+
+    if (this.usesAlignment) {
+      writer.writeByte(this.alignment);
+    }
+
     return new DataPacket(
       this.netId,
-      new MessageWriter()
-        .writeUInt16(this.sequenceId)
-        .writeVector2(this.position)
-        .writeVector2(this.velocity),
+      writer.writeVector2(this.position),
     );
   }
 
   setData(packet: MessageReader | MessageWriter): void {
     const reader = MessageReader.fromRawBytes(packet.getBuffer());
-    const sequenceId = reader.readUInt16();
 
-    if (!this.isSequenceIdGreater(sequenceId)) {
-      return;
-    }
-
-    this.sequenceId = sequenceId;
     this.position = reader.readVector2();
-    this.velocity = reader.readVector2();
   }
 
   serializeSpawn(): SpawnPacketObject {
+    const writer = new MessageWriter()
+      .writeBoolean(this.usesAlignment);
+
+    if (this.usesAlignment) {
+      writer.writeByte(this.alignment);
+    }
+
     return new SpawnPacketObject(
       this.netId,
-      new MessageWriter()
-        .writeUInt16(this.sequenceId)
-        .writeVector2(this.position)
-        .writeVector2(this.velocity),
+      writer.writeVector2(this.position),
     );
   }
 
   clone(): InnerCustomNetworkTransformGeneric {
-    return new InnerCustomNetworkTransformGeneric(this.parent, this.position, this.velocity, this.sequenceId, this.netId);
-  }
-
-  protected incrementSequenceId(amount: number): number {
-    this.sequenceId = (this.sequenceId + Math.abs(amount)) % (MaxValue.UInt16 + 1);
-
-    return this.sequenceId;
-  }
-
-  protected isSequenceIdGreater(sequenceId: number): boolean {
-    const max = this.sequenceId + 32767;
-
-    if (this.sequenceId < max) {
-      if (sequenceId > this.sequenceId) {
-        return sequenceId <= max;
-      }
-
-      return false;
-    }
-
-    if (sequenceId <= this.sequenceId) {
-      return sequenceId <= max;
-    }
-
-    return true;
+    return new InnerCustomNetworkTransformGeneric(this.parent, this.usesAlignment, this.alignment, this.position, this.netId);
   }
 }

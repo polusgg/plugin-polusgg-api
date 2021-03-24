@@ -1,11 +1,12 @@
+import { InnerCustomNetworkTransformGeneric } from "../innerNetObjects/innerCustomNetworkTransformGeneric";
 import { BaseInnerNetEntity } from "../../../../lib/protocol/entities/baseEntity";
 import { GLOBAL_OWNER } from "../../../../lib/util/constants";
-import { BodyDirection } from "../types/enums";
+import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { LobbyInstance } from "../../../../lib/api/lobby";
 import { SpawnFlag } from "../../../../lib/types/enums";
 import { InnerDeadBody } from "../innerNetObjects";
-import { InnerCustomNetworkTransformGeneric } from "../innerNetObjects/innerCustomNetworkTransformGeneric";
 import { Vector2 } from "../../../../lib/types";
+import { BodyDirection } from "../types/enums";
 
 // TODO: Rewrite to not suck ass
 
@@ -15,8 +16,8 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     color: [number, number, number, number],
     shadowColor: [number, number, number, number],
     position: Vector2,
-    velocity: Vector2 = Vector2.zero(),
-    sequenceId: number = 5,
+    usesAlignment: boolean = true,
+    alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
     hasFallen: boolean = false,
     bodyFacing: BodyDirection = BodyDirection.FacingLeft,
     deadBodyNetId: number = lobby.getHostInstance().getNextNetId(),
@@ -26,7 +27,7 @@ export class EntityDeadBody extends BaseInnerNetEntity {
 
     this.innerNetObjects = [
       new InnerDeadBody(this, color, shadowColor, hasFallen, bodyFacing, deadBodyNetId),
-      new InnerCustomNetworkTransformGeneric(this, position, velocity, sequenceId, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, usesAlignment, alignment, position, customNetworkTransformNetId),
     ];
   }
 

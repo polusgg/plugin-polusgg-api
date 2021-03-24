@@ -6,7 +6,7 @@ export class ResizePacket extends BaseRootPacket {
     public readonly width: number,
     public readonly height: number,
   ) {
-    super(0x80);
+    super(0x81);
   }
 
   static deserialize(reader: MessageReader): ResizePacket {

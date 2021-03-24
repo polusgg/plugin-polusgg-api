@@ -2,15 +2,12 @@ import { FetchResourceResponseEndedPacket, FetchResourceResponseFailedPacket } f
 import { FetchResourcePacket, FetchResourceResponsePacket } from "../../packets/root";
 import { CustomRootPacketType, ResourceState, ResourceType } from "../../types/enums";
 import { Connection } from "../../../../../lib/protocol/connection";
-import { MaxValue } from "../../../../../lib/util/constants";
 import { Resource, ResourceResponse } from "../../types";
 
 export class ResourceService {
   private readonly resourceIds: Map<Connection, Map<number, Resource>> = new Map();
 
-  async load(connection: Connection, location: URL | string, hash: Buffer): Promise<ResourceResponse> {
-    const resourceId = Math.random() * MaxValue.UInt32;
-
+  async load(connection: Connection, resourceId: number, location: URL | string, hash: Buffer): Promise<ResourceResponse> {
     this.getResourceMapForConnection(connection).set(resourceId, {
       location: location.toString(),
       state: ResourceState.AwaitingResponse,

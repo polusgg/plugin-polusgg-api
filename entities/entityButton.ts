@@ -13,7 +13,6 @@ export class EntityButton extends BaseInnerNetEntity {
     lobby: LobbyInstance,
     resourceId: number,
     position: Vector2,
-    usesAlignment: boolean = true,
     alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
     graphicNetId: number = lobby.getHostInstance().getNextNetId(),

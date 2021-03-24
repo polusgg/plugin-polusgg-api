@@ -13,10 +13,10 @@ import { BodyDirection } from "../types/enums";
 export class EntityDeadBody extends BaseInnerNetEntity {
   constructor(
     lobby: LobbyInstance,
+    reportable: boolean,
     color: [number, number, number, number],
     shadowColor: [number, number, number, number],
     position: Vector2,
-    usesAlignment: boolean = true,
     alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
     hasFallen: boolean = false,
     bodyFacing: BodyDirection = BodyDirection.FacingLeft,
@@ -27,7 +27,7 @@ export class EntityDeadBody extends BaseInnerNetEntity {
 
     this.innerNetObjects = [
       new InnerDeadBody(this, color, shadowColor, hasFallen, bodyFacing, deadBodyNetId),
-      new InnerCustomNetworkTransformGeneric(this, usesAlignment, alignment, position, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
     ];
   }
 

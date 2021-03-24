@@ -11,8 +11,7 @@ import { SnapToPacket } from "../packets/rpc/customNetworkTransform";
 export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   constructor(
     protected readonly parent: BaseInnerNetEntity,
-    protected usesAlignment: boolean = true,
-    protected alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
+    protected alignment: EdgeAlignments = EdgeAlignments.None,
     protected position: Vector2 = Vector2.zero(),
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {

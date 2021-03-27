@@ -27,7 +27,7 @@ export class EntityConsole extends BaseInnerNetEntity {
       new InnerConsoleBehaviour(this, canUse, consoleBehaviourNetId),
       new InnerClickBehaviour(this, clickBehaviourNetId),
       new InnerGraphic(this, resourceId, graphicNetId),
-      new InnerCustomNetworkTransformGeneric(this, usesAlignment, alignment, position, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
     ];
   }
 

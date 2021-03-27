@@ -50,12 +50,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   }
 
   serializeData(): DataPacket {
-    const writer = new MessageWriter()
-      .writeBoolean(this.usesAlignment);
-
-    if (this.usesAlignment) {
-      writer.writeByte(this.alignment);
-    }
+    const writer = new MessageWriter().writeByte(this.alignment);
 
     return new DataPacket(
       this.netId,
@@ -70,12 +65,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   }
 
   serializeSpawn(): SpawnPacketObject {
-    const writer = new MessageWriter()
-      .writeBoolean(this.usesAlignment);
-
-    if (this.usesAlignment) {
-      writer.writeByte(this.alignment);
-    }
+    const writer = new MessageWriter().writeByte(this.alignment);
 
     return new SpawnPacketObject(
       this.netId,
@@ -84,6 +74,6 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   }
 
   clone(): InnerCustomNetworkTransformGeneric {
-    return new InnerCustomNetworkTransformGeneric(this.parent, this.usesAlignment, this.alignment, this.position, this.netId);
+    return new InnerCustomNetworkTransformGeneric(this.parent, this.alignment, this.position, this.netId);
   }
 }

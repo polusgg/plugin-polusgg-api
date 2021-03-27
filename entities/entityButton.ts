@@ -21,7 +21,7 @@ export class EntityButton extends BaseInnerNetEntity {
     super(0x81, lobby, 0x42069, SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerCustomNetworkTransformGeneric(this, usesAlignment, alignment, position, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
       new InnerGraphic(this, resourceId, graphicNetId),
       new InnerClickBehaviour(this, clickBehaviourNetId),
     ];

@@ -1,5 +1,5 @@
-import { MessageReader, MessageWriter } from "../../../../../../lib/util/hazelMessage";
-import { BaseRpcPacket } from "../../../../../../lib/protocol/packets/rpc";
+import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
+import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
 
 export class RevivePacket extends BaseRpcPacket {
   constructor() {

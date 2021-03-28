@@ -1,10 +1,10 @@
-import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/baseEntity";
-import { InnerNetObjectType, RpcPacketType } from "../../../../lib/types/enums";
-import { DataPacket, SpawnPacketObject } from "../../../../lib/protocol/packets/gameData";
-import { BaseRpcPacket } from "../../../../lib/protocol/packets/rpc";
-import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
-import { Connection } from "../../../../lib/protocol/connection";
-import { Vector2 } from "../../../../lib/types";
+import { BaseInnerNetEntity, BaseInnerNetObject } from "@nodepolus/framework/src/protocol/entities/baseEntity";
+import { InnerNetObjectType, RpcPacketType } from "@nodepolus/framework/src/types/enums";
+import { DataPacket, SpawnPacketObject } from "@nodepolus/framework/src/protocol/packets/gameData";
+import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
+import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { SnapToPacket } from "../packets/rpc/customNetworkTransform";
 

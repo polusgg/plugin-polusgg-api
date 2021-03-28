@@ -1,5 +1,5 @@
-import { RootPacket } from "../../../lib/protocol/packets/hazel";
-import { BasePlugin } from "../../../lib/api/plugin";
+import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
+import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { ResizePacket } from "./packets/root";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {

@@ -1,7 +1,7 @@
 import { RoleAssignmentData } from "../services/roleManager/roleManagerService";
-import { PluginMetadata } from "../../../../lib/api/plugin";
-import { LobbyInstance } from "../../../../lib/api/lobby";
-import { TextComponent } from "../../../../lib/api/text";
+import { PluginMetadata } from "@nodepolus/framework/src/api/plugin";
+import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
+import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { BaseRole } from "../baseRole";
 
 export class BaseMod {

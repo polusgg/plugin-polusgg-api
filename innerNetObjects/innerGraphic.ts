@@ -1,9 +1,9 @@
-import { Connection } from "../../../../lib/protocol/connection";
-import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/baseEntity";
-import { DataPacket, SpawnPacketObject } from "../../../../lib/protocol/packets/gameData";
-import { BaseRpcPacket } from "../../../../lib/protocol/packets/rpc";
-import { RpcPacketType } from "../../../../lib/types/enums";
-import { MessageReader, MessageWriter } from "../../../../lib/util/hazelMessage";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { BaseInnerNetEntity, BaseInnerNetObject } from "@nodepolus/framework/src/protocol/entities/baseEntity";
+import { DataPacket, SpawnPacketObject } from "@nodepolus/framework/src/protocol/packets/gameData";
+import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
+import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
+import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
 
 // TODO: Rewrite to not suck ass
 

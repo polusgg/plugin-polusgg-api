@@ -1,7 +1,7 @@
 import { FetchResourceResponseEndedPacket, FetchResourceResponseFailedPacket } from "../../packets/root/fetchResource";
 import { FetchResourcePacket, FetchResourceResponsePacket } from "../../packets/root";
 import { CustomRootPacketType, ResourceState, ResourceType } from "../../types/enums";
-import { Connection } from "../../../../../lib/protocol/connection";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Resource, ResourceResponse } from "../../types";
 
 export class ResourceService {

@@ -1,7 +1,7 @@
-import { MessageReader, MessageWriter } from "../../../../../../lib/util/hazelMessage";
-import { BaseRpcPacket } from "../../../../../../lib/protocol/packets/rpc";
-import { RpcPacketType } from "../../../../../../lib/types/enums";
-import { Vector2 } from "../../../../../../lib/types";
+import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
+import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
+import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
+import { Vector2 } from "@nodepolus/framework/src/types";
 
 /**
  * RPC Packet ID: `0x15` (`21`)

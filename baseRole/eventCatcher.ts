@@ -1,5 +1,5 @@
-import { ServerEvents } from "../../../../lib/api/events";
-import { Server } from "../../../../lib/server";
+import { ServerEvents } from "@nodepolus/framework/src/api/events";
+import { Server } from "@nodepolus/framework/src/server";
 
 declare const server: Server;
 

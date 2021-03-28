@@ -1,11 +1,11 @@
 import { InnerCustomNetworkTransformGeneric } from "../innerNetObjects/innerCustomNetworkTransformGeneric";
-import { BaseInnerNetEntity } from "../../../../lib/protocol/entities/baseEntity";
-import { GLOBAL_OWNER } from "../../../../lib/util/constants";
+import { BaseInnerNetEntity } from "@nodepolus/framework/src/protocol/entities/baseEntity";
+import { GLOBAL_OWNER } from "@nodepolus/framework/src/util/constants";
 import { EdgeAlignments } from "../types/enums/edgeAlignment";
-import { LobbyInstance } from "../../../../lib/api/lobby";
-import { SpawnFlag } from "../../../../lib/types/enums";
+import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
+import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { InnerDeadBody } from "../innerNetObjects";
-import { Vector2 } from "../../../../lib/types";
+import { Vector2 } from "@nodepolus/framework/src/types";
 import { BodyDirection } from "../types/enums";
 
 // TODO: Rewrite to not suck ass

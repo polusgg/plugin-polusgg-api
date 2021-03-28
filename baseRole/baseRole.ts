@@ -1,12 +1,12 @@
-import { ServerEvents } from "../../../../lib/api/events";
+import { ServerEvents } from "@nodepolus/framework/src/api/events";
 import { EventCatcher } from ".";
-import { LobbyInstance } from "../../../../lib/api/lobby";
-import { PlayerInstance } from "../../../../lib/api/player";
-import { Game } from "../../../../lib/api/game";
-import { Connection } from "../../../../lib/protocol/connection";
-import { BaseInnerNetEntity, BaseInnerNetObject } from "../../../../lib/protocol/entities/baseEntity";
-import { Lobby } from "../../../../lib/lobby";
-import { Player } from "../../../../lib/player";
+import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
+import { PlayerInstance } from "@nodepolus/framework/src/api/player";
+import { Game } from "@nodepolus/framework/src/api/game";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { BaseInnerNetEntity, BaseInnerNetObject } from "@nodepolus/framework/src/protocol/entities/baseEntity";
+import { Lobby } from "@nodepolus/framework/src/lobby";
+import { Player } from "@nodepolus/framework/src/player";
 import { StartGameScreenData } from "../services/roleManager/roleManagerService";
 
 export type Ownable = LobbyInstance | PlayerInstance | Connection | Game | BaseInnerNetEntity | BaseInnerNetObject;

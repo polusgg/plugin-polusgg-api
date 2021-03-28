@@ -1,8 +1,8 @@
-import { Game } from "../../../../../lib/api/game";
-import { PlayerInstance } from "../../../../../lib/api/player";
-import { TextComponent } from "../../../../../lib/api/text";
-import { Connection } from "../../../../../lib/protocol/connection";
-import { shuffleArrayClone } from "../../../../../lib/util/shuffle";
+import { Game } from "@nodepolus/framework/src/api/game";
+import { PlayerInstance } from "@nodepolus/framework/src/api/player";
+import { TextComponent } from "@nodepolus/framework/src/api/text";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { BaseRole } from "../../baseRole";
 import { DisplayStartGameScreenPacket, OverwriteGameOver } from "../../packets/root";
 

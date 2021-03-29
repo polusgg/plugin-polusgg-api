@@ -1,9 +1,19 @@
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Palette } from "@nodepolus/framework/src/static";
+import { BaseManager } from "../../baseManager/baseManager";
 import { StartGameScreenData } from "../../services/roleManager/roleManagerService";
 import { BaseRole } from "../baseRole";
 
+export class CrewmateManager extends BaseManager {
+  getId(): string { return "crewmate" }
+  getTypeName(): string { return "crewmate" }
+}
+
 export class Crewmate extends BaseRole {
+  protected readonly metadata = {
+    name: "crewmate",
+  };
+
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: `[${Palette.crewmateBlue().map(e => e.toString(16)).join("")}]Crewmate`,
@@ -11,4 +21,6 @@ export class Crewmate extends BaseRole {
       color: Palette.crewmateBlue(),
     };
   }
+
+  getManagerType(): typeof CrewmateManager { return CrewmateManager }
 }

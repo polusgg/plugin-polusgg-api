@@ -4,6 +4,8 @@ import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { BaseRole } from "../../baseRole";
+import { Crewmate } from "../../baseRole/crewmate/crewmate";
+import { Impostor } from "../../baseRole/impostor/impostor";
 import { DisplayStartGameScreenPacket, OverwriteGameOver } from "../../packets/root";
 
 export type EndGameScreenData = {
@@ -18,7 +20,7 @@ export type EndGameScreenData = {
 export type StartGameScreenData = {
   title: string | TextComponent;
   subtitle: string | TextComponent;
-  color: [number, number, number, number];
+  color: readonly [number, number, number, number];
 };
 
 export type RoleAssignmentData = {
@@ -38,15 +40,15 @@ export class RoleManagerService {
     displayPlayAgain: true,
   };
 
-  async setEndGameData(connection: Connection, endGameData: EndGameScreenData): Promise<void> {
-    connection.setMeta("pgg.api.endGameData", endGameData);
+  async setEndGameData(connection: Connection | undefined, endGameData: EndGameScreenData): Promise<void> {
+    connection?.setMeta("pgg.api.endGameData", endGameData);
 
-    return connection.writeReliable(new OverwriteGameOver(
+    return connection?.writeReliable(new OverwriteGameOver(
       endGameData.title.toString(),
       endGameData.subtitle.toString(),
       endGameData.color,
       endGameData.yourTeam.map(player => player.getId()),
-      endGameData.displayQuit ?? false,
+      endGameData.displayQuit ?? true,
       endGameData.displayPlayAgain ?? false,
     ));
   }
@@ -75,36 +77,39 @@ export class RoleManagerService {
       }
     }
 
-    let i = 0;
+    shuffleArrayClone(game.getLobby().getPlayers().filter(p => !p.isImpostor())).forEach((player, index) => {
+      console.log(player.getName(), player.isImpostor());
 
-    shuffleArrayClone(game.getLobby().getPlayers()).forEach(player => {
-      const roleInstance = this.assignRole(player, assignmentArray[i].role);
-
-      const connection = player.getConnection();
-
-      let startGameScreen = assignmentArray[i].startGameScreen;
-
-      startGameScreen ||= roleInstance.getAssignmentScreen(player);
-
-      if (connection !== undefined) {
-        connection.writeReliable(new DisplayStartGameScreenPacket(
-          startGameScreen.title.toString(),
-          startGameScreen.subtitle.toString(),
-          startGameScreen.color,
-          game.getLobby().getPlayers().filter(p => p.getMeta<BaseRole>("pgg.api.role") === roleInstance).map(p => p.getId()),
-        ));
+      if (index < assignmentArray.length) {
+        this.assignRole(player, assignmentArray[index].role, assignmentArray[index].startGameScreen);
+      } else {
+        this.assignRole(player, Crewmate);
       }
+    });
 
-      i++;
+    game.getLobby().getPlayers().filter(p => p.isImpostor()).forEach(player => {
+      this.assignRole(player, Impostor);
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  assignRole<T extends new (...args: any[]) => InstanceType<T>>(player: PlayerInstance, role: T): InstanceType<T> {
+  assignRole<T extends typeof BaseRole>(player: PlayerInstance, role: T, startGameScreen?: StartGameScreenData): BaseRole {
     // eslint-disable-next-line new-cap
     const roleInstance = new role(player);
 
+    startGameScreen ||= roleInstance.getAssignmentScreen(player);
+
     player.setMeta("pgg.api.role", roleInstance);
+
+    const connection = player.getConnection();
+
+    if (connection !== undefined) {
+      connection.writeReliable(new DisplayStartGameScreenPacket(
+        startGameScreen.title.toString(),
+        startGameScreen.subtitle.toString(),
+        startGameScreen.color,
+        player.getLobby().getPlayers().filter(p => p.getMeta<BaseRole>("pgg.api.role") === roleInstance).map(p => p.getId()),
+      ));
+    }
 
     return roleInstance;
   }

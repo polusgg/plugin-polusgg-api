@@ -5,7 +5,7 @@ export class DisplayStartGameScreenPacket extends BaseRootPacket {
   constructor(
     public readonly titleText: string,
     public readonly subtitleText: string,
-    public readonly backgroundColor: [number, number, number, number],
+    public readonly backgroundColor: readonly [number, number, number, number],
     public readonly yourTeam: number[],
   ) {
     super(0x82);
@@ -24,7 +24,7 @@ export class DisplayStartGameScreenPacket extends BaseRootPacket {
     writer
       .writeString(this.titleText)
       .writeString(this.subtitleText)
-      .writeBytes(this.backgroundColor)
+      .writeBytes(this.backgroundColor as [number, number, number, number])
       .writeBytes(this.yourTeam);
   }
 

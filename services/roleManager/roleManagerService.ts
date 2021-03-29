@@ -1,12 +1,16 @@
 import { Game } from "@nodepolus/framework/src/api/game";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
+import { Player } from "@nodepolus/framework/src/player";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
+import { BaseManager } from "../../baseManager/baseManager";
 import { BaseRole } from "../../baseRole";
 import { Crewmate } from "../../baseRole/crewmate/crewmate";
 import { Impostor } from "../../baseRole/impostor/impostor";
 import { DisplayStartGameScreenPacket, OverwriteGameOver } from "../../packets/root";
+import { SetRolePacket } from "../../packets/rpc/playerControl";
 
 export type EndGameScreenData = {
   title: string | TextComponent;
@@ -77,19 +81,35 @@ export class RoleManagerService {
       }
     }
 
+    const managers: typeof BaseManager[] = [];
+
     shuffleArrayClone(game.getLobby().getPlayers().filter(p => !p.isImpostor())).forEach((player, index) => {
       console.log(player.getName(), player.isImpostor());
 
       if (index < assignmentArray.length) {
-        this.assignRole(player, assignmentArray[index].role, assignmentArray[index].startGameScreen);
+        const role = this.assignRole(player, assignmentArray[index].role, assignmentArray[index].startGameScreen);
+
+        managers.push(role.getManagerType());
       } else {
-        this.assignRole(player, Crewmate);
+        const role = this.assignRole(player, Crewmate);
+
+        managers.push(role.getManagerType());
       }
     });
 
     game.getLobby().getPlayers().filter(p => p.isImpostor()).forEach(player => {
-      this.assignRole(player, Impostor);
+      const role = this.assignRole(player, Impostor);
+
+      managers.push(role.getManagerType());
     });
+
+    const uniqueManagers = [...new Set(managers)];
+
+    for (let i = 0; i < uniqueManagers.length; i++) {
+      const manager = new uniqueManagers[i](game.getLobby());
+
+      game.getLobby().setMeta(`pgg.manager.${manager.getId()}`, manager);
+    }
   }
 
   assignRole<T extends typeof BaseRole>(player: PlayerInstance, role: T, startGameScreen?: StartGameScreenData): BaseRole {
@@ -112,5 +132,9 @@ export class RoleManagerService {
     }
 
     return roleInstance;
+  }
+
+  setBaseRole(player: Player, role: PlayerRole): void {
+    player.getEntity().getPlayerControl().sendRpcPacket(new SetRolePacket(role), player.getLobby().getConnections());
   }
 }

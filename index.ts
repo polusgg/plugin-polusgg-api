@@ -5,6 +5,8 @@ import { Services } from "./services";
 import { ServiceType } from "./types/enums";
 import { BaseMod } from "./baseMod/baseMod";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { Impostor } from "./baseRole/impostor/impostor";
+import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({
@@ -27,8 +29,16 @@ export default class PolusGGApi extends BasePlugin {
     BaseMod.owner = this;
 
     this.server.on("game.started", event => {
+      const roles = this.mods.filter(mod => mod.getEnabled(event.getGame().getLobby())).map(e => e.getRoles(event.getGame().getLobby())).flat();
+      const impostorRoleDecls = roles.filter(r => r.role === Impostor);
+      const impostorCounts = impostorRoleDecls.reduce((a, r) => a + r.playerCount, 0);
+
+      if (impostorRoleDecls.length > 0) {
+        event.setImpostors(shuffleArrayClone(event.getGame().getLobby().getPlayers()).slice(0, impostorCounts));
+      }
+
       event.getImpostors().forEach(p => p.setRole(PlayerRole.Impostor));
-      Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), this.mods.filter(mod => mod.getEnabled(event.getGame().getLobby())).map(e => e.getRoles(event.getGame().getLobby())).flat());
+      Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles.filter(r => r.role !== Impostor));
     });
   }
 

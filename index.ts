@@ -5,10 +5,12 @@ import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
 import { Impostor } from "./src/baseRole/impostor/impostor";
 import { Player } from "@nodepolus/framework/src/player";
-import { ResizePacket } from "./src/packets/root";
+import { FetchResourceResponsePacket, ResizePacket } from "./src/packets/root";
 import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
+import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
+import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({
@@ -17,6 +19,14 @@ RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) =
       height: packet.height,
     },
   });
+});
+
+RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_connection, _packet) => {
+  // do not handle
+});
+
+RpcPacket.registerPacket(0x81, ClickPacket.deserialize, (_connection, _packet) => {
+  // handle buttons rose!!!
 });
 
 export default class PolusGGApi extends BasePlugin {

@@ -19,7 +19,7 @@ export type RoleMetadata = {
 export class BaseRole {
   protected readonly metadata!: RoleMetadata;
 
-  constructor(private readonly owner: PlayerInstance) {}
+  constructor(protected readonly owner: PlayerInstance) { }
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData { throw new Error("needs to be overwritten") }
 

@@ -9,7 +9,7 @@ import { EventCatcher } from "../baseRole";
 import { BaseRole, Ownable } from "../baseRole/baseRole";
 
 export class BaseManager {
-  constructor(private readonly owner: LobbyInstance) {}
+  constructor(protected readonly owner: LobbyInstance) { }
 
   catch<NameType extends Extract<keyof ServerEvents, string>>(eventName: NameType, ownsMethod: (event: ServerEvents[NameType]) => Ownable): EventCatcher<NameType> {
     return new EventCatcher(eventName).where(event => this.owns(ownsMethod(event)));

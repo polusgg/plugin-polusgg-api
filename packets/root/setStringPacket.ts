@@ -1,13 +1,13 @@
 import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
-import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
-import { Location } from "../../../types/enums";
+import { BaseRootPacket } from "@nodepolus/framework/src/protocol/packets/root";
+import { Location } from "../../types/enums";
 
-export class SetStringPacket extends BaseRpcPacket {
+export class SetStringPacket extends BaseRootPacket {
   constructor(
     public content: string,
     public location: Location,
   ) {
-    super(0x81);
+    super(0x84);
   }
 
   static deserialize(reader: MessageReader): SetStringPacket {

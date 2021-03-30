@@ -68,6 +68,14 @@ export class RoleManagerService {
   }
 
   assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
+    const managers: typeof BaseManager[] = [];
+
+    game.getLobby().getPlayers().filter(p => p.isImpostor()).forEach(player => {
+      const role = this.assignRole(player, Impostor);
+
+      managers.push(role.getManagerType());
+    });
+
     const assignmentArray: { role: typeof BaseRole; startGameScreen?: StartGameScreenData }[] = [];
 
     for (let i = 0; i < assignmentData.length; i++) {
@@ -81,11 +89,7 @@ export class RoleManagerService {
       }
     }
 
-    const managers: typeof BaseManager[] = [];
-
     shuffleArrayClone(game.getLobby().getPlayers().filter(p => !p.isImpostor())).forEach((player, index) => {
-      console.log(player.getName(), player.isImpostor());
-
       if (index < assignmentArray.length) {
         const role = this.assignRole(player, assignmentArray[index].role, assignmentArray[index].startGameScreen);
 
@@ -95,12 +99,6 @@ export class RoleManagerService {
 
         managers.push(role.getManagerType());
       }
-    });
-
-    game.getLobby().getPlayers().filter(p => p.isImpostor()).forEach(player => {
-      const role = this.assignRole(player, Impostor);
-
-      managers.push(role.getManagerType());
     });
 
     const uniqueManagers = [...new Set(managers)];
@@ -135,6 +133,8 @@ export class RoleManagerService {
   }
 
   setBaseRole(player: Player, role: PlayerRole): void {
+    player.setRole(role);
     player.getEntity().getPlayerControl().sendRpcPacket(new SetRolePacket(role), player.getLobby().getConnections());
+    player.updateGameData();
   }
 }

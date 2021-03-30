@@ -7,6 +7,8 @@ import { BaseMod } from "./baseMod/baseMod";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Impostor } from "./baseRole/impostor/impostor";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
+import { Player } from "@nodepolus/framework/src/player";
+import { RevivePacket } from "./packets/rpc/playerControl";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({
@@ -33,13 +35,24 @@ export default class PolusGGApi extends BasePlugin {
       const impostorRoleDecls = roles.filter(r => r.role === Impostor);
       const impostorCounts = impostorRoleDecls.reduce((a, r) => a + r.playerCount, 0);
 
+      console.log(roles);
+
       if (impostorRoleDecls.length > 0) {
         event.setImpostors(shuffleArrayClone(event.getGame().getLobby().getPlayers()).slice(0, impostorCounts));
       }
 
       event.getImpostors().forEach(p => p.setRole(PlayerRole.Impostor));
+
       Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles.filter(r => r.role !== Impostor));
     });
+
+    Player.prototype.revive = async function revive(this: Player): Promise<void> {
+      this.getGameDataEntry().setDead(false);
+      this.updateGameData();
+      this.getEntity().getPlayerControl().sendRpcPacket(new RevivePacket(), this.getLobby().getConnections());
+
+      return new Promise(r => r());
+    };
   }
 
   registerMod(mod: BaseMod): void {

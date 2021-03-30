@@ -5,3 +5,5 @@ export { FetchResourcePacket, FetchResourceResponsePacket } from "./fetchResourc
 export { OverwriteGameOver } from "./overwriteGameOverPacket";
 
 export { ResizePacket } from "./resizePacket";
+
+export { SetStringPacket } from "./setStringPacket";

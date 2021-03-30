@@ -1,7 +1,7 @@
 import { RoleAssignmentData } from "../services/roleManager/roleManagerService";
 import { BasePlugin, PluginMetadata } from "@nodepolus/framework/src/api/plugin";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
-import PolusGGApi from "..";
+import PolusGGApi from "../..";
 
 export class BaseMod extends BasePlugin {
   public static owner: PolusGGApi;

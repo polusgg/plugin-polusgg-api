@@ -1,14 +1,14 @@
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
-import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
-import { ResizePacket } from "./packets/root";
-import { Services } from "./services";
-import { ServiceType } from "./types/enums";
-import { BaseMod } from "./baseMod/baseMod";
-import { PlayerRole } from "@nodepolus/framework/src/types/enums";
-import { Impostor } from "./baseRole/impostor/impostor";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
+import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
+import { RevivePacket } from "./src/packets/rpc/playerControl";
+import { Impostor } from "./src/baseRole/impostor/impostor";
 import { Player } from "@nodepolus/framework/src/player";
-import { RevivePacket } from "./packets/rpc/playerControl";
+import { ResizePacket } from "./src/packets/root";
+import { ServiceType } from "./src/types/enums";
+import { BaseMod } from "./src/baseMod/baseMod";
+import { Services } from "./src/services";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({

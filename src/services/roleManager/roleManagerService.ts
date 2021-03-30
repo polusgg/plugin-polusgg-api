@@ -64,7 +64,7 @@ export class RoleManagerService {
       }
     });
 
-    game.getLobby().getHostInstance().endGame(0xff);
+    game.getLobby().getHostInstance().endGame(0x08);
   }
 
   assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {

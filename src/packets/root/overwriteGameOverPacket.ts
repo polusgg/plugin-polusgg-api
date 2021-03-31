@@ -1,5 +1,6 @@
 import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
 import { BaseRootPacket } from "@nodepolus/framework/src/protocol/packets/root";
+import { CustomRootPacketType } from "../../types/enums";
 
 export class OverwriteGameOver extends BaseRootPacket {
   constructor(
@@ -10,7 +11,7 @@ export class OverwriteGameOver extends BaseRootPacket {
     public readonly displayQuit: boolean,
     public readonly displayPlayAgain: boolean,
   ) {
-    super(0x83);
+    super(CustomRootPacketType.OverwriteGameOver as number);
   }
 
   static deserialize(reader: MessageReader): OverwriteGameOver {

@@ -11,6 +11,7 @@ import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
+import { ButtonService } from "./src/services/button/buttonService";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({
@@ -22,11 +23,11 @@ RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) =
 });
 
 RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_connection, _packet) => {
-  // do not handle
+  // ignored
 });
 
 RpcPacket.registerPacket(0x81, ClickPacket.deserialize, (_connection, _packet) => {
-  // handle buttons rose!!!
+  // ignored
 });
 
 export default class PolusGGApi extends BasePlugin {
@@ -37,6 +38,8 @@ export default class PolusGGApi extends BasePlugin {
       name: "Polus.gg API",
       version: [1, 0, 0],
     });
+
+    Services.get(ServiceType.Button).setupService(this.server);
 
     BaseMod.owner = this;
 

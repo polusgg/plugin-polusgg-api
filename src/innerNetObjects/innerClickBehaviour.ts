@@ -5,8 +5,6 @@ import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
 
-// TODO: Rewrite to not suck ass
-
 export class InnerClickBehaviour extends BaseInnerNetObject {
   constructor(
     parent: BaseInnerNetEntity,
@@ -57,7 +55,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
   handleRpc(_connection: Connection, type: RpcPacketType, _packet: BaseRpcPacket, _sendTo: Connection[]): void {
     switch (type) {
       case 0x86:
-        console.log("!!! [ ICB Use Fired. Figure out an API to interface with this event ] !!!");
+        // console.log("!!! [ ICB Use Fired. Figure out an API to interface with this event ] !!!");
         break;
       default:
         break;

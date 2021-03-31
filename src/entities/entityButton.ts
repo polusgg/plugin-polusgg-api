@@ -12,8 +12,12 @@ export class EntityButton extends BaseInnerNetEntity {
   constructor(
     lobby: LobbyInstance,
     resourceId: number,
+    maxTimer: number,
     position: Vector2,
     alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
+    currentTime: number = 0,
+    color: [number, number, number, number] = [255, 255, 255, 255],
+    isCountingDown: boolean = true,
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
     graphicNetId: number = lobby.getHostInstance().getNextNetId(),
     clickBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
@@ -23,7 +27,7 @@ export class EntityButton extends BaseInnerNetEntity {
     this.innerNetObjects = [
       new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
       new InnerGraphic(this, resourceId, graphicNetId),
-      new InnerClickBehaviour(this, clickBehaviourNetId),
+      new InnerClickBehaviour(this, maxTimer, currentTime, color, isCountingDown, clickBehaviourNetId),
     ];
   }
 

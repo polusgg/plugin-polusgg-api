@@ -11,7 +11,6 @@ import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
-import { ButtonService } from "./src/services/button/buttonService";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({

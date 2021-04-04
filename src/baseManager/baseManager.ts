@@ -21,7 +21,8 @@ export class BaseManager {
     }
 
     if (thing instanceof Connection) {
-      return this.owner === thing.getLobby() && thing.getLobby()?.findSafePlayerByConnection(thing).getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === this.getTypeName();
+      return this.owner === thing.getLobby() && thing.getLobby()?.findSafePlayerByConnection(thing).getMeta<BaseRole | undefined>("pgg.api.role")
+        ?.getName() === this.getTypeName();
     }
 
     if (thing instanceof Lobby) {

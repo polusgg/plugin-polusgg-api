@@ -70,11 +70,12 @@ export class RoleManagerService {
   assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
     const managers: typeof BaseManager[] = [];
 
-    game.getLobby().getPlayers().filter(p => p.isImpostor()).forEach(player => {
-      const role = this.assignRole(player, Impostor);
+    game.getLobby().getPlayers().filter(p => p.isImpostor())
+      .forEach(player => {
+        const role = this.assignRole(player, Impostor);
 
-      managers.push(role.getManagerType());
-    });
+        managers.push(role.getManagerType());
+      });
 
     const assignmentArray: { role: typeof BaseRole; startGameScreen?: StartGameScreenData }[] = [];
 
@@ -125,7 +126,8 @@ export class RoleManagerService {
         startGameScreen.title.toString(),
         startGameScreen.subtitle.toString(),
         startGameScreen.color,
-        player.getLobby().getPlayers().filter(p => p.getMeta<BaseRole>("pgg.api.role") === roleInstance).map(p => p.getId()),
+        player.getLobby().getPlayers().filter(p => p.getMeta<BaseRole>("pgg.api.role") === roleInstance)
+          .map(p => p.getId()),
       ));
     }
 

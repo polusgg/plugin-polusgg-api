@@ -5,13 +5,12 @@ import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
 import { Impostor } from "./src/baseRole/impostor/impostor";
 import { Player } from "@nodepolus/framework/src/player";
-import { FetchResourceResponsePacket, ResizePacket } from "./src/packets/root";
+import { ResizePacket } from "./src/packets/root";
 import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
-import { ButtonService } from "./src/services/button/buttonService";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({
@@ -22,12 +21,8 @@ RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) =
   });
 });
 
-RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_connection, _packet) => {
-  // ignored
-});
-
-RpcPacket.registerPacket(0x81, ClickPacket.deserialize, (_connection, _packet) => {
-  // ignored
+RpcPacket.registerPacket(0x86, ClickPacket.deserialize, () => {
+  // Handled in ICB INO
 });
 
 export default class PolusGGApi extends BasePlugin {
@@ -38,8 +33,6 @@ export default class PolusGGApi extends BasePlugin {
       name: "Polus.gg API",
       version: [1, 0, 0],
     });
-
-    Services.get(ServiceType.Button).setupService(this.server);
 
     BaseMod.owner = this;
 

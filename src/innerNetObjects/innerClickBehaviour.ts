@@ -4,6 +4,9 @@ import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/haze
 import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
+import { Services } from "../services";
+import { ServiceType } from "../types/enums";
+import { ClickPacket } from "../packets/rpc/clickBehaviour";
 
 export class InnerClickBehaviour extends BaseInnerNetObject {
   constructor(
@@ -52,10 +55,10 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     return this.parent;
   }
 
-  handleRpc(_connection: Connection, type: RpcPacketType, _packet: BaseRpcPacket, _sendTo: Connection[]): void {
+  handleRpc(connection: Connection, type: RpcPacketType, packet: BaseRpcPacket, _sendTo: Connection[]): void {
     switch (type) {
       case 0x86:
-        // console.log("!!! [ ICB Use Fired. Figure out an API to interface with this event ] !!!");
+        Services.get(ServiceType.Button).findSafeButtonByNetId(this.getLobby(), this.getNetId()).emit("clicked", packet as ClickPacket);
         break;
       default:
         break;

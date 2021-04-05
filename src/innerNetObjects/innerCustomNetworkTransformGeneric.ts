@@ -28,7 +28,15 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     return this;
   }
 
-  // todo add get/set methods!!!
+  getAlignment(): EdgeAlignments {
+    return this.alignment;
+  }
+
+  setAlignment(alignment: EdgeAlignments): this {
+    this.alignment = alignment;
+
+    return this;
+  }
 
   snapTo(position: Vector2, sendTo?: Connection[]): void {
     this.position = position;

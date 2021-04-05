@@ -1,20 +1,20 @@
 import { InnerCustomNetworkTransformGeneric } from "../innerNetObjects/innerCustomNetworkTransformGeneric";
 import { BaseInnerNetEntity } from "@nodepolus/framework/src/protocol/entities/baseEntity";
 import { InnerClickBehaviour, InnerGraphic } from "../innerNetObjects";
-import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "../types/enums/edgeAlignment";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
 
 // TODO: Rewrite to not suck ass
 
 export class EntityButton extends BaseInnerNetEntity {
   constructor(
-    lobby: LobbyInstance,
+    owner: Connection,
     resourceId: number,
     maxTimer: number,
     position: Vector2,
-    alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
+    alignment: EdgeAlignments = EdgeAlignments.None,
     currentTime: number = 0,
     color: [number, number, number, number] = [255, 255, 255, 255],
     isCountingDown: boolean = true,
@@ -22,7 +22,7 @@ export class EntityButton extends BaseInnerNetEntity {
     graphicNetId: number = lobby.getHostInstance().getNextNetId(),
     clickBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
   ) {
-    super(0x81, lobby, 0x42069, SpawnFlag.None);
+    super(0x81, owner.getLobby()!, owner.getId(), SpawnFlag.None);
 
     this.innerNetObjects = [
       new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),

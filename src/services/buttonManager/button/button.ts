@@ -6,6 +6,8 @@ import { EdgeAlignments } from "../../../types/enums/edgeAlignment";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { EntityButton } from "../../../entities";
 import Emittery from "emittery";
+import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
 
 export type ButtonEvents = ClickBehaviourEvents;
 
@@ -20,6 +22,14 @@ export class Button extends Emittery<ButtonEvents> {
     return this.entity;
   }
 
+  getLobby(): LobbyInstance {
+    return this.getEntity().getLobby();
+  }
+
+  getOwner(): Connection {
+    return this.getLobby().findSafeConnection(this.getEntity().getOwnerId());
+  }
+
   async setPosition(x: number, y: number): Promise<void>;
   async setPosition(position: Exclude<EdgeAlignments, EdgeAlignments.None> | Vector2): Promise<void>;
   async setPosition(arg0: Exclude<EdgeAlignments, EdgeAlignments.None> | Vector2 | number, arg1?: number): Promise<void> {
@@ -29,8 +39,8 @@ export class Button extends Emittery<ButtonEvents> {
       // we are setting the position of the button to a Vec2,
       // because of this: if the button has an EdgeAlignment we
       // want to override this with our Vec2
-      if (this.entity.getCustomNetworkTransform().getAlignment() !== EdgeAlignments.None) {
-        this.entity.getCustomNetworkTransform().setAlignment(EdgeAlignments.None);
+      if (this.getEntity().getCustomNetworkTransform().getAlignment() !== EdgeAlignments.None) {
+        this.getEntity().getCustomNetworkTransform().setAlignment(EdgeAlignments.None);
       }
 
       let position: Vector2;
@@ -41,25 +51,31 @@ export class Button extends Emittery<ButtonEvents> {
         position = new Vector2(arg0, arg1!);
       }
 
-      data = this.entity.getCustomNetworkTransform().setPosition(position).serializeData();
+      data = this
+        .getEntity()
+        .getCustomNetworkTransform()
+        .setPosition(position)
+        .serializeData();
     } else {
-      data = this.entity.getCustomNetworkTransform().setAlignment(arg0).serializeData();
+      data = this
+        .getEntity()
+        .getCustomNetworkTransform()
+        .setAlignment(arg0)
+        .serializeData();
     }
 
-    return this.entity.getLobby().findSafeConnection(this.entity.getOwnerId()).writeReliable(new GameDataPacket([data], this.entity.getLobby().getCode()));
+    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
   }
 
   async snapPosition(x: number, y: number): Promise<void>;
   async snapPosition(position: EdgeAlignments | Vector2): Promise<void>;
   async snapPosition(arg0: EdgeAlignments | Vector2 | number, arg1?: number): Promise<void> {
-    const connection = this.entity.getLobby().findSafeConnection(this.entity.getOwnerId());
-
     if (arg0 instanceof Vector2 || arg1 !== undefined) {
       // we are setting the position of the button to a Vec2,
       // because of this: if the button has an EdgeAlignment we
       // want to override this with our Vec2
-      if (this.entity.getCustomNetworkTransform().getAlignment() !== EdgeAlignments.None) {
-        this.entity.getCustomNetworkTransform().setAlignment(EdgeAlignments.None);
+      if (this.getEntity().getCustomNetworkTransform().getAlignment() !== EdgeAlignments.None) {
+        this.getEntity().getCustomNetworkTransform().setAlignment(EdgeAlignments.None);
       }
 
       let position: Vector2;
@@ -70,19 +86,103 @@ export class Button extends Emittery<ButtonEvents> {
         position = new Vector2(arg0, arg1!);
       }
 
-      return connection.writeReliable(new GameDataPacket([
-        new RpcPacket(this.entity.getCustomNetworkTransform().getNetId(), new SnapToPacket(position)),
-      ], this.entity.getLobby().getCode()));
+      return this.getOwner().writeReliable(new GameDataPacket([
+        new RpcPacket(this.getEntity().getCustomNetworkTransform().getNetId(), new SnapToPacket(position)),
+      ], this.getLobby().getCode()));
     }
 
-    const data = this.entity.getCustomNetworkTransform().setAlignment(arg0).serializeData();
+    const data = this
+      .getEntity()
+      .getCustomNetworkTransform()
+      .setAlignment(arg0)
+      .serializeData();
 
-    return connection.writeReliable(new GameDataPacket([data], this.entity.getLobby().getCode()));
+    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+  }
+
+  async setColor(colorInput: [number, number, number, number] | [number, number, number]): Promise<void> {
+    let color: [number, number, number, number];
+
+    if (colorInput.length === 3) {
+      color = [...colorInput, 0xff];
+    } else {
+      color = colorInput;
+    }
+
+    const data = this
+      .getEntity()
+      .getClickBehaviour()
+      .setColor(color)
+      .serializeData();
+
+    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+  }
+
+  getColor(): [number, number, number, number] {
+    return this.getEntity().getClickBehaviour().getColor();
+  }
+
+  async setCountingDown(countingDown: boolean = true): Promise<void> {
+    const data = this
+      .getEntity()
+      .getClickBehaviour()
+      .setIsCountingDown(countingDown)
+      .serializeData();
+
+    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+  }
+
+  isCountingDown(): boolean {
+    return this.getEntity().getClickBehaviour().getIsCountingDown();
+  }
+
+  async startCountingDown(): Promise<void> {
+    if (this.isCountingDown()) {
+      throw new Error("Attempted to start a button countdown while it is already counting down.");
+    }
+
+    return this.setCountingDown();
+  }
+
+  async stopCountingDown(): Promise<void> {
+    if (!this.isCountingDown()) {
+      throw new Error("Attempted to stop a button countdown while it is already stopped.");
+    }
+
+    return this.setCountingDown(false);
+  }
+
+  async setCurrentTime(currentTime: number): Promise<void> {
+    const data = this
+      .getEntity()
+      .getClickBehaviour()
+      .setCurrentTime(currentTime)
+      .serializeData();
+
+    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+  }
+
+  getCurrentTime(): number {
+    return this.getEntity().getClickBehaviour().getCurrentTime();
+  }
+
+  async setMaxTime(maxTime: number): Promise<void> {
+    const data = this
+      .getEntity()
+      .getClickBehaviour()
+      .setMaxTimer(maxTime)
+      .serializeData();
+
+    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+  }
+
+  getMaxTime(): number {
+    return this.getEntity().getClickBehaviour().getMaxTimer();
   }
 
   getPosition(): Exclude<EdgeAlignments | Vector2, EdgeAlignments.None> {
-    const alignment = this.entity.getCustomNetworkTransform().getAlignment();
-    const position = this.entity.getCustomNetworkTransform().getPosition();
+    const alignment = this.getEntity().getCustomNetworkTransform().getAlignment();
+    const position = this.getEntity().getCustomNetworkTransform().getPosition();
 
     return alignment === EdgeAlignments.None ? position : alignment;
   }

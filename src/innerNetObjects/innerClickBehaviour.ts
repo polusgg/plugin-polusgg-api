@@ -9,6 +9,8 @@ import { ServiceType } from "../types/enums";
 import { ClickPacket } from "../packets/rpc/clickBehaviour";
 
 export class InnerClickBehaviour extends BaseInnerNetObject {
+  private lastCurrentTimeSet: number;
+
   constructor(
     parent: BaseInnerNetEntity,
     public maxTimer: number,
@@ -18,6 +20,59 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
     super(0x83, parent, netId);
+
+    this.lastCurrentTimeSet = Date.now();
+  }
+
+  getColor(): [number, number, number, number] {
+    return this.color;
+  }
+
+  setColor(color: [number, number, number, number]): this {
+    this.color = color;
+
+    return this;
+  }
+
+  getIsCountingDown(): boolean {
+    return this.isCountingDown;
+  }
+
+  setIsCountingDown(isCountingDown: boolean): this {
+    this.isCountingDown = isCountingDown;
+
+    return this;
+  }
+
+  getCurrentTime(): number {
+    const timeSinceSet = Date.now() - this.lastCurrentTimeSet;
+
+    return Math.max(this.currentTime - timeSinceSet, 0);
+  }
+
+  setCurrentTime(time: number): this {
+    this.currentTime = time;
+
+    // this *technically* sets it at the wrong time.
+    // if the consumer were to call setCurrentTime();
+    // seconds before sending a data update, this
+    // would be out of step.
+    //
+    // TODO: fix above issue
+
+    this.lastCurrentTimeSet = Date.now();
+
+    return this;
+  }
+
+  getMaxTimer(): number {
+    return this.maxTimer;
+  }
+
+  setMaxTimer(maxTimer: number): this {
+    this.maxTimer = maxTimer;
+
+    return this;
   }
 
   serializeData(): DataPacket {

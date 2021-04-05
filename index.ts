@@ -5,7 +5,7 @@ import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
 import { Impostor } from "./src/baseRole/impostor/impostor";
 import { Player } from "@nodepolus/framework/src/player";
-import { ResizePacket } from "./src/packets/root";
+import { FetchResourceResponsePacket, ResizePacket } from "./src/packets/root";
 import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
@@ -19,6 +19,10 @@ RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) =
       height: packet.height,
     },
   });
+});
+
+RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_connection, _packet) => {
+  // ignored
 });
 
 RpcPacket.registerPacket(0x86, ClickPacket.deserialize, () => {

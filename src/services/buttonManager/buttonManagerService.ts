@@ -24,7 +24,14 @@ export class ButtonManagerService {
     });
   }
 
-  async spawnButton(connection: Connection, resourceId: number, position: Vector2 | EdgeAlignments): Promise<Button> {
+  async spawnButton(connection: Connection, { resourceId, position, maxTimer, currentTime, color, isCountingDown }: {
+    resourceId: number;
+    position: Vector2 | EdgeAlignments;
+    maxTimer: number;
+    currentTime?: number;
+    color?: [number, number, number, number];
+    isCountingDown?: boolean;
+  }): Promise<Button> {
     const lobby = connection.getLobby();
 
     if (lobby === undefined) {
@@ -38,9 +45,9 @@ export class ButtonManagerService {
     let button: EntityButton;
 
     if (position instanceof Vector2) {
-      button = new EntityButton(connection, resourceId, position);
+      button = new EntityButton(connection, resourceId, maxTimer, position, EdgeAlignments.None, currentTime, color, isCountingDown);
     } else {
-      button = new EntityButton(connection, resourceId, new Vector2(0, 0), position);
+      button = new EntityButton(connection, resourceId, maxTimer, Vector2.zero(), position, currentTime, color, isCountingDown);
     }
 
     await connection.writeReliable(new GameDataPacket([button.serializeSpawn()], lobby.getCode()));

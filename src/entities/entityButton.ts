@@ -18,9 +18,9 @@ export class EntityButton extends BaseInnerNetEntity {
     currentTime: number = 0,
     color: [number, number, number, number] = [255, 255, 255, 255],
     isCountingDown: boolean = true,
-    customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
-    graphicNetId: number = lobby.getHostInstance().getNextNetId(),
-    clickBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
+    customNetworkTransformNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
+    graphicNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
+    clickBehaviourNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
   ) {
     super(0x81, owner.getLobby()!, owner.getId(), SpawnFlag.None);
 

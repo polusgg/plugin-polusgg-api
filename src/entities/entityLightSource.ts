@@ -1,7 +1,7 @@
 import { BaseInnerNetEntity } from "@nodepolus/framework/src/protocol/entities/baseEntity";
 import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
-import { InnerPointOfInterest } from "../innerNetObjects";
+import { InnerLightSource } from "../innerNetObjects";
 import { InnerCustomNetworkTransformGeneric } from "../innerNetObjects/innerCustomNetworkTransformGeneric";
 import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { Vector2 } from "@nodepolus/framework/src/types";
@@ -9,18 +9,18 @@ import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { SnapToPacket } from "../packets/rpc/customNetworkTransform";
 
-export class EntityPointOfInterest extends BaseInnerNetEntity {
+export class EntityLightSource extends BaseInnerNetEntity {
   constructor(
     owner: Connection,
-    resourceId: number,
+    radius: number,
     position: Vector2 = Vector2.zero(),
-    cameraControllerNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
+    lightSourceNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
   ) {
-    super(0x87, owner.getLobby()!, owner.getId(), SpawnFlag.None);
+    super(0x86, owner.getLobby()!, owner.getId(), SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerPointOfInterest(this, cameraControllerNetId, resourceId),
+      new InnerLightSource(this, lightSourceNetId, radius),
       new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, customNetworkTransformNetId),
     ];
   }
@@ -48,11 +48,19 @@ export class EntityPointOfInterest extends BaseInnerNetEntity {
     ], this.getLobby().getCode()));
   }
 
-  getResourceId(): number {
-    return this.getPointOfInterest().getResourceId();
+  getRadius(): number {
+    return this.getLightSource().getRadius();
   }
 
-  getPointOfInterest(): InnerPointOfInterest {
+  async setRadius(radius: number): Promise<void> {
+    const data = this.getLightSource().setRadius(radius).serializeData();
+
+    return this.getLobby().findSafeConnection(this.getOwnerId()).writeReliable(new GameDataPacket([
+      data,
+    ], this.getLobby().getCode()));
+  }
+
+  getLightSource(): InnerLightSource {
     return this.getObject(0);
   }
 

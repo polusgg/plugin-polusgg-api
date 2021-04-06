@@ -3,4 +3,5 @@ export enum ServiceType {
   RoleManager,
   Button,
   CameraManager,
+  PointOfInterestManager,
 }

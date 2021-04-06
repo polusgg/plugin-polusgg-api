@@ -4,7 +4,7 @@ import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
 import { MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
-import { EntityCameraController } from "../entities";
+import { EntityPointOfInterest } from "../entities";
 
 export class InnerPointOfInterest extends BaseInnerNetObject {
   constructor(parent: BaseInnerNetEntity, netId: number, protected readonly resourceId: number) {
@@ -15,8 +15,8 @@ export class InnerPointOfInterest extends BaseInnerNetObject {
     return this.resourceId;
   }
 
-  getParent(): EntityCameraController {
-    return this.parent as EntityCameraController;
+  getParent(): EntityPointOfInterest {
+    return this.parent as EntityPointOfInterest;
   }
 
   clone(): InnerPointOfInterest {

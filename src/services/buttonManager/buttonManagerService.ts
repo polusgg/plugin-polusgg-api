@@ -8,6 +8,7 @@ import { ServiceType } from "../../types/enums";
 import { EntityButton } from "../../entities";
 import { Services } from "../services";
 import { Button } from ".";
+import { Asset } from "../../assets";
 
 declare const server: Server;
 
@@ -24,8 +25,8 @@ export class ButtonManagerService {
     });
   }
 
-  async spawnButton(connection: Connection, { resourceId, position, maxTimer, currentTime, color, isCountingDown }: {
-    resourceId: number;
+  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, color, isCountingDown }: {
+    asset: Asset;
     position: Vector2 | EdgeAlignments;
     maxTimer: number;
     currentTime?: number;
@@ -38,16 +39,14 @@ export class ButtonManagerService {
       throw new Error("Attempted to spawn a button for a connection not in a lobby.");
     }
 
-    if (!Services.get(ServiceType.Resource).getResourceMapForConnection(connection).has(resourceId)) {
-      throw new Error(`Attempted to spawn a button with a resource id of ${resourceId} for a connection that did not have that resource loaded.`);
-    }
+    await Services.get(ServiceType.Resource).assertLoaded(connection, asset);
 
     let button: EntityButton;
 
     if (position instanceof Vector2) {
-      button = new EntityButton(connection, resourceId, maxTimer, position, EdgeAlignments.None, currentTime, color, isCountingDown);
+      button = new EntityButton(connection, asset.getId(), maxTimer, position, EdgeAlignments.None, currentTime, color, isCountingDown);
     } else {
-      button = new EntityButton(connection, resourceId, maxTimer, Vector2.zero(), position, currentTime, color, isCountingDown);
+      button = new EntityButton(connection, asset.getId(), maxTimer, Vector2.zero(), position, currentTime, color, isCountingDown);
     }
 
     await connection.writeReliable(new GameDataPacket([button.serializeSpawn()], lobby.getCode()));

@@ -8,7 +8,7 @@ import { EntityPointOfInterest } from "../entities";
 
 export class InnerPointOfInterest extends BaseInnerNetObject {
   constructor(parent: BaseInnerNetEntity, netId: number, protected readonly resourceId: number) {
-    super(0x84, parent, netId);
+    super(0x86, parent, netId);
   }
 
   getResourceId(): number {

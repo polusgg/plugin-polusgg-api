@@ -1,46 +1,61 @@
 import { FetchResourceResponseEndedPacket, FetchResourceResponseFailedPacket } from "../../packets/root/fetchResource";
 import { FetchResourcePacket, FetchResourceResponsePacket } from "../../packets/root";
-import { CustomRootPacketType, ResourceState, ResourceType } from "../../types/enums";
+import { CustomRootPacketType, ResourceType } from "../../types/enums";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
-import { Resource, ResourceResponse } from "../../types";
+import { ResourceResponse } from "../../types";
+import { Asset, AssetBundle } from "../../assets";
+import { Server } from "@nodepolus/framework/src/server";
+
+declare const server: Server;
 
 export class ResourceService {
-  private readonly resourceIds: Map<Connection, Map<number, Resource>> = new Map();
+  private readonly loadedBundlesMap: Map<Connection, AssetBundle[]> = new Map();
 
-  async load(connection: Connection, resourceId: number, location: URL | string, hash: Buffer): Promise<ResourceResponse> {
-    this.getResourceMapForConnection(connection).set(resourceId, {
-      location: location.toString(),
-      state: ResourceState.AwaitingResponse,
-      hash,
-    });
-
+  async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
     connection.writeReliable(new FetchResourcePacket(
-      resourceId,
-      location.toString(),
-      hash,
+      assetBundle.getId(),
+      assetBundle.getAddress(),
+      Buffer.from(assetBundle.getHash()),
       ResourceType.AssetBundle,
     ));
 
     const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number
-      && (p as FetchResourceResponsePacket).resourceId == resourceId
+      && (p as FetchResourceResponsePacket).resourceId == assetBundle.getId()
       && (p as FetchResourceResponsePacket).response.getType() !== 0x00,
     ) as FetchResourceResponsePacket;
 
     if (response.getType() == 0x01) {
+      this.getLoadedAssetBundlesForConnection(connection).push(assetBundle);
+
       return {
         isCached: (response as FetchResourceResponseEndedPacket).didCache,
-        resourceId: resourceId,
+        resourceId: assetBundle.getId(),
       };
     }
 
     throw new Error((response as FetchResourceResponseFailedPacket).reason.toString());
   }
 
-  getResourceMapForConnection(connection: Connection): Map<number, Resource> {
-    if (!this.resourceIds.has(connection)) {
-      this.resourceIds.set(connection, new Map());
+  async assertLoaded(connection: Connection, asset: Asset): Promise<void> {
+    const assetIds = this.getLoadedAssetBundlesForConnection(connection)
+      .map(bundle => bundle.getContents())
+      .flat()
+      .map(singleAsset => singleAsset.getId());
+
+    if (assetIds.includes(asset.getId())) {
+      return;
     }
 
-    return this.resourceIds.get(connection)!;
+    server.getLogger("Polus.gg Resource Service").warn(`Asset "${asset.getPath().join("/")}" (${asset.getId()}) from assetBundle "${asset.getBundle().getAddress()}" (${asset.getBundle().getId()}) was asserted to be loaded, but did not exist on the connection's LoadedBundles array`);
+
+    await this.load(connection, asset.getBundle());
+  }
+
+  getLoadedAssetBundlesForConnection(connection: Connection): AssetBundle[] {
+    if (!this.loadedBundlesMap.has(connection)) {
+      this.loadedBundlesMap.set(connection, []);
+    }
+
+    return this.loadedBundlesMap.get(connection)!;
   }
 }

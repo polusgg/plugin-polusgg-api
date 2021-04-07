@@ -8,7 +8,7 @@ import { EntityPointOfInterest } from "../entities";
 
 export class InnerLightSource extends BaseInnerNetObject {
   constructor(parent: BaseInnerNetEntity, netId: number, protected radius: number) {
-    super(0x84, parent, netId);
+    super(0x85, parent, netId);
   }
 
   getRadius(): number {

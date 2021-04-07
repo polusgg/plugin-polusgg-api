@@ -1,15 +1,20 @@
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { Vector2 } from "@nodepolus/framework/src/types";
+import { Services } from "..";
+import { Asset } from "../../assets";
 import { EntityPointOfInterest } from "../../entities";
+import { ServiceType } from "../../types/enums";
 
 export class PointOfInterestManagerService {
-  async spawnPointOfInterest(owner: Connection, resourceId: number, position: Vector2): Promise<EntityPointOfInterest> {
-    const entity = new EntityPointOfInterest(owner, resourceId, position);
+  async spawnPointOfInterest(connection: Connection, asset: Asset, position: Vector2): Promise<EntityPointOfInterest> {
+    await Services.get(ServiceType.Resource).assertLoaded(connection, asset);
 
-    await owner.writeReliable(new GameDataPacket([
+    const entity = new EntityPointOfInterest(connection, asset.getId(), position);
+
+    await connection.writeReliable(new GameDataPacket([
       entity.serializeSpawn(),
-    ], owner.getLobby()!.getCode()));
+    ], connection.getLobby()!.getCode()));
 
     return entity;
   }

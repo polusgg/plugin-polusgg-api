@@ -5,4 +5,5 @@ export enum ServiceType {
   CameraManager,
   PointOfInterestManager,
   LightManager,
+  SoundManager,
 }

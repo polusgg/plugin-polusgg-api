@@ -10,7 +10,7 @@ import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/haze
 export class InnerGraphic extends BaseInnerNetObject {
   constructor(
     parent: BaseInnerNetEntity,
-    public resourceId: number,
+    protected resourceId: number,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
     super(0x80, parent, netId);

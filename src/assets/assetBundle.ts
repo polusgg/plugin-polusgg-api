@@ -2,7 +2,7 @@ import * as fetch from "node-fetch";
 import { AssetBundleDeceleration } from "../types/assetBundleDeceleration";
 import { Asset } from "./asset";
 
-const rootPath = "https://www.google.com/";
+const rootPath = "https://pgg-assetbundles.nyc3.digitaloceanspaces.com/";
 
 export class AssetBundle {
   protected readonly contents: Asset[] = [];

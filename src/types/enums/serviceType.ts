@@ -6,4 +6,5 @@ export enum ServiceType {
   PointOfInterestManager,
   LightManager,
   SoundManager,
+  GameOptions,
 }

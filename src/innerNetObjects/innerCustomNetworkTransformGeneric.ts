@@ -90,8 +90,10 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     return new InnerCustomNetworkTransformGeneric(this.parent, this.alignment, this.position, this.netId);
   }
 
-  setAttachedTo(object: Attachable): void {
+  setAttachedTo(object: Attachable): this {
     this.attachedTo = this.findOwner(object);
+
+    return this;
   }
 
   protected findOwner(object: Attachable): number {

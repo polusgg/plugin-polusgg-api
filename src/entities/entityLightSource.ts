@@ -8,6 +8,7 @@ import { Vector2 } from "@nodepolus/framework/src/types";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { SnapToPacket } from "../packets/rpc/customNetworkTransform";
+import { Attachable } from "../types/attachable";
 
 export class EntityLightSource extends BaseInnerNetEntity {
   constructor(
@@ -45,6 +46,14 @@ export class EntityLightSource extends BaseInnerNetEntity {
         this.getCustomNetworkTransform().getNetId(),
         new SnapToPacket(position),
       ),
+    ], this.getLobby().getCode()));
+  }
+
+  async attach(to: Attachable): Promise<void> {
+    const data = this.getCustomNetworkTransform().setAttachedTo(to).serializeData();
+
+    return this.getLobby().findSafeConnection(this.getOwnerId()).writeReliable(new GameDataPacket([
+      data,
     ], this.getLobby().getCode()));
   }
 

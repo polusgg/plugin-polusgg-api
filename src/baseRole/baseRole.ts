@@ -55,5 +55,9 @@ export class BaseRole {
     throw new Error("Input invalid.");
   }
 
+  getManager<T extends BaseManager>(id: string): T {
+    return this.owner.getLobby().getMeta<T>(`pgg.manager.${id}`);
+  }
+
   getManagerType(): typeof BaseManager { throw new Error("needs to be overwritten") }
 }

@@ -9,7 +9,21 @@ import { Server } from "@nodepolus/framework/src/server";
 declare const server: Server;
 
 export class ResourceService {
+  protected globalAssetBundle!: AssetBundle;
+
   private readonly loadedBundlesMap: Map<Connection, AssetBundle[]> = new Map();
+
+  constructor() {
+    AssetBundle.load("global").then(bundle => {
+      this.globalAssetBundle = bundle;
+
+      server.getLogger("ResourceService").info("Global AssetBundle loaded.");
+    });
+
+    server.on("connection.opened", event => {
+      this.load(event.getConnection(), this.globalAssetBundle);
+    });
+  }
 
   async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
     connection.writeReliable(new FetchResourcePacket(
@@ -57,5 +71,9 @@ export class ResourceService {
     }
 
     return this.loadedBundlesMap.get(connection)!;
+  }
+
+  getGlobalBundle(): AssetBundle {
+    return this.globalAssetBundle;
   }
 }

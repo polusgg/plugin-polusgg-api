@@ -3,7 +3,7 @@ import * as fetch from "node-fetch";
 import { Asset } from "./asset";
 import { URL } from "url";
 
-const rootPath = "https://pgg-assetbundles.nyc3.digitaloceanspaces.com/";
+const rootPath = "https://polusgg-assetbundles.nyc3.digitaloceanspaces.com/";
 
 export class AssetBundle {
   protected readonly contents: Asset[] = [];

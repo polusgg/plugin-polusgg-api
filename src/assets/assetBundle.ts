@@ -6,6 +6,7 @@ import { URL } from "url";
 const rootPath = "https://polusgg-assetbundles.nyc3.digitaloceanspaces.com/";
 
 export class AssetBundle {
+  protected static readonly cache: Map<string, AssetBundle> = new Map();
   protected readonly contents: Asset[] = [];
 
   protected constructor(protected readonly deceleration: AssetBundleDeceleration, protected readonly address: string) {
@@ -19,10 +20,18 @@ export class AssetBundle {
   static async load(fileName: string, path: string = ""): Promise<AssetBundle> {
     const address = new URL(rootPath, path);
 
+    if (this.cache.has(fileName)) {
+      return this.cache.get(fileName)!;
+    }
+
     const response = await fetch(`${address.href}/${fileName}.json`);
     const content = await response.json() as AssetBundleDeceleration;
 
-    return new AssetBundle(content, path);
+    const bundle = new AssetBundle(content, path);
+
+    this.cache.set(fileName, bundle);
+
+    return bundle;
   }
 
   getId(): number {

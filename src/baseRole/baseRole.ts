@@ -10,7 +10,7 @@ import { Player } from "@nodepolus/framework/src/player";
 import { StartGameScreenData } from "../services/roleManager/roleManagerService";
 import { BaseManager } from "../baseManager/baseManager";
 
-export type Ownable = LobbyInstance | PlayerInstance | Connection | Game | BaseInnerNetEntity | BaseInnerNetObject;
+export type Ownable = LobbyInstance | PlayerInstance | Connection | Game | BaseInnerNetEntity | BaseInnerNetObject | undefined;
 
 export type RoleMetadata = {
   name: string;
@@ -32,6 +32,10 @@ export class BaseRole {
   }
 
   owns(thing: Ownable): boolean {
+    if (thing === undefined) {
+      return false;
+    }
+
     if (thing instanceof Player) {
       return this.owner === thing;
     }

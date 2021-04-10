@@ -1,6 +1,7 @@
-import * as fetch from "node-fetch";
 import { AssetBundleDeceleration } from "../types/assetBundleDeceleration";
+import * as fetch from "node-fetch";
 import { Asset } from "./asset";
+import { URL } from "url";
 
 const rootPath = "https://pgg-assetbundles.nyc3.digitaloceanspaces.com/";
 
@@ -15,11 +16,13 @@ export class AssetBundle {
     }
   }
 
-  static async load(address: string): Promise<AssetBundle> {
-    const response = await fetch(`${rootPath + address}.json`);
+  static async load(fileName: string, path: string = ""): Promise<AssetBundle> {
+    const address = new URL(rootPath, path);
+
+    const response = await fetch(`${address.href}/${fileName}.json`);
     const content = await response.json() as AssetBundleDeceleration;
 
-    return new AssetBundle(content, address);
+    return new AssetBundle(content, path);
   }
 
   getId(): number {

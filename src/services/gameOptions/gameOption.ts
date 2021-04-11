@@ -1,7 +1,7 @@
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
-import { SetGameOption } from "../../packets/root/setGameOption";
+import { EnumOption, SetGameOption } from "../../packets/root/setGameOption";
 
-export class GameOption<V extends boolean | number> {
+export class GameOption<V extends boolean | number | EnumOption> {
   constructor(protected readonly lobby: LobbyInstance, protected readonly key: string, protected value: V) {}
 
   async setValue(value: V): Promise<void> {

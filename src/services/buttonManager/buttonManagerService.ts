@@ -29,7 +29,7 @@ export class ButtonManagerService {
       this.buttonMap.delete(event.getLobby());
     });
 
-    RpcPacket.registerPacket(0x90, SetCountingDown.deserialize, this.handleCountingDown)
+    RpcPacket.registerPacket(0x90, SetCountingDown.deserialize, this.handleCountingDown);
   }
 
   async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, color, isCountingDown, alignment }: {

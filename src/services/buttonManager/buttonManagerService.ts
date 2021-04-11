@@ -9,6 +9,11 @@ import { EntityButton } from "../../entities";
 import { Services } from "../services";
 import { Button } from ".";
 import { Asset } from "../../assets";
+import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
+import { SetCountingDown } from "../../packets/rpc/clickBehaviour/setCountingDown";
+import { BaseInnerNetObject } from "@nodepolus/framework/src/protocol/entities/baseEntity";
+import { InnerClickBehaviour } from "../../innerNetObjects";
+import { ButtonCountdownUpdated } from "./events/buttonCountdownUpdated";
 
 declare const server: Server;
 
@@ -23,6 +28,8 @@ export class ButtonManagerService {
     server.on("server.lobby.destroyed", event => {
       this.buttonMap.delete(event.getLobby());
     });
+
+    RpcPacket.registerPacket(0x90, SetCountingDown.deserialize, this.handleCountingDown)
   }
 
   async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, color, isCountingDown, alignment }: {
@@ -81,5 +88,31 @@ export class ButtonManagerService {
     }
 
     return result;
+  }
+
+  private handleCountingDown(connection: Connection, packet: SetCountingDown, sender?: BaseInnerNetObject): void {
+    if (sender === undefined) {
+      throw new Error("HandleCountingDown sent from unknown InnerNetObject");
+    }
+
+    if (sender.getType() !== 0x83) {
+      throw new Error(`HandleCountingDown sent from a non-InnerClickBehaviour (${sender.getType()})`);
+    }
+
+    const innerClickBehaviour = sender as InnerClickBehaviour;
+    const button = this.findSafeButtonByNetId(connection, innerClickBehaviour.getNetId());
+
+    // fire
+
+    const event = new ButtonCountdownUpdated();
+
+    button.emit(packet.requestCounting ? "button.countdown.started" : "button.countdown.stopped", event);
+
+    if (event.isCancelled()) {
+      return;
+    }
+
+    button.setCurrentTime(packet.currentTimer);
+    button.setCountingDown(packet.requestCounting);
   }
 }

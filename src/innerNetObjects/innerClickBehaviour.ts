@@ -45,9 +45,13 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
   }
 
   getCurrentTime(): number {
-    const timeSinceSet = Date.now() - this.lastCurrentTimeSet;
+    if (this.isCountingDown) {
+      const timeSinceSet = Date.now() - this.lastCurrentTimeSet;
 
-    return Math.max(this.currentTime - timeSinceSet, 0);
+      return Math.max(this.currentTime - timeSinceSet, 0);
+    }
+
+    return this.currentTime;
   }
 
   setCurrentTime(time: number): this {

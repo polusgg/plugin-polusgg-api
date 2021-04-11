@@ -9,8 +9,12 @@ import Emittery from "emittery";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Asset } from "../../../assets";
+import { ButtonCountdownUpdated } from "../events/buttonCountdownUpdated";
 
-export type ButtonEvents = ClickBehaviourEvents;
+export type ButtonEvents = ClickBehaviourEvents & {
+  "button.countdown.started": ButtonCountdownUpdated;
+  "button.countdown.stopped": ButtonCountdownUpdated;
+};
 
 export class Button extends Emittery<ButtonEvents> {
   constructor(

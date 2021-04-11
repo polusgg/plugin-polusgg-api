@@ -208,7 +208,7 @@ export class Button extends Emittery<ButtonEvents> {
       .sort((p1, p2) => p1.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) - p2.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()));
   }
 
-  getTarget(range: number): PlayerInstance {
+  getTarget(range: number): PlayerInstance | undefined {
     return this.getTargets(range)[0];
   }
 }

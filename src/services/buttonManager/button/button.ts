@@ -10,6 +10,7 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Asset } from "../../../assets";
 import { ButtonCountdownUpdated } from "../events/buttonCountdownUpdated";
+import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 
 export type ButtonEvents = ClickBehaviourEvents & {
   "button.countdown.started": ButtonCountdownUpdated;
@@ -200,5 +201,14 @@ export class Button extends Emittery<ButtonEvents> {
     const position = this.getEntity().getCustomNetworkTransform().getPosition();
 
     return alignment === EdgeAlignments.None ? position : alignment;
+  }
+
+  getTargets(range: number): PlayerInstance[] {
+    return this.getLobby().getPlayers().filter(p => p.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) <= range)
+      .sort((p1, p2) => p1.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) - p2.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()));
+  }
+
+  getTarget(range: number): PlayerInstance {
+    return this.getTargets(range)[0];
   }
 }

@@ -28,6 +28,12 @@ export class InnerGraphic extends BaseInnerNetObject {
     );
   }
 
+  setAsset(id: number): this {
+    this.resourceId = id;
+
+    return this;
+  }
+
   setData(packet: MessageReader | MessageWriter): void {
     const reader = MessageReader.fromRawBytes(packet);
 

@@ -8,6 +8,7 @@ import { EntityButton } from "../../../entities";
 import Emittery from "emittery";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { Asset } from "../../../assets";
 
 export type ButtonEvents = ClickBehaviourEvents;
 
@@ -171,6 +172,16 @@ export class Button extends Emittery<ButtonEvents> {
       .getEntity()
       .getClickBehaviour()
       .setMaxTimer(maxTime)
+      .serializeData();
+
+    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+  }
+
+  async setAsset(asset: Asset): Promise<void> {
+    const data = this
+      .getEntity()
+      .getGraphic()
+      .setAsset(asset.getId())
       .serializeData();
 
     return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));

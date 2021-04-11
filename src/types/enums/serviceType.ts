@@ -7,4 +7,5 @@ export enum ServiceType {
   LightManager,
   SoundManager,
   GameOptions,
+  Animation,
 }

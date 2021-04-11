@@ -6,6 +6,8 @@ import { Vector2 } from "@nodepolus/framework/src/types";
 import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
 import { MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
 import { EntityCameraController } from "../entities";
+import { BeginCameraAnimation } from "../packets/rpc/cameraController/beginAnimation";
+import { CameraAnimationKeyframe } from "../services/animation/keyframes/camera";
 
 export class InnerCameraController extends BaseInnerNetObject {
   constructor(parent: BaseInnerNetEntity, netId: number, protected scale: Vector2 = Vector2.one()) {
@@ -39,5 +41,9 @@ export class InnerCameraController extends BaseInnerNetObject {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  handleRpc(_connection: Connection, _type: RpcPacketType, _packet: BaseRpcPacket, _sendTo?: Connection[]): void {}
+  handleRpc(_connection: Connection, _type: RpcPacketType, _packet: BaseRpcPacket, _sendTo?: Connection[]): void { }
+
+  async beginAnimation(keyframes: CameraAnimationKeyframe[], reset: boolean): Promise<void> {
+    await this.sendRpcPacket(new BeginCameraAnimation(keyframes, reset));
+  }
 }

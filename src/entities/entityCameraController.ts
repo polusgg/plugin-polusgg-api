@@ -3,6 +3,7 @@ import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { InnerCameraController } from "../innerNetObjects/innerCameraControl";
+import { CameraAnimationKeyframe } from "../services/animation/keyframes/camera";
 
 // TODO: Rewrite to not suck ass
 
@@ -37,6 +38,10 @@ export class EntityCameraController extends BaseInnerNetEntity {
     for (let i = 0; i < this.innerNetObjects.length; i++) {
       this.lobby.despawn(this.innerNetObjects[i]);
     }
+  }
+
+  async beginAnimation(keyframes: CameraAnimationKeyframe[], reset: boolean): Promise<void> {
+    await this.getCameraController().beginAnimation(keyframes, reset);
   }
 }
 

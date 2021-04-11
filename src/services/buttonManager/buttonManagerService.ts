@@ -25,13 +25,14 @@ export class ButtonManagerService {
     });
   }
 
-  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, color, isCountingDown }: {
+  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, color, isCountingDown, alignment }: {
     asset: Asset;
-    position: Vector2 | EdgeAlignments;
+    position: Vector2;
     maxTimer: number;
     currentTime?: number;
     color?: [number, number, number, number];
     isCountingDown?: boolean;
+    alignment: EdgeAlignments;
   }): Promise<Button> {
     const lobby = connection.getLobby();
 
@@ -41,13 +42,7 @@ export class ButtonManagerService {
 
     await Services.get(ServiceType.Resource).assertLoaded(connection, asset);
 
-    let button: EntityButton;
-
-    if (position instanceof Vector2) {
-      button = new EntityButton(connection, asset.getId(), maxTimer, position, EdgeAlignments.None, currentTime, color, isCountingDown);
-    } else {
-      button = new EntityButton(connection, asset.getId(), maxTimer, Vector2.zero(), position, currentTime, color, isCountingDown);
-    }
+    const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, color, isCountingDown);
 
     await connection.writeReliable(new GameDataPacket([button.serializeSpawn()], lobby.getCode()));
 

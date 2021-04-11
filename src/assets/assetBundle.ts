@@ -27,7 +27,7 @@ export class AssetBundle {
     const response = await fetch(`${address.href}/${fileName}.json`);
     const content = await response.json() as AssetBundleDeceleration;
 
-    const bundle = new AssetBundle(content, path);
+    const bundle = new AssetBundle(content, `${address.href}/${fileName}`);
 
     this.cache.set(fileName, bundle);
 

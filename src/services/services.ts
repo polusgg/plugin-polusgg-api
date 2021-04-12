@@ -8,6 +8,7 @@ import { LightManagerService } from "./lightManager";
 import { SoundManagerService } from "./soundManager";
 import { GameOptionsService } from "./gameOptions/gameOptionsService";
 import { AnimationService } from "./animation/animationService";
+import { NameService } from "./name";
 
 const RESOURCE_SERVICE = new ResourceService();
 const ROLE_MANAGER_SERVICE = new RoleManagerService();
@@ -18,6 +19,7 @@ const LIGHT_MANAGER_SERVICE = new LightManagerService();
 const SOUND_MANAGER_SERVICE = new SoundManagerService();
 const GAME_OPTIONS_SERVICE = new GameOptionsService();
 const ANIMATION_SERVICE = new AnimationService();
+const NAME_SERVICE = new NameService();
 
 /* eslint-disable @typescript-eslint/indent */
 type ServiceFromType<T extends ServiceType> =
@@ -30,6 +32,7 @@ type ServiceFromType<T extends ServiceType> =
   T extends ServiceType.SoundManager ? SoundManagerService :
   T extends ServiceType.GameOptions ? GameOptionsService :
   T extends ServiceType.Animation ? AnimationService :
+  T extends ServiceType.Name ? NameService :
   undefined;
 /* eslint-enable @typescript-eslint/indent */
 
@@ -64,6 +67,9 @@ export class Services {
         break;
       case ServiceType.Animation:
         service = ANIMATION_SERVICE;
+        break;
+      case ServiceType.Name:
+        service = NAME_SERVICE;
         break;
     }
 

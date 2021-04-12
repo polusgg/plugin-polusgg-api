@@ -8,4 +8,5 @@ export enum ServiceType {
   SoundManager,
   GameOptions,
   Animation,
+  Name,
 }

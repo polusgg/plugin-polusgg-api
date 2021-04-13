@@ -2,7 +2,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Palette } from "@nodepolus/framework/src/static";
 import { BaseManager } from "../../baseManager/baseManager";
 import { StartGameScreenData } from "../../services/roleManager/roleManagerService";
-import { BaseRole } from "../baseRole";
+import { BaseRole, RoleAlignment } from "../baseRole";
 
 export class ImpostorManager extends BaseManager {
   getId(): string { return "impostor" }
@@ -12,6 +12,7 @@ export class ImpostorManager extends BaseManager {
 export class Impostor extends BaseRole {
   protected readonly metadata = {
     name: "impostor",
+    alignment: RoleAlignment.Impostor,
   };
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {

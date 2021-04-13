@@ -12,8 +12,16 @@ import { BaseManager } from "../baseManager/baseManager";
 
 export type Ownable = LobbyInstance | PlayerInstance | Connection | Game | BaseInnerNetEntity | BaseInnerNetObject | undefined;
 
+export enum RoleAlignment {
+  Crewmate,
+  Impostor,
+  Neutral,
+  Other,
+}
+
 export type RoleMetadata = {
   name: string;
+  alignment: RoleAlignment;
 };
 
 export class BaseRole {
@@ -25,6 +33,10 @@ export class BaseRole {
 
   getName(): string {
     return this.metadata.name;
+  }
+
+  getAlignment(): RoleAlignment {
+    return this.metadata.alignment;
   }
 
   catch<NameType extends Extract<keyof ServerEvents, string>>(eventName: NameType, ownsMethod: (event: ServerEvents[NameType]) => Ownable): EventCatcher<NameType> {

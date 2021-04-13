@@ -75,6 +75,10 @@ export class NameService {
   }
 
   private setForNoUpdate(connection: Connection, player: PlayerInstance, name: string, priority: NameServicePriority): void {
+    if (!this.nameMap.get(connection)!.has(player)) {
+      this.nameMap.get(connection)!.set(player, []);
+    }
+
     this.nameMap.get(connection)!.get(player)!.push({ name, priority });
   }
 }

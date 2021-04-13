@@ -14,7 +14,7 @@ export class ResourceService {
   private readonly loadedBundlesMap: Map<Connection, AssetBundle[]> = new Map();
 
   constructor() {
-    AssetBundle.load("global").then(bundle => {
+    AssetBundle.load("Global").then(bundle => {
       this.globalAssetBundle = bundle;
 
       server.getLogger("ResourceService").info("Global AssetBundle loaded.");
@@ -47,7 +47,7 @@ export class ResourceService {
       };
     }
 
-    throw new Error((response as FetchResourceResponseFailedPacket).reason.toString());
+    throw new Error(`Client sent Error: ${(response as FetchResourceResponseFailedPacket).reason.toString()}`);
   }
 
   async assertLoaded(connection: Connection, asset: Asset): Promise<void> {

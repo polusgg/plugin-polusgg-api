@@ -17,21 +17,35 @@ export class AssetBundle {
     }
   }
 
-  static async load(fileName: string, path: string = ""): Promise<AssetBundle> {
+  static async load(fileName: string, path?: string): Promise<AssetBundle> {
     const address = new URL(rootPath, path);
 
     if (this.cache.has(fileName)) {
       return this.cache.get(fileName)!;
     }
 
-    const response = await fetch(`${address.href}/${fileName}.json`);
+    const response = await fetch(`${address.href}${fileName}/${fileName}.json`);
     const content = await response.json() as AssetBundleDeceleration;
 
-    const bundle = new AssetBundle(content, `${address.href}/${fileName}`);
+    const bundle = new AssetBundle(content, `${address.href}${fileName}/${fileName}`);
 
     this.cache.set(fileName, bundle);
 
     return bundle;
+  }
+
+  static loadFromCache(fileName: string): AssetBundle | undefined {
+    return this.cache.get(fileName)!;
+  }
+
+  static loadSafeFromCache(fileName: string): AssetBundle {
+    const res = this.loadFromCache(fileName);
+
+    if (res === undefined) {
+      throw new Error("Attempted to load asset bundle from cache, that was not cached");
+    }
+
+    return res;
   }
 
   getId(): number {

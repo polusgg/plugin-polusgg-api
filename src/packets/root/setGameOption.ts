@@ -52,8 +52,7 @@ export class SetGameOption extends BaseRootPacket {
         writer.writeByte(0);
         writer.writeFloat32(this.value);
         break;
-        break;
-      case "string":
+      case "boolean":
         writer.writeByte(1);
         writer.writeBoolean(this.value);
         break;

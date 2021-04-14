@@ -10,22 +10,22 @@ import { CameraAnimationKeyframe } from "../services/animation/keyframes/camera"
 export class EntityCameraController extends BaseInnerNetEntity {
   constructor(
     owner: Connection,
-    scale: Vector2 = Vector2.one(),
+    offset: Vector2 = Vector2.zero(),
     cameraControllerNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
   ) {
     super(0x88, owner.getLobby()!, owner.getId(), SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerCameraController(this, cameraControllerNetId, scale),
+      new InnerCameraController(this, cameraControllerNetId, offset),
     ];
   }
 
-  getScale(): Vector2 {
-    return this.getCameraController().getScale();
+  getOffset(): Vector2 {
+    return this.getCameraController().getOffset();
   }
 
-  setScale(scale: Vector2): this {
-    this.getCameraController().setScale(scale);
+  setOffset(offset: Vector2): this {
+    this.getCameraController().setOffset(offset);
 
     return this;
   }

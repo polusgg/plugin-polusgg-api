@@ -56,6 +56,31 @@ export default class PolusGGApi extends BasePlugin {
       Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles.filter(r => r.role !== Impostor));
     });
 
+    this.server.on("player.chat.message", event => {
+      if (event.getMessage().toString().toLowerCase()
+        .trim() == "/gol") {
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("number-1", 1);
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("number-2", 2);
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("number-20", 20);
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("boolean-true", true);
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("boolean-false", false);
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("enum-0", { options: ["ENUM0", "ENUM1", "ENUM2"], index: 0 });
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("enum-1", { options: ["ENUM0", "ENUM1", "ENUM2"], index: 1 });
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("enum-2", { options: ["ENUM0", "ENUM1", "ENUM2"], index: 2 });
+      }
+
+      if (event.getMessage().toString().toLowerCase()
+        .trim()
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        .split(" ")[0] == "/dgo" && event.getMessage().toString().toLowerCase()
+        .trim()
+        .split(" ")[1] !== undefined) {
+        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).deleteOption(event.getMessage().toString().toLowerCase()
+          .trim()
+          .split(" ")[1]);
+      }
+    });
+
     Player.prototype.revive = async function revive(this: Player): Promise<void> {
       this.getGameDataEntry().setDead(false);
       this.updateGameData();

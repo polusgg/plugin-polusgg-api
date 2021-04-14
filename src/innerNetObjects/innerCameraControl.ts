@@ -10,16 +10,16 @@ import { BeginCameraAnimation } from "../packets/rpc/cameraController/beginAnima
 import { CameraAnimationKeyframe } from "../services/animation/keyframes/camera";
 
 export class InnerCameraController extends BaseInnerNetObject {
-  constructor(parent: BaseInnerNetEntity, netId: number, protected scale: Vector2 = Vector2.one()) {
+  constructor(parent: BaseInnerNetEntity, netId: number, protected offset: Vector2 = Vector2.zero()) {
     super(0x84, parent, netId);
   }
 
-  getScale(): Vector2 {
-    return this.scale;
+  getOffset(): Vector2 {
+    return this.offset;
   }
 
-  setScale(scale: Vector2): this {
-    this.scale = scale;
+  setOffset(offset: Vector2): this {
+    this.offset = offset;
 
     return this;
   }
@@ -29,15 +29,15 @@ export class InnerCameraController extends BaseInnerNetObject {
   }
 
   clone(): InnerCameraController {
-    return new InnerCameraController(this.parent, this.netId, this.scale);
+    return new InnerCameraController(this.parent, this.netId, this.offset);
   }
 
   serializeData(): DataPacket {
-    return new DataPacket(this.netId, new MessageWriter().writeVector2(this.scale));
+    return new DataPacket(this.netId, new MessageWriter().writeVector2(this.offset));
   }
 
   serializeSpawn(): SpawnPacketObject {
-    return new SpawnPacketObject(this.netId, new MessageWriter().writeVector2(this.scale));
+    return new SpawnPacketObject(this.netId, new MessageWriter().writeVector2(this.offset));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function

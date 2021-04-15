@@ -1,9 +1,9 @@
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { DeleteGameOption } from "../../packets/root/deleteGameOption";
-import { EnumOption } from "../../packets/root/setGameOption";
+import { NumberValue, BooleanValue, EnumValue } from "../../packets/root/setGameOption";
 import { GameOption } from "./gameOption";
 
-export class LobbyOptions<T extends Record<string, boolean | number | EnumOption>> {
+export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | EnumValue>> {
   constructor(protected readonly lobby: LobbyInstance) {}
 
   async createOption<K extends Extract<keyof T, string>, V extends T[K]>(key: K, value: V): Promise<GameOption<V>> {

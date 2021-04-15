@@ -11,6 +11,7 @@ import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
+import { BooleanValue, EnumValue, NumberValue } from "./src/packets/root/setGameOption";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({
@@ -59,14 +60,14 @@ export default class PolusGGApi extends BasePlugin {
     this.server.on("player.chat.message", event => {
       if (event.getMessage().toString().toLowerCase()
         .trim() == "/gol") {
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("number-1", 1);
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("number-2", 2);
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("number-20", 20);
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("boolean-true", true);
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("boolean-false", false);
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("enum-0", { options: ["ENUM0", "ENUM1", "ENUM2"], index: 0 });
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("enum-1", { options: ["ENUM0", "ENUM1", "ENUM2"], index: 1 });
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).createOption("enum-2", { options: ["ENUM0", "ENUM1", "ENUM2"], index: 2 });
+        
+        const gameOptionsSet = Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby())
+        gameOptionsSet.createOption("number-1", new NumberValue(1, 1, 0, 5, false, "s"));
+        gameOptionsSet.createOption("number-2", new NumberValue(1, 1, 0, 5, false, "s"));
+        gameOptionsSet.createOption("number-20", new NumberValue(1, 1, 0, 5, false, "s"));
+        gameOptionsSet.createOption("boolean-true", new BooleanValue(true));
+        gameOptionsSet.createOption("boolean-false", new BooleanValue(false));
+        gameOptionsSet.createOption("enum-0", new EnumValue(1, [ "Index0", "Index1", "Index2" ]));
       }
 
       if (event.getMessage().toString().toLowerCase()

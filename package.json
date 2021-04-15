@@ -1,7 +1,7 @@
 {
   "name": "@polusgg/plugin-polusgg-api",
   "np-plugin": true,
-  "version": "1.0.3-7",
+  "version": "1.0.3-8",
   "description": "Polus.gg API plugin (implementing the networking protocol used by client mods) for NodePolus",
   "repository": {
     "type": "git",
@@ -15,6 +15,7 @@
   "homepage": "https://github.com/polusgg/plugin-polusgg-api",
   "devDependencies": {
     "@types/node": "^14.14.22",
+    "@types/node-fetch": "^2.5.10",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
     "eslint": "^7.19.0",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "@nodepolus/framework": "latest",
-    "emittery": "^0.8.1"
+    "emittery": "^0.8.1",
+    "node-fetch": "^2.6.1"
   }
 }

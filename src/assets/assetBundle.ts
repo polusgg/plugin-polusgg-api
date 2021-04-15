@@ -1,5 +1,5 @@
 import { AssetBundleDeceleration } from "../types/assetBundleDeceleration";
-import * as fetch from "node-fetch";
+import fetch from "node-fetch";
 import { Asset } from "./asset";
 import { URL } from "url";
 

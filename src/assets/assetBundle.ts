@@ -1,4 +1,4 @@
-import { AssetBundleDeceleration } from "../types/assetBundleDeceleration";
+import { AssetBundleDeclaration } from "../types/assetBundleDeclaration";
 import fetch from "node-fetch";
 import { Asset } from "./asset";
 import { URL } from "url";
@@ -9,11 +9,11 @@ export class AssetBundle {
   protected static readonly cache: Map<string, AssetBundle> = new Map();
   protected readonly contents: Asset[] = [];
 
-  protected constructor(protected readonly deceleration: AssetBundleDeceleration, protected readonly address: string) {
-    for (let i = 0; i < deceleration.assets.length; i++) {
-      const assetDeceleration = deceleration.assets[i];
+  protected constructor(protected readonly declaration: AssetBundleDeclaration, protected readonly address: string) {
+    for (let i = 0; i < declaration.assets.length; i++) {
+      const assetDeclaration = declaration.assets[i];
 
-      this.contents.push(new Asset(this, assetDeceleration));
+      this.contents.push(new Asset(this, assetDeclaration));
     }
   }
 
@@ -25,7 +25,7 @@ export class AssetBundle {
     }
 
     const response = await fetch(`${address.href}${fileName}/${fileName}.json`);
-    const content = await response.json() as AssetBundleDeceleration;
+    const content = await response.json() as AssetBundleDeclaration;
 
     const bundle = new AssetBundle(content, `${address.href}${fileName}/${fileName}`);
 
@@ -49,7 +49,7 @@ export class AssetBundle {
   }
 
   getId(): number {
-    return this.deceleration.assetBundleId;
+    return this.declaration.assetBundleId;
   }
 
   getContents(): Asset[] {
@@ -107,6 +107,6 @@ export class AssetBundle {
   }
 
   getHash(): number[] {
-    return this.deceleration.hash;
+    return this.declaration.hash;
   }
 }

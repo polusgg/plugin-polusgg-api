@@ -11,21 +11,21 @@ export type AudioAssetDetails = {
   samples: number;
 };
 
-export type BaseAssetDeceleration = {
+export type BaseAssetDeclaration = {
   id: number;
   path: string;
   type: AssetType;
 };
 
-export type AudioAssetDeceleration = BaseAssetDeceleration & {
+export type AudioAssetDeclaration = BaseAssetDeclaration & {
   type: AssetType.Audio;
   details: AudioAssetDetails;
 };
 
-export type AssetDeceleration = BaseAssetDeceleration | AudioAssetDeceleration;
+export type AssetDeclaration = BaseAssetDeclaration | AudioAssetDeclaration;
 
-export type AssetBundleDeceleration = {
+export type AssetBundleDeclaration = {
   assetBundleId: number;
   hash: number[];
-  assets: AssetDeceleration[];
+  assets: AssetDeclaration[];
 };

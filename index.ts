@@ -12,6 +12,9 @@ import { Services } from "./src/services";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
 import { BooleanValue, EnumValue, NumberValue } from "./src/packets/root/setGameOption";
+import { AssetBundle } from "./src/assets";
+import { Vector2 } from "@nodepolus/framework/src/types";
+import { EdgeAlignments } from "./src/types/enums/edgeAlignment";
 
 RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
   connection.setMeta({
@@ -58,6 +61,26 @@ export default class PolusGGApi extends BasePlugin {
     });
 
     this.server.on("player.chat.message", event => {
+      if (event.getMessage().toString().toLowerCase().trim() === "/load") {
+        AssetBundle.load("TownOfPolus").then(bundle => {
+          this.server.getLogger("PGG Test").info("TownOfPolus Bundle loaded.");
+        });
+      }
+
+      if (event.getMessage().toString().toLowerCase().trim() === "/butt" ) {
+        Services.get(ServiceType.Button).spawnButton(event.getPlayer().getSafeConnection(), {
+          asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
+          maxTimer: event.getPlayer().getLobby().getOptions().getKillCooldown(),
+          position: new Vector2(2.7, 0.7),
+          alignment: EdgeAlignments.RightBottom,
+        }).then(button => {
+          button.on("clicked", () => {
+            event.getPlayer().sendChat("help me");
+          });
+        });
+      }
+
+
       if (event.getMessage().toString().toLowerCase()
         .trim() == "/gol") {
         

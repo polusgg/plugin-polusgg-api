@@ -1,22 +1,22 @@
-import { AssetDeceleration, AssetType } from "../types/assetBundleDeceleration";
+import { AssetDeclaration, AssetType } from "../types/assetBundleDeclaration";
 import { AssetBundle } from "./assetBundle";
 
 export class Asset {
-  constructor(protected readonly bundle: AssetBundle, protected readonly deceleration: AssetDeceleration) {}
+  constructor(protected readonly bundle: AssetBundle, protected readonly declaration: AssetDeclaration) {}
 
   getBundle(): AssetBundle {
     return this.bundle;
   }
 
   getId(): number {
-    return this.deceleration.id;
+    return this.declaration.id;
   }
 
   getPath(): string[] {
-    return this.deceleration.path.split("/");
+    return this.declaration.path.split("/");
   }
 
   getType(): AssetType {
-    return this.deceleration.type;
+    return this.declaration.type;
   }
 }

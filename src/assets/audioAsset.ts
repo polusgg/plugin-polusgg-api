@@ -1,22 +1,22 @@
-import { AudioAssetDeceleration } from "../types/assetBundleDeceleration";
+import { AudioAssetDeclaration } from "../types/assetBundleDeclaration";
 import { Asset } from "./asset";
 import { AssetBundle } from "./assetBundle";
 
 export class AudioAsset extends Asset {
-  constructor(protected readonly bundle: AssetBundle, protected readonly deceleration: AudioAssetDeceleration) {
-    super(bundle, deceleration);
+  constructor(protected readonly bundle: AssetBundle, protected readonly declaration: AudioAssetDeclaration) {
+    super(bundle, declaration);
   }
 
   getSampleCount(): number {
-    return this.deceleration.details.samples;
+    return this.declaration.details.samples;
   }
 
   getSampleRate(): number {
-    return this.deceleration.details.sampleRate;
+    return this.declaration.details.sampleRate;
   }
 
   getDurationSeconds(): number {
-    return this.deceleration.details.sampleRate / this.deceleration.details.samples;
+    return this.declaration.details.sampleRate / this.declaration.details.samples;
   }
 
   getDurationMs(): number {

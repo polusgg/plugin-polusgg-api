@@ -12,7 +12,7 @@ export class AssetBundle {
   protected constructor(protected readonly declaration: AssetBundleDeclaration, protected readonly address: string) {
     for (let i = 0; i < declaration.assets.length; i++) {
       const assetDeclaration = declaration.assets[i];
-
+      assetDeclaration.id = i;
       this.contents.push(new Asset(this, assetDeclaration));
     }
   }

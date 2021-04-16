@@ -44,7 +44,7 @@ export class EnumValue extends GameOptionValue {
 export class SetGameOption extends BaseRootPacket {
   constructor(
     public name: string,
-    public value: GameOptionValue,
+    public value: NumberValue | BooleanValue | EnumValue,
   ) {
     super(0x89);
   }
@@ -53,7 +53,7 @@ export class SetGameOption extends BaseRootPacket {
     const name = reader.readString();
     const type = reader.readByte();
     
-    let value: GameOptionValue;
+    let value: NumberValue | BooleanValue | EnumValue;
 
     switch (type) {
       case GameOptionType.NumberValue: {

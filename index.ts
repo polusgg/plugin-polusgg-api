@@ -11,7 +11,7 @@ import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
-import { BooleanValue, EnumValue, NumberValue } from "./src/packets/root/setGameOption";
+import { BooleanValue, EnumValue, NumberValue, SetGameOption } from "./src/packets/root/setGameOption";
 import { AssetBundle } from "./src/assets";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "./src/types/enums/edgeAlignment";
@@ -31,6 +31,10 @@ RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_conne
 
 RpcPacket.registerPacket(0x86, ClickPacket.deserialize, () => {
   // Handled in ICB INO
+});
+
+RootPacket.registerPacket(0x89, SetGameOption.deserialize, (connection, packet) => {
+    Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value);
 });
 
 export default class PolusGGApi extends BasePlugin {

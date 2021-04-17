@@ -98,9 +98,9 @@ export default class PolusGGApi extends BasePlugin {
         .trim() == "/gol") {
         
         const gameOptionsSet = Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby())
-        gameOptionsSet.createOption("number-1", new NumberValue(1, 1, 0, 5, false, "s"));
-        gameOptionsSet.createOption("number-2", new NumberValue(1, 1, 0, 5, false, "s"));
-        gameOptionsSet.createOption("number-20", new NumberValue(1, 1, 0, 5, false, "s"));
+        gameOptionsSet.createOption("number-1", new NumberValue(1, 1, 0, 5, false, "{0}"));
+        gameOptionsSet.createOption("number-2", new NumberValue(1, 1, 0, 5, false, "{0}"));
+        gameOptionsSet.createOption("number-20", new NumberValue(1, 1, 0, 5, false, "{0}"));
         gameOptionsSet.createOption("boolean-true", new BooleanValue(true));
         gameOptionsSet.createOption("boolean-false", new BooleanValue(false));
         gameOptionsSet.createOption("enum-0", new EnumValue(1, [ "Index0", "Index1", "Index2" ]));

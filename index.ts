@@ -34,7 +34,16 @@ RpcPacket.registerPacket(0x86, ClickPacket.deserialize, () => {
 });
 
 RootPacket.registerPacket(0x89, SetGameOption.deserialize, (connection, packet) => {
-    Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value);
+  // TODO: Do validation on EnumValue
+  // const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby())
+  // const option = gameOptions.getOption(packet.name);
+  // const value = option.getValue();
+
+  // if (value instanceof EnumValue) {
+  //   value.value = (packet.value as EnumValue).index;
+  // }
+  
+  Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value);
 });
 
 export default class PolusGGApi extends BasePlugin {

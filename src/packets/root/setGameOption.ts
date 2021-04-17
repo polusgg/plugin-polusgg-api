@@ -73,6 +73,8 @@ export class SetGameOption extends BaseRootPacket {
         );
         break;
       case GameOptionType.EnumValue: {
+        const index = reader.readPackedUInt32();
+
         const options: string[] = [];
 
         while (reader.getCursor() < reader.getLength()) {
@@ -80,7 +82,7 @@ export class SetGameOption extends BaseRootPacket {
         }
 
         value = new EnumValue(
-          reader.readPackedUInt32(),
+          index,
           options
         );
         break;

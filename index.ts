@@ -71,24 +71,6 @@ export default class PolusGGApi extends BasePlugin {
       event.getImpostors().forEach(p => p.setRole(PlayerRole.Impostor));
 
       Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles.filter(r => r.role !== Impostor));
-
-      AssetBundle.load("TownOfPolus").then(bundle => {
-        event.getGame().getLobby().getPlayers().forEach(player => {
-          if (!player.isImpostor()) {
-            Services.get(ServiceType.Button).spawnButton(player.getSafeConnection(), {
-              asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
-              maxTimer: event.getGame().getLobby().getOptions().getKillCooldown(),
-              position: new Vector2(2.1, 0.7),
-              alignment: EdgeAlignments.RightBottom,
-              isCountingDown: true
-            }).then(button => {
-              button.on("clicked", () => {
-                this.getLogger().info("true click");
-              });
-            });
-          }
-        });
-      });
     });
 
     this.server.on("player.chat.message", event => {

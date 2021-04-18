@@ -16,36 +16,6 @@ import { AssetBundle } from "./src/assets";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "./src/types/enums/edgeAlignment";
 
-RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
-  connection.setMeta({
-    displaySize: {
-      width: packet.width,
-      height: packet.height,
-    },
-  });
-});
-
-RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_connection, _packet) => {
-  // ignored
-});
-
-RpcPacket.registerPacket(0x86, ClickPacket.deserialize, () => {
-  // Handled in ICB INO
-});
-
-RootPacket.registerPacket(0x89, SetGameOption.deserialize, (connection, packet) => {
-  // TODO: Do validation on EnumValue
-  // const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby())
-  // const option = gameOptions.getOption(packet.name);
-  // const value = option.getValue();
-
-  // if (value instanceof EnumValue) {
-  //   value.value = (packet.value as EnumValue).index;
-  // }
-  
-  Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value);
-});
-
 export default class PolusGGApi extends BasePlugin {
   private readonly mods: BaseMod[] = [];
 
@@ -53,6 +23,36 @@ export default class PolusGGApi extends BasePlugin {
     super({
       name: "Polus.gg API",
       version: [1, 0, 0],
+    });
+
+    RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
+      connection.setMeta({
+        displaySize: {
+          width: packet.width,
+          height: packet.height,
+        },
+      });
+    });
+    
+    RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_connection, _packet) => {
+      // ignored
+    });
+    
+    RpcPacket.registerPacket(0x86, ClickPacket.deserialize, () => {
+      // Handled in ICB INO
+    });
+    
+    RootPacket.registerPacket(0x89, SetGameOption.deserialize, (connection, packet) => {
+      // TODO: Do validation on EnumValue
+      // const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby())
+      // const option = gameOptions.getOption(packet.name);
+      // const value = option.getValue();
+    
+      // if (value instanceof EnumValue) {
+      //   value.value = (packet.value as EnumValue).index;
+      // }
+      
+      Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value);
     });
 
     BaseMod.owner = this;
@@ -71,24 +71,43 @@ export default class PolusGGApi extends BasePlugin {
       event.getImpostors().forEach(p => p.setRole(PlayerRole.Impostor));
 
       Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles.filter(r => r.role !== Impostor));
+
+      AssetBundle.load("TownOfPolus").then(bundle => {
+        event.getGame().getLobby().getPlayers().forEach(player => {
+          if (!player.isImpostor()) {
+            Services.get(ServiceType.Button).spawnButton(player.getSafeConnection(), {
+              asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
+              maxTimer: event.getGame().getLobby().getOptions().getKillCooldown(),
+              position: new Vector2(2.1, 0.7),
+              alignment: EdgeAlignments.RightBottom,
+              isCountingDown: true
+            }).then(button => {
+              button.on("clicked", () => {
+                this.getLogger().info("true click");
+              });
+            });
+          }
+        });
+      });
     });
 
     this.server.on("player.chat.message", event => {
       if (event.getMessage().toString().toLowerCase().trim() === "/load") {
-        AssetBundle.load("TownOfPolus").then(bundle => {
-          this.server.getLogger("PGG Test").info("TownOfPolus Bundle loaded.");
-        });
+        
       }
 
       if (event.getMessage().toString().toLowerCase().trim() === "/butt" ) {
-        Services.get(ServiceType.Button).spawnButton(event.getPlayer().getSafeConnection(), {
-          asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
-          maxTimer: event.getPlayer().getLobby().getOptions().getKillCooldown(),
-          position: new Vector2(2.7, 0.7),
-          alignment: EdgeAlignments.RightBottom,
-        }).then(button => {
-          button.on("clicked", () => {
-            event.getPlayer().sendChat("help me");
+        AssetBundle.load("TownOfPolus").then(bundle => {
+          this.server.getLogger().info("TownOfPolus Bundle loaded.");
+          Services.get(ServiceType.Button).spawnButton(event.getPlayer().getSafeConnection(), {
+            asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
+            maxTimer: event.getPlayer().getLobby().getOptions().getKillCooldown(),
+            position: new Vector2(2.1, 0.7),
+            alignment: EdgeAlignments.RightBottom,
+          }).then(button => {
+            button.on("clicked", () => {
+              this.server.getLogger().info("Click recieved");
+            });
           });
         });
       }

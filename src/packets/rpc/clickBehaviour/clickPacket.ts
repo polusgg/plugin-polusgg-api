@@ -3,7 +3,7 @@ import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
 
 export class ClickPacket extends BaseRpcPacket {
   constructor() {
-    super(0x84);
+    super(0x86);
   }
 
   static deserialize(_reader: MessageReader): ClickPacket {

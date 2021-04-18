@@ -17,7 +17,7 @@ export class Impostor extends BaseRole {
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
-      title: `[${Palette.impostorRed().map(e => e.toString(16)).join("")}]Cringe`,
+      title: `Impostor`,
       subtitle: ``,
       color: Palette.impostorRed(),
     };

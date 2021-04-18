@@ -33,25 +33,25 @@ export default class PolusGGApi extends BasePlugin {
         },
       });
     });
-    
+
     RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_connection, _packet) => {
       // ignored
     });
-    
+
     RpcPacket.registerPacket(0x86, ClickPacket.deserialize, () => {
       // Handled in ICB INO
     });
-    
+
     RootPacket.registerPacket(0x89, SetGameOption.deserialize, (connection, packet) => {
       // TODO: Do validation on EnumValue
       // const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby())
       // const option = gameOptions.getOption(packet.name);
       // const value = option.getValue();
-    
+
       // if (value instanceof EnumValue) {
       //   value.value = (packet.value as EnumValue).index;
       // }
-      
+
       Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value);
     });
 
@@ -74,18 +74,18 @@ export default class PolusGGApi extends BasePlugin {
     });
 
     this.server.on("player.chat.message", event => {
-      if (event.getMessage().toString().toLowerCase().trim() === "/load") {
-        
-      }
-
-      if (event.getMessage().toString().toLowerCase().trim() === "/butt" ) {
-        AssetBundle.load("TownOfPolus").then(bundle => {
+      if (event.getMessage().toString().toLowerCase()
+        .trim() === "/butt") {
+        AssetBundle.load("TownOfPolus").then(_ => {
           this.server.getLogger().info("TownOfPolus Bundle loaded.");
           Services.get(ServiceType.Button).spawnButton(event.getPlayer().getSafeConnection(), {
             asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
-            maxTimer: event.getPlayer().getLobby().getOptions().getKillCooldown(),
+            maxTimer: event.getPlayer().getLobby().getOptions()
+              .getKillCooldown(),
             position: new Vector2(2.1, 0.7),
             alignment: EdgeAlignments.RightBottom,
+            currentTime: 10,
+            isCountingDown: true,
           }).then(button => {
             button.on("clicked", () => {
               this.server.getLogger().info("Click recieved");
@@ -94,17 +94,16 @@ export default class PolusGGApi extends BasePlugin {
         });
       }
 
-
       if (event.getMessage().toString().toLowerCase()
         .trim() == "/gol") {
-        
-        const gameOptionsSet = Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby())
+        const gameOptionsSet = Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby());
+
         gameOptionsSet.createOption("number-1", new NumberValue(1, 1, 0, 5, false, "{0}"));
         gameOptionsSet.createOption("number-2", new NumberValue(1, 1, 0, 5, false, "{0}"));
         gameOptionsSet.createOption("number-20", new NumberValue(1, 1, 0, 5, false, "{0}"));
         gameOptionsSet.createOption("boolean-true", new BooleanValue(true));
         gameOptionsSet.createOption("boolean-false", new BooleanValue(false));
-        gameOptionsSet.createOption("enum-0", new EnumValue(1, [ "Index0", "Index1", "Index2" ]));
+        gameOptionsSet.createOption("enum-0", new EnumValue(1, ["Index0", "Index1", "Index2"]));
       }
 
       if (event.getMessage().toString().toLowerCase()

@@ -1,4 +1,3 @@
-import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { EdgeAlignments } from "../../types/enums/edgeAlignment";
@@ -51,7 +50,7 @@ export class ButtonManagerService {
 
     const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, color, isCountingDown);
 
-    await connection.writeReliable(new GameDataPacket([button.serializeSpawn()], lobby.getCode()));
+    lobby.spawn(button, [connection]);
 
     const buttonInstance = new Button(button);
 

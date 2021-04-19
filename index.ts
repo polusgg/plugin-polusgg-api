@@ -91,7 +91,7 @@ export default class PolusGGApi extends BasePlugin {
         lastIndex = option.getValue().index;
 
         this.mods[lastIndex].onEnable(event.getLobby());
-      })
+      });
     });
 
     this.server.on("player.chat.message", event => {

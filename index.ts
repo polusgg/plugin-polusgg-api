@@ -73,6 +73,27 @@ export default class PolusGGApi extends BasePlugin {
       Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles.filter(r => r.role !== Impostor));
     });
 
+    this.server.on("server.lobby.created", event => {
+      const options = Services.get(ServiceType.GameOptions).getGameOptions<{ gamemode: EnumValue }>(event.getLobby());
+
+      options.createOption("gamemode", {
+        index: 0,
+        options: this.mods.map(mod => mod.getMetadata().name),
+      });
+
+      this.mods[0].onEnable(event.getLobby());
+
+      let lastIndex = 0;
+
+      options.on("option.gamemode.changed", option => {
+        this.mods[lastIndex].onDisable(event.getLobby());
+
+        lastIndex = option.getValue().index;
+
+        this.mods[lastIndex].onEnable(event.getLobby());
+      })
+    });
+
     this.server.on("player.chat.message", event => {
       if (event.getMessage().toString().toLowerCase()
         .trim() === "/butt") {

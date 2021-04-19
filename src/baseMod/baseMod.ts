@@ -17,9 +17,19 @@ export class BaseMod extends BasePlugin {
     BaseMod.owner.registerMod(this);
   }
 
+  getMetadata(): PluginMetadata {
+    return this.modMetadata;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getRoles(lobby: LobbyInstance): RoleAssignmentData[] { return [] }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getEnabled(lobby: LobbyInstance): boolean { return false }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  onEnable(lobby: LobbyInstance): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  onDisable(lobby: LobbyInstance): void {}
 }

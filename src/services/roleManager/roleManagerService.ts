@@ -90,7 +90,7 @@ export class RoleManagerService {
       }
     }
 
-    shuffleArrayClone(game.getLobby().getPlayers().filter(p => !p.isImpostor())).forEach((player, index) => {
+    shuffleArrayClone(game.getLobby().getPlayers().filter(p => p.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() !== "impostor")).forEach((player, index) => {
       if (index < assignmentArray.length) {
         const role = this.assignRole(player, assignmentArray[index].role, assignmentArray[index].startGameScreen);
 

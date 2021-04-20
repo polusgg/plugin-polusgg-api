@@ -17,8 +17,8 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
     super();
   }
 
-  async createOption<K extends Extract<keyof T, string>, V extends T[K]>(key: K, value: V): Promise<GameOption<V>> {
-    const option = new GameOption<V>(this.lobby, key, value);
+  async createOption<K extends Extract<keyof T, string>, V extends T[K]>(category: string, key: K, value: V): Promise<GameOption<V>> {
+    const option = new GameOption<V>(this.lobby, category, key, value);
 
     await option.setValue(value);
 

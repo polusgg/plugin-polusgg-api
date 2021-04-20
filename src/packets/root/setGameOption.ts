@@ -33,6 +33,7 @@ export class EnumValue {
 
 export class SetGameOption extends BaseRootPacket {
   constructor(
+    public category: string,
     public name: string,
     public value: NumberValue | BooleanValue | EnumValue | { index: number; options: string[] },
   ) {
@@ -40,6 +41,7 @@ export class SetGameOption extends BaseRootPacket {
   }
 
   static deserialize(reader: MessageReader): SetGameOption {
+    const category = reader.readString();
     const name = reader.readString();
     const type = reader.readByte();
     let value: NumberValue | BooleanValue | EnumValue;
@@ -80,10 +82,11 @@ export class SetGameOption extends BaseRootPacket {
         throw new Error(`Unexpected game option type: ${type}`);
     }
 
-    return new SetGameOption(name, value);
+    return new SetGameOption(category, name, value);
   }
 
   serialize(writer: MessageWriter): void {
+    writer.writeString(this.category);
     writer.writeString(this.name);
 
     if (this.value instanceof NumberValue) {
@@ -116,6 +119,6 @@ export class SetGameOption extends BaseRootPacket {
   }
 
   clone(): SetGameOption {
-    return new SetGameOption(this.name, this.value);
+    return new SetGameOption(this.category, this.name, this.value);
   }
 }

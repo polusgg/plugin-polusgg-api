@@ -19,7 +19,7 @@ export class GameOptionsService {
       const options = this.getGameOptions(event.getLobby());
 
       Object.entries(options.getAllOptions()).forEach(([_name, option]) => {
-        event.getLobby().sendRootGamePacket(new SetGameOption(option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
+        event.getLobby().sendRootGamePacket(new SetGameOption(option.getCategory(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
       });
     });
   }

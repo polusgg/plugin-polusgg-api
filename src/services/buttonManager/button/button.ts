@@ -211,4 +211,15 @@ export class Button extends Emittery<ButtonEvents> {
   getTarget(range: number): PlayerInstance | undefined {
     return this.getTargets(range)[0];
   }
+
+  async reset(): Promise<void> {
+    const data = this
+      .getEntity()
+      .getClickBehaviour()
+      .setIsCountingDown(false)
+      .setCurrentTime(this.getMaxTime())
+      .serializeData();
+
+    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+  }
 }

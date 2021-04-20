@@ -11,10 +11,7 @@ import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
-import { BooleanValue, EnumValue, NumberValue, SetGameOption } from "./src/packets/root/setGameOption";
-import { AssetBundle } from "./src/assets";
-import { Vector2 } from "@nodepolus/framework/src/types";
-import { EdgeAlignments } from "./src/types/enums/edgeAlignment";
+import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
 
 export default class PolusGGApi extends BasePlugin {
   private readonly mods: BaseMod[] = [];
@@ -85,58 +82,13 @@ export default class PolusGGApi extends BasePlugin {
 
       let lastIndex = 0;
 
-      options.on("option.gamemode.changed", option => {
-        this.mods[lastIndex].onDisable(event.getLobby());
+      options.on("option.gamemode.changed", async option => {
+        await this.mods[lastIndex].onDisable(event.getLobby());
 
         lastIndex = option.getValue().index;
 
         this.mods[lastIndex].onEnable(event.getLobby());
       });
-    });
-
-    this.server.on("player.chat.message", event => {
-      if (event.getMessage().toString().toLowerCase()
-        .trim() === "/butt") {
-        AssetBundle.load("TownOfPolus").then(_ => {
-          this.server.getLogger().info("TownOfPolus Bundle loaded.");
-          Services.get(ServiceType.Button).spawnButton(event.getPlayer().getSafeConnection(), {
-            asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
-            maxTimer: event.getPlayer().getLobby().getOptions()
-              .getKillCooldown(),
-            position: new Vector2(2.1, 0.7),
-            alignment: EdgeAlignments.RightBottom,
-            currentTime: 10,
-            isCountingDown: true,
-          }).then(button => {
-            button.on("clicked", () => {
-              this.server.getLogger().info("Click recieved");
-            });
-          });
-        });
-      }
-
-      if (event.getMessage().toString().toLowerCase()
-        .trim() == "/gol") {
-        const gameOptionsSet = Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby());
-
-        gameOptionsSet.createOption("number-1", new NumberValue(1, 1, 0, 5, false, "{0}"));
-        gameOptionsSet.createOption("number-2", new NumberValue(1, 1, 0, 5, false, "{0}"));
-        gameOptionsSet.createOption("number-20", new NumberValue(1, 1, 0, 5, false, "{0}"));
-        gameOptionsSet.createOption("boolean-true", new BooleanValue(true));
-        gameOptionsSet.createOption("boolean-false", new BooleanValue(false));
-        gameOptionsSet.createOption("enum-0", new EnumValue(1, ["Index0", "Index1", "Index2"]));
-      }
-
-      if (event.getMessage().toString().toLowerCase()
-        .trim()
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        .split(" ")[0] == "/dgo" && event.getMessage().toString().toLowerCase()
-        .trim()
-        .split(" ")[1] !== undefined) {
-        Services.get(ServiceType.GameOptions).getGameOptions(event.getPlayer().getLobby()).deleteOption(event.getMessage().toString().toLowerCase()
-          .trim()
-          .split(" ")[1]);
-      }
     });
 
     Player.prototype.revive = async function revive(this: Player): Promise<void> {

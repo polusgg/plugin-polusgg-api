@@ -7,44 +7,34 @@ export enum GameOptionType {
   EnumValue = 2,
 }
 
-export abstract class GameOptionValue {
-  constructor() {}
-}
-
-export class NumberValue extends GameOptionValue {
+export class NumberValue {
   constructor(
     public value: number,
     public step: number,
     public lower: number,
     public upper: number,
     public zeroIsInfinity: boolean,
-    public suffix: string
-  ) {
-    super();
-  }
-};
+    public suffix: string,
+  ) {}
+}
 
-export class BooleanValue extends GameOptionValue {
+export class BooleanValue {
   constructor(
-    public value: boolean
-  ) {
-    super();
-  }
-};
+    public value: boolean,
+  ) {}
+}
 
-export class EnumValue extends GameOptionValue {
+export class EnumValue {
   constructor(
     public index: number,
-    public options: string[]
-  ) {
-    super();
-  }
-};
+    public options: string[],
+  ) {}
+}
 
 export class SetGameOption extends BaseRootPacket {
   constructor(
     public name: string,
-    public value: NumberValue | BooleanValue | EnumValue,
+    public value: NumberValue | BooleanValue | EnumValue | { index: number; options: string[] },
   ) {
     super(0x89);
   }
@@ -52,7 +42,6 @@ export class SetGameOption extends BaseRootPacket {
   static deserialize(reader: MessageReader): SetGameOption {
     const name = reader.readString();
     const type = reader.readByte();
-    
     let value: NumberValue | BooleanValue | EnumValue;
 
     switch (type) {
@@ -63,13 +52,13 @@ export class SetGameOption extends BaseRootPacket {
           reader.readFloat32(),
           reader.readFloat32(),
           reader.readBoolean(),
-          reader.readString()
+          reader.readString(),
         );
         break;
       }
       case GameOptionType.BooleanValue:
         value = new BooleanValue(
-          reader.readBoolean()
+          reader.readBoolean(),
         );
         break;
       case GameOptionType.EnumValue: {
@@ -83,7 +72,7 @@ export class SetGameOption extends BaseRootPacket {
 
         value = new EnumValue(
           index,
-          options
+          options,
         );
         break;
       }
@@ -107,23 +96,20 @@ export class SetGameOption extends BaseRootPacket {
       writer.writeFloat32(value.upper);
       writer.writeBoolean(value.zeroIsInfinity);
       writer.writeString(value.suffix);
-
     } else if (this.value instanceof BooleanValue) {
       const value = this.value as BooleanValue;
 
       writer.writeByte(GameOptionType.BooleanValue);
       writer.writeBoolean(value.value);
-
-    } else if (this.value instanceof EnumValue) {
+    } else if (this.value instanceof EnumValue || typeof this.value === "object") {
       const value = this.value as EnumValue;
 
       writer.writeByte(GameOptionType.EnumValue);
       writer.writePackedUInt32(value.index);
-      
+
       for (let i = 0; i < this.value.options.length; i++) {
         writer.writeString(this.value.options[i]);
       }
-      
     } else {
       throw new Error(`Unexpected game option type: ${typeof this.value}`);
     }

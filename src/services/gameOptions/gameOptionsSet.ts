@@ -11,6 +11,8 @@ export type BaseLobbyOptionsEvents = {
 export type SpecializedLobbyOptionsEvents<T extends Record<string, NumberValue | BooleanValue | EnumValue>, A extends Extract<keyof T, string>> = Record<`option.${A}.changed`, GameOption<T[A]>>;
 
 export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | EnumValue>> extends Emittery<BaseLobbyOptionsEvents & SpecializedLobbyOptionsEvents<T, Extract<keyof T, string>>> {
+  protected knownOptions: Set<Extract<keyof T, string>> = new Set();
+
   constructor(protected readonly lobby: LobbyInstance) {
     super();
   }
@@ -22,6 +24,8 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
 
     this.lobby.setMeta(`pgg.options.${key}`, option);
 
+    this.knownOptions.add(key);
+
     return option;
   }
 
@@ -29,14 +33,29 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
     return this.lobby.getMeta<GameOption<T[K]>>(`pgg.options.${key}`);
   }
 
+  getAllOptions<K extends Extract<keyof T, string>>(): Record<K, GameOption<T[K]>> {
+    const record: Partial<Record<K, GameOption<T[K]>>> = {};
+
+    this.knownOptions.forEach(optionName => {
+      //@ts-expect-error
+      record[optionName] = this.getOption(optionName);
+    });
+
+    return record as Record<K, GameOption<T[K]>>;
+  }
+
   async setOption<K extends Extract<keyof T, string>, V extends T[K]>(key: K, value: V): Promise<this> {
     await this.getOption(key).setValue(value);
+
+    this.knownOptions.add(key);
 
     return this;
   }
 
   async deleteOption<K extends Extract<keyof T, string>>(key: K): Promise<this> {
     await this.lobby.sendRootGamePacket(new DeleteGameOption(key), this.lobby.getConnections());
+
+    this.knownOptions.delete(key);
 
     return this;
   }

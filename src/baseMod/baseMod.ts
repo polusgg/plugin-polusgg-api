@@ -28,8 +28,8 @@ export class BaseMod extends BasePlugin {
   getEnabled(lobby: LobbyInstance): boolean { return false }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  onEnable(lobby: LobbyInstance): void {}
+  async onEnable(lobby: LobbyInstance): Promise<void> {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  onDisable(lobby: LobbyInstance): void {}
+  async onDisable(lobby: LobbyInstance): Promise<void> {}
 }

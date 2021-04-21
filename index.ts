@@ -73,10 +73,10 @@ export default class PolusGGApi extends BasePlugin {
     this.server.on("server.lobby.created", event => {
       const options = Services.get(ServiceType.GameOptions).getGameOptions<{ gamemode: EnumValue }>(event.getLobby());
 
-      options.createOption("gamemode", {
-        index: 0,
-        options: this.mods.map(mod => mod.getMetadata().name),
-      });
+      options.createOption("gamemode", "gamemode", new EnumValue(
+        0,
+        this.mods.map(mod => mod.getMetadata().name),
+      ));
 
       this.mods[0].onEnable(event.getLobby());
 

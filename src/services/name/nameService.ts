@@ -72,7 +72,7 @@ export class NameService {
     }));
   }
 
-  async setForBatch(connections: Connection[], player: PlayerInstance, name: string | TextComponent, priority: NameServicePriority = NameServicePriority.Normal): void {
+  async setForBatch(connections: Connection[], player: PlayerInstance, name: string | TextComponent, priority: NameServicePriority = NameServicePriority.Normal): Promise<void> {
     for (let i = 0; i < connections.length; i++) {
       this.setForNoUpdate(connections[i], player, name.toString(), priority);
     }

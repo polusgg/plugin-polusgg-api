@@ -1,7 +1,9 @@
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import Emittery from "emittery";
+import { Services } from "..";
 import { DeleteGameOption } from "../../packets/root/deleteGameOption";
 import { NumberValue, BooleanValue, EnumValue } from "../../packets/root/setGameOption";
+import { ServiceType } from "../../types/enums";
 import { GameOption } from "./gameOption";
 
 export type BaseLobbyOptionsEvents = {
@@ -53,7 +55,7 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
   }
 
   async deleteOption<K extends Extract<keyof T, string>>(key: K): Promise<this> {
-    await this.lobby.sendRootGamePacket(new DeleteGameOption(key), this.lobby.getConnections());
+    await this.lobby.sendRootGamePacket(new DeleteGameOption(Services.get(ServiceType.GameOptions).nextSequenceId(this.lobby), key), this.lobby.getConnections());
 
     this.knownOptions.delete(key);
 

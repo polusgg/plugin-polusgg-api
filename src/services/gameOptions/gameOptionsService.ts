@@ -90,13 +90,23 @@ export class GameOptionsService {
 
       const options = this.getGameOptions(event.getLobby());
 
+      const sequenceId = this.nextSequenceId(event.getLobby());
+
       Object.entries(options.getAllOptions()).forEach(([_name, option]) => {
-        event.getLobby().sendRootGamePacket(new SetGameOption(option.getCategory(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
+        event.getLobby().sendRootGamePacket(new SetGameOption(sequenceId, option.getCategory(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
       });
     });
   }
 
   getGameOptions<T extends Record<string, NumberValue | BooleanValue | EnumValue>>(lobby: LobbyInstance): LobbyOptions<T> {
     return lobby.getMeta<LobbyOptions<T>>("pgg.options");
+  }
+
+  nextSequenceId(lobby: LobbyInstance): number {
+    const sequenceId = lobby.getMeta<number>("pgg.optionSequenceId") + 1;
+
+    lobby.setMeta("pgg.optionSequenceId", sequenceId);
+
+    return sequenceId;
   }
 }

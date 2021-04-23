@@ -81,6 +81,8 @@ export class GameOptionsService {
           applyOption[changedEvent.getKey()](changedEvent.getLobby(), changedEvent.getValue());
         }
       });
+
+      event.getLobby().setMeta("pgg.optionSequenceId", 0);
     });
 
     server.on("player.joined", event => {

@@ -41,8 +41,20 @@ export class NameService {
         });
     });
 
-    server.on("player.joined", event => {
-      this.setForBatch(event.getLobby().getConnections(), event.getPlayer(), event.getPlayer().getName(), NameServicePriority.Lowest);
+    server.on("player.name.updated", async event => {
+      event.cancel(true);
+
+      // Override it with our custom name setup
+      await Promise.allSettled(event.getPlayer().getLobby().getConnections()
+        .map(async otherConnection => {
+        // get otherConnection's understanding of this player's name
+          const nameUnderstanding = this.getFor(otherConnection, event.getPlayer());
+
+          // update the player's name
+          return otherConnection.sendReliable([new GameDataPacket([
+            new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetNamePacket(nameUnderstanding)),
+          ], event.getPlayer().getLobby().getCode())]);
+        }));
     });
   }
 
@@ -60,10 +72,20 @@ export class NameService {
     }));
   }
 
-  setForBatch(connections: Connection[], player: PlayerInstance, name: string | TextComponent, priority: NameServicePriority = NameServicePriority.Normal): void {
+  async setForBatch(connections: Connection[], player: PlayerInstance, name: string | TextComponent, priority: NameServicePriority = NameServicePriority.Normal): void {
     for (let i = 0; i < connections.length; i++) {
       this.setForNoUpdate(connections[i], player, name.toString(), priority);
     }
+
+    await Promise.allSettled(connections.map(async otherConnection => {
+      // get otherConnection's understanding of this player's name
+      const nameUnderstanding = this.getFor(otherConnection, player);
+
+      // update the player's name
+      return otherConnection.sendReliable([new GameDataPacket([
+        new RpcPacket((player as Player).getEntity().getPlayerControl().getNetId(), new SetNamePacket(nameUnderstanding)),
+      ], player.getLobby().getCode())]);
+    }));
   }
 
   getAllFor(connection: Connection, player: PlayerInstance): { name: string; priority: NameServicePriority }[] {

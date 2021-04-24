@@ -9,8 +9,6 @@ import { FetchResourceResponsePacket, ResizePacket } from "./src/packets/root";
 import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
-import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
-import { ClickPacket } from "./src/packets/rpc/clickBehaviour";
 import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
 
 export default class PolusGGApi extends BasePlugin {
@@ -33,10 +31,6 @@ export default class PolusGGApi extends BasePlugin {
 
     RootPacket.registerPacket(0x80, FetchResourceResponsePacket.deserialize, (_connection, _packet) => {
       // ignored
-    });
-
-    RpcPacket.registerPacket(0x86, ClickPacket.deserialize, () => {
-      // Handled in ICB INO
     });
 
     RootPacket.registerPacket(0x89, SetGameOption.deserialize, (connection, packet) => {

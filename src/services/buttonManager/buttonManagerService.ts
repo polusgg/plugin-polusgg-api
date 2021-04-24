@@ -13,6 +13,7 @@ import { SetCountingDown } from "../../packets/rpc/clickBehaviour/setCountingDow
 import { BaseInnerNetObject } from "@nodepolus/framework/src/protocol/entities/baseEntity";
 import { InnerClickBehaviour } from "../../innerNetObjects";
 import { ButtonCountdownUpdated } from "./events/buttonCountdownUpdated";
+import { ClickPacket } from "../../packets/rpc/clickBehaviour";
 
 declare const server: Server;
 
@@ -29,6 +30,7 @@ export class ButtonManagerService {
     });
 
     RpcPacket.registerPacket(0x90, SetCountingDown.deserialize, this.handleCountingDown);
+    RpcPacket.registerPacket(0x86, ClickPacket.deserialize, this.handleClickButton);
   }
 
   async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, color, isCountingDown, alignment }: {
@@ -87,6 +89,14 @@ export class ButtonManagerService {
     }
 
     return result;
+  }
+
+  private handleClickButton(connection: Connection, packet: ClickPacket, sender?: BaseInnerNetObject): void {
+    if (sender === undefined) {
+      throw new Error("HandleClickButton sent from unknown InnerNetObject");
+    }
+
+    this.findSafeButtonByNetId(connection, sender.getNetId()).emit("clicked", packet);
   }
 
   private handleCountingDown(connection: Connection, packet: SetCountingDown, sender?: BaseInnerNetObject): void {

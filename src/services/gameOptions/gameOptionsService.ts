@@ -1,4 +1,4 @@
-import { NumberValue, BooleanValue, EnumValue } from "../../packets/root/setGameOption";
+import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packets/root/setGameOption";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { GameOptionsData } from "@nodepolus/framework/src/types";
 import { Server } from "@nodepolus/framework/src/server";
@@ -96,19 +96,19 @@ export class GameOptionsService {
       event.getLobby()!.getMeta<Map<number, number>>("pgg.optionSequenceId").set(event.getConnection().getId(), -1);
     });
 
-    // server.on("player.joined", event => {
-    //   if (event.getPlayer().getConnection() === undefined) {
-    //     return;
-    //   }
+    server.on("player.joined", event => {
+      if (event.getPlayer().getConnection() === undefined) {
+        return;
+      }
 
-    //   const options = this.getGameOptions(event.getLobby());
+      const options = this.getGameOptions(event.getLobby());
 
-    //   Object.entries(options.getAllOptions()).forEach(([_name, option]) => {
-    //     const sequenceId = this.nextSequenceId(event.getLobby(), event.getPlayer().getConnection()!);
+      Object.entries(options.getAllOptions()).forEach(([_name, option]) => {
+        const sequenceId = this.nextSequenceId(event.getLobby(), event.getPlayer().getConnection()!);
 
-    //     event.getLobby().sendRootGamePacket(new SetGameOption(sequenceId, option.getCategory(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
-    //   });
-    // });
+        event.getLobby().sendRootGamePacket(new SetGameOption(sequenceId, option.getCategory(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
+      });
+    });
   }
 
   getGameOptions<T extends Record<string, NumberValue | BooleanValue | EnumValue>>(lobby: LobbyInstance): LobbyOptions<T> {

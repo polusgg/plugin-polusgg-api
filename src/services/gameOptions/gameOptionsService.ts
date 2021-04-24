@@ -1,8 +1,11 @@
-import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packets/root/setGameOption";
+import { NumberValue, BooleanValue, EnumValue } from "../../packets/root/setGameOption";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { GameOptionsData } from "@nodepolus/framework/src/types";
 import { Server } from "@nodepolus/framework/src/server";
 import { LobbyOptions } from "./gameOptionsSet";
+import { MaxValue } from "@nodepolus/framework/src/util/constants";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { Player } from "@nodepolus/framework/src/player";
 
 declare const server: Server;
 
@@ -56,7 +59,7 @@ export class GameOptionsService {
       /* eslint-enable @typescript-eslint/naming-convention */
 
       event.getLobby().setMeta("pgg.options", options);
-      event.getLobby().setMeta("pgg.optionSequenceId", 0);
+      event.getLobby().setMeta("pgg.optionSequenceId", new Map());
 
       options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "Airship", "dlekS ehT"]));
       options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"));
@@ -71,42 +74,53 @@ export class GameOptionsService {
       options.createOption("Player Settings", "Impostor Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"));
       options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"));
       options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]));
-      options.createOption("Task Settings", "Common Tasks", new NumberValue(0, 1, 0, -1, false, "ERROR"));
-      options.createOption("Task Settings", "Long Tasks", new NumberValue(0, 1, 0, -1, false, "ERROR"));
-      options.createOption("Task Settings", "Short Tasks", new NumberValue(0, 1, 0, -1, false, "ERROR"));
+      options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"));
+      options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"));
+      options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"));
       options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false));
       options.createOption("Task Settings", "Taskbar Mode", new EnumValue(0, ["Always", "Meetings", "Never"]));
 
       options.on("option.*.changed", changedEvent => {
         if (applyOption[changedEvent.getKey()] !== undefined) {
-          applyOption[changedEvent.getKey()](changedEvent.getLobby(), changedEvent.getValue());
+          applyOption[changedEvent.getKey()](changedEvent.getLobby().getOptions(), changedEvent.getValue());
+          (changedEvent.getLobby().getPlayers()[0] as Player).getEntity().getPlayerControl().syncSettings(changedEvent.getLobby().getOptions(), changedEvent.getLobby().getConnections());
         }
       });
     });
 
-    server.on("player.joined", event => {
-      if (event.getPlayer().getConnection() === undefined) {
+    server.on("server.lobby.join", event => {
+      if (event.getLobby() === undefined) {
         return;
       }
 
-      const options = this.getGameOptions(event.getLobby());
-
-      const sequenceId = this.nextSequenceId(event.getLobby());
-
-      Object.entries(options.getAllOptions()).forEach(([_name, option]) => {
-        event.getLobby().sendRootGamePacket(new SetGameOption(sequenceId, option.getCategory(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
-      });
+      event.getLobby()!.getMeta<Map<number, number>>("pgg.optionSequenceId").set(event.getConnection().getId(), -1);
     });
+
+    // server.on("player.joined", event => {
+    //   if (event.getPlayer().getConnection() === undefined) {
+    //     return;
+    //   }
+
+    //   const options = this.getGameOptions(event.getLobby());
+
+    //   Object.entries(options.getAllOptions()).forEach(([_name, option]) => {
+    //     const sequenceId = this.nextSequenceId(event.getLobby(), event.getPlayer().getConnection()!);
+
+    //     event.getLobby().sendRootGamePacket(new SetGameOption(sequenceId, option.getCategory(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
+    //   });
+    // });
   }
 
   getGameOptions<T extends Record<string, NumberValue | BooleanValue | EnumValue>>(lobby: LobbyInstance): LobbyOptions<T> {
     return lobby.getMeta<LobbyOptions<T>>("pgg.options");
   }
 
-  nextSequenceId(lobby: LobbyInstance): number {
-    const sequenceId = lobby.getMeta<number>("pgg.optionSequenceId") + 1;
+  nextSequenceId(lobby: LobbyInstance, connection: Connection): number {
+    const map = lobby.getMeta<Map<number, number>>("pgg.optionSequenceId");
 
-    lobby.setMeta("pgg.optionSequenceId", sequenceId);
+    const sequenceId = map.get(connection.getId())! + 1;
+
+    map.set(connection.getId(), sequenceId % MaxValue.UInt16);
 
     return sequenceId;
   }

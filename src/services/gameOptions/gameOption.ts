@@ -12,7 +12,18 @@ export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {
     Services.get(ServiceType.GameOptions).getGameOptions(this.getLobby()).emit(`option.${this.getKey()}.changed` as `option.${string}.changed`, this);
     Services.get(ServiceType.GameOptions).getGameOptions(this.getLobby()).emit(`option.*.changed`, this);
 
-    await this.lobby.sendRootGamePacket(new SetGameOption(Services.get(ServiceType.GameOptions).nextSequenceId(this.getLobby()), this.category, this.key, value), this.lobby.getConnections());
+    const connections = this.lobby.getConnections();
+
+    const proms = new Array<Promise<void>>(connections.length);
+
+    for (let i = 0; i < connections.length; i++) {
+      const connection = connections[i];
+      const sequenceId = Services.get(ServiceType.GameOptions).nextSequenceId(this.getLobby(), connection);
+
+      proms.push(connection.writeReliable(new SetGameOption(sequenceId, this.category, this.key, value)));
+    }
+
+    await Promise.all(proms);
   }
 
   getValue(): V {

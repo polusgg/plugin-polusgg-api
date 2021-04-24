@@ -55,9 +55,20 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
   }
 
   async deleteOption<K extends Extract<keyof T, string>>(key: K): Promise<this> {
-    await this.lobby.sendRootGamePacket(new DeleteGameOption(Services.get(ServiceType.GameOptions).nextSequenceId(this.lobby), key), this.lobby.getConnections());
+    const connections = this.lobby.getConnections();
+
+    const proms: Promise<void>[] = new Array(connections.length);
+
+    for (let i = 0; i < connections.length; i++) {
+      const connection = connections[i];
+      const sid = Services.get(ServiceType.GameOptions).nextSequenceId(this.lobby, connection);
+
+      proms[i] = connection.writeReliable(new DeleteGameOption(sid, key));
+    }
 
     this.knownOptions.delete(key);
+
+    await Promise.all(proms);
 
     return this;
   }

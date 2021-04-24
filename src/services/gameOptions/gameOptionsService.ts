@@ -1,4 +1,4 @@
-import { NumberValue, BooleanValue, EnumValue } from "../../packets/root/setGameOption";
+import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packets/root/setGameOption";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { GameOptionsData } from "@nodepolus/framework/src/types";
 import { Server } from "@nodepolus/framework/src/server";

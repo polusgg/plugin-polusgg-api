@@ -56,6 +56,7 @@ export class GameOptionsService {
       /* eslint-enable @typescript-eslint/naming-convention */
 
       event.getLobby().setMeta("pgg.options", options);
+      event.getLobby().setMeta("pgg.optionSequenceId", 0);
 
       options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "Airship", "dlekS ehT"]));
       options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"));
@@ -81,8 +82,6 @@ export class GameOptionsService {
           applyOption[changedEvent.getKey()](changedEvent.getLobby(), changedEvent.getValue());
         }
       });
-
-      event.getLobby().setMeta("pgg.optionSequenceId", 0);
     });
 
     server.on("player.joined", event => {

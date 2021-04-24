@@ -9,31 +9,31 @@ import { Player } from "@nodepolus/framework/src/player";
 
 declare const server: Server;
 
+/* eslint-disable @typescript-eslint/naming-convention */
+export type LobbyDefaultOptions = {
+  "Map": EnumValue;
+  "Impostor Count": NumberValue;
+  "Max Button Presses": NumberValue;
+  "Button Cooldown": NumberValue;
+  "Discussion Time": NumberValue;
+  "Voting Time": NumberValue;
+  "Anon Votes": BooleanValue;
+  "Confirm Ejects": BooleanValue;
+  "Player Speed": NumberValue;
+  "Crew Light Modifier": NumberValue;
+  "Impostor Light Modifier": NumberValue;
+  "Kill Cooldown": NumberValue;
+  "Kill Distance": EnumValue;
+  "Common Tasks": NumberValue;
+  "Long Tasks": NumberValue;
+  "Short Tasks": NumberValue;
+  "Visual Tasks": BooleanValue;
+  "Taskbar Mode": EnumValue;
+};
+
 export class GameOptionsService {
   constructor() {
     server.on("server.lobby.created", event => {
-      /* eslint-disable @typescript-eslint/naming-convention */
-      type LobbyDefaultOptions = {
-        "Map": EnumValue;
-        "Impostor Count": NumberValue;
-        "Max Button Presses": NumberValue;
-        "Button Cooldown": NumberValue;
-        "Discussion Time": NumberValue;
-        "Voting Time": NumberValue;
-        "Anon Votes": BooleanValue;
-        "Confirm Ejects": BooleanValue;
-        "Player Speed": NumberValue;
-        "Crew Light Modifier": NumberValue;
-        "Impostor Light Modifier": NumberValue;
-        "Kill Cooldown": NumberValue;
-        "Kill Distance": EnumValue;
-        "Common Tasks": NumberValue;
-        "Long Tasks": NumberValue;
-        "Short Tasks": NumberValue;
-        "Visual Tasks": BooleanValue;
-        "Taskbar Mode": EnumValue;
-      };
-
       const options = new LobbyOptions<LobbyDefaultOptions>(event.getLobby());
 
       const applyOption = {

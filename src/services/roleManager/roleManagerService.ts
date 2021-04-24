@@ -7,10 +7,14 @@ import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { BaseManager } from "../../baseManager/baseManager";
 import { BaseRole } from "../../baseRole";
+import { RoleAlignment } from "../../baseRole/baseRole";
 import { Crewmate } from "../../baseRole/crewmate/crewmate";
 import { Impostor } from "../../baseRole/impostor/impostor";
 import { DisplayStartGameScreenPacket, OverwriteGameOver } from "../../packets/root";
 import { SetRolePacket } from "../../packets/rpc/playerControl";
+import { ServiceType } from "../../types/enums";
+import { LobbyDefaultOptions } from "../gameOptions/gameOptionsService";
+import { Services } from "../services";
 
 export type EndGameScreenData = {
   title: string | TextComponent;
@@ -31,6 +35,7 @@ export type RoleAssignmentData = {
   playerCount: number;
   role: typeof BaseRole;
   startGameScreen?: StartGameScreenData;
+  assignWith: RoleAlignment;
 };
 
 export class RoleManagerService {
@@ -69,15 +74,8 @@ export class RoleManagerService {
 
   assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
     const managers: typeof BaseManager[] = [];
-
-    game.getLobby().getPlayers().filter(p => p.isImpostor())
-      .forEach(player => {
-        const role = this.assignRole(player, Impostor);
-
-        managers.push(role.getManagerType());
-      });
-
-    const assignmentArray: { role: typeof BaseRole; startGameScreen?: StartGameScreenData }[] = [];
+    const assignmentArray: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = [];
+    const options = Services.get(ServiceType.GameOptions).getGameOptions<LobbyDefaultOptions>(game.getLobby());
 
     for (let i = 0; i < assignmentData.length; i++) {
       const singleAssignmentData = assignmentData[i];
@@ -86,21 +84,46 @@ export class RoleManagerService {
         assignmentArray.push({
           role: singleAssignmentData.role,
           startGameScreen: singleAssignmentData.startGameScreen,
+          assignWith: singleAssignmentData.assignWith,
         });
       }
     }
 
-    shuffleArrayClone(game.getLobby().getPlayers().filter(p => p.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() !== "impostor")).forEach((player, index) => {
-      if (index < assignmentArray.length) {
-        const role = this.assignRole(player, assignmentArray[index].role, assignmentArray[index].startGameScreen);
+    const fixedImpostorAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = new Array(options.getOption("Impostor Count").getValue().value).fill(0).map(_ => ({
+      role: Impostor,
+      assignWith: RoleAlignment.Impostor,
+    }));
 
-        managers.push(role.getManagerType());
-      } else {
+    const impostorAlignedRoles = assignmentArray.filter(i => i.assignWith === RoleAlignment.Impostor);
+    const nonImpostorAlignedRoles = assignmentArray.filter(i => i.assignWith !== RoleAlignment.Impostor).slice(0, game.getLobby().getPlayers().length - fixedImpostorAlignedRoles.length);
+
+    for (let i = 0; i < impostorAlignedRoles.length; i++) {
+      fixedImpostorAlignedRoles[i] = impostorAlignedRoles[i];
+    }
+
+    const shuffledPlayers = shuffleArrayClone(game.getLobby().getPlayers());
+
+    shuffleArrayClone(fixedImpostorAlignedRoles).forEach((assignment, index) => {
+      const role = this.assignRole(shuffledPlayers[index], assignment.role, assignment.startGameScreen);
+
+      managers.push(role.getManagerType());
+    });
+
+    shuffleArrayClone(nonImpostorAlignedRoles).forEach((assignment, index) => {
+      const role = this.assignRole(shuffledPlayers[index + fixedImpostorAlignedRoles.length], assignment.role, assignment.startGameScreen);
+
+      managers.push(role.getManagerType());
+    });
+
+    for (let i = 0; i < shuffledPlayers.length; i++) {
+      const player = shuffledPlayers[i];
+
+      if (player.getMeta<BaseRole | undefined>("pgg.api.role") === undefined) {
         const role = this.assignRole(player, Crewmate);
 
         managers.push(role.getManagerType());
       }
-    });
+    }
 
     const uniqueManagers = [...new Set(managers)];
 

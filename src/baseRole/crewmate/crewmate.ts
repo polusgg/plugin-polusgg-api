@@ -18,7 +18,7 @@ export class Crewmate extends BaseRole {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: `Crewmate`,
-      subtitle: `There is <color=#${Palette.impostorRed().map(e => e.toString(16)).join("")}>Impostors</color among us`,
+      subtitle: `There is <color=#${Palette.impostorRed().map(e => e.toString(16)).join("")}>Impostors</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }

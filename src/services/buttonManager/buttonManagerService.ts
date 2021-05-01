@@ -33,11 +33,12 @@ export class ButtonManagerService {
     RpcPacket.registerPacket(0x86, ClickPacket.deserialize, this.handleClickButton.bind(this));
   }
 
-  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, color, isCountingDown, alignment }: {
+  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment }: {
     asset: Asset;
     position: Vector2;
     maxTimer: number;
     currentTime?: number;
+    saturated: boolean;
     color?: [number, number, number, number];
     isCountingDown?: boolean;
     alignment: EdgeAlignments;
@@ -50,7 +51,7 @@ export class ButtonManagerService {
 
     await Services.get(ServiceType.Resource).assertLoaded(connection, asset);
 
-    const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, color, isCountingDown);
+    const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, saturated, color, isCountingDown);
 
     lobby.spawn(button, [connection]);
 

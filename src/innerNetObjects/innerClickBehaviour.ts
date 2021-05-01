@@ -15,6 +15,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     parent: BaseInnerNetEntity,
     public maxTimer: number,
     public currentTime: number = 0,
+    public saturated: boolean = true,
     public color: [number, number, number, number] = [255, 255, 255, 255],
     public isCountingDown: boolean = true,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
@@ -30,6 +31,12 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
 
   setColor(color: [number, number, number, number]): this {
     this.color = color;
+
+    return this;
+  }
+
+  setSaturated(saturated: boolean): this {
+    this.saturated = saturated;
 
     return this;
   }
@@ -84,6 +91,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
       .writeFloat32(this.maxTimer)
       .writeFloat32(this.currentTime)
       .writeBoolean(this.isCountingDown)
+      .writeBoolean(this.saturated)
       .writeBytes(this.color),
     );
   }
@@ -94,6 +102,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     this.maxTimer = reader.readFloat32();
     this.currentTime = reader.readFloat32();
     this.isCountingDown = reader.readBoolean();
+    this.saturated = reader.readBoolean();
     this.color = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
   }
 
@@ -102,12 +111,13 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
       .writeFloat32(this.maxTimer)
       .writeFloat32(this.currentTime)
       .writeBoolean(this.isCountingDown)
+      .writeBoolean(this.saturated)
       .writeBytes(this.color),
     );
   }
 
   clone(): InnerClickBehaviour {
-    return new InnerClickBehaviour(this.parent, this.maxTimer, this.currentTime, this.color, this.isCountingDown, this.netId);
+    return new InnerClickBehaviour(this.parent, this.maxTimer, this.currentTime, this.saturated, this.color, this.isCountingDown, this.netId);
   }
 
   getParent(): BaseInnerNetEntity {

@@ -52,6 +52,8 @@ export class RoleManagerService {
   async setEndGameData(connection: Connection | undefined, endGameData: EndGameScreenData): Promise<void> {
     connection?.setMeta("pgg.api.endGameData", endGameData);
 
+    console.log(endGameData);
+
     return connection?.writeReliable(new OverwriteGameOver(
       endGameData.title.toString(),
       endGameData.subtitle.toString(),
@@ -96,21 +98,23 @@ export class RoleManagerService {
 
     const impostorAlignedRoles = assignmentArray.filter(i => i.assignWith === RoleAlignment.Impostor);
     const nonImpostorAlignedRoles = assignmentArray.filter(i => i.assignWith !== RoleAlignment.Impostor).slice(0, game.getLobby().getPlayers().length - fixedImpostorAlignedRoles.length);
-
-    for (let i = 0; i < impostorAlignedRoles.length; i++) {
-      fixedImpostorAlignedRoles[i] = impostorAlignedRoles[i];
-    }
-
+    const shuffledImpostors = shuffleArrayClone(game.getLobby().getPlayers().filter(p => p.isImpostor()));
     const shuffledPlayers = shuffleArrayClone(game.getLobby().getPlayers());
 
+    for (let i = 0; i < shuffledImpostors.length; i++) {
+      fixedImpostorAlignedRoles[i] = impostorAlignedRoles[i] ?? { role: Impostor, assignWith: RoleAlignment.Impostor };
+    }
+
     shuffleArrayClone(fixedImpostorAlignedRoles).forEach((assignment, index) => {
-      const role = this.assignRole(shuffledPlayers[index], assignment.role, assignment.startGameScreen);
+      const impostor = shuffledImpostors[index];
+      const role = this.assignRole(impostor, assignment.role, assignment.startGameScreen);
 
       managers.push(role.getManagerType());
+      shuffledPlayers.splice(shuffledPlayers.indexOf(impostor), 1);
     });
 
     shuffleArrayClone(nonImpostorAlignedRoles).forEach((assignment, index) => {
-      const role = this.assignRole(shuffledPlayers[index + fixedImpostorAlignedRoles.length], assignment.role, assignment.startGameScreen);
+      const role = this.assignRole(shuffledPlayers[index], assignment.role, assignment.startGameScreen);
 
       managers.push(role.getManagerType());
     });

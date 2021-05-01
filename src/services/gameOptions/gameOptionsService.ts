@@ -36,6 +36,8 @@ export class GameOptionsService {
     server.on("server.lobby.created", event => {
       const options = new LobbyOptions<LobbyDefaultOptions>(event.getLobby());
 
+      event.getLobby().getOptions().setVersion(4);
+
       const applyOption = {
         Map: (vanillaOptions: GameOptionsData, option: EnumValue) => { vanillaOptions.setLevels([option.index]) },
         "Impostor Count": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setLevels([option.value]) },

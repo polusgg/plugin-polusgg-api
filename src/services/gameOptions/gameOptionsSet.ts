@@ -1,4 +1,5 @@
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import Emittery from "emittery";
 import { Services } from "..";
 import { DeleteGameOption } from "../../packets/root/deleteGameOption";
@@ -46,8 +47,8 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
     return record as Record<K, GameOption<T[K]>>;
   }
 
-  async setOption<K extends Extract<keyof T, string>, V extends T[K]>(key: K, value: V): Promise<this> {
-    await this.getOption(key).setValue(value);
+  async setOption<K extends Extract<keyof T, string>, V extends T[K]>(key: K, value: V, sendTo: Connection[] = this.lobby.getConnections()): Promise<this> {
+    await this.getOption(key).setValue(value, sendTo);
 
     this.knownOptions.add(key);
 

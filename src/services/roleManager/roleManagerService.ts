@@ -41,8 +41,8 @@ export type RoleAssignmentData = {
 export class RoleManagerService {
   //@TODO: Setters and getters for defaultEndGameData
   public defaultEndGameData: EndGameScreenData = {
-    title: "undefined",
-    subtitle: "no data was sent from the server for your end game",
+    title: "Missing",
+    subtitle: "End game was not overwritten",
     color: [127, 127, 127, 255],
     yourTeam: [],
     displayQuit: true,
@@ -58,7 +58,7 @@ export class RoleManagerService {
       endGameData.color,
       endGameData.yourTeam.map(player => player.getId()),
       endGameData.displayQuit ?? true,
-      endGameData.displayPlayAgain ?? false,
+      endGameData.displayPlayAgain ?? true,
     ));
   }
 

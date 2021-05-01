@@ -63,7 +63,7 @@ export class GameOptionsService {
       event.getLobby().setMeta("pgg.options", options);
       event.getLobby().setMeta("pgg.optionSequenceId", new Map());
 
-      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "Airship", "dlekS ehT"]));
+      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]));
       options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"));
       options.createOption("Meeting Settings", "Max Button Presses", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"));
       options.createOption("Meeting Settings", "Button Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"));

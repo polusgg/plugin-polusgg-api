@@ -28,7 +28,7 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     this.innerNetObjects = [
       new InnerDeadBody(this, color, shadowColor, hasFallen, bodyFacing, deadBodyNetId),
       new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
-      new InnerClickBehaviour(this, 0, 0, [0, 0, 0, 0], false, clickBehaviourNetId),
+      new InnerClickBehaviour(this, 0, 0, true, [0, 0, 0, 0], false, clickBehaviourNetId),
     ];
   }
 

@@ -35,6 +35,10 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     return this;
   }
 
+  getSaturated(): boolean {
+    return this.saturated;
+  }
+
   setSaturated(saturated: boolean): this {
     this.saturated = saturated;
 

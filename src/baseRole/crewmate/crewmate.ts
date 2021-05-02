@@ -15,10 +15,12 @@ export class Crewmate extends BaseRole {
     alignment: RoleAlignment.Crewmate,
   };
 
-  getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
+  getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
+    const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
+
     return {
-      title: `Crewmate`,
-      subtitle: `There is <color=#${Palette.impostorRed().map(e => e.toString(16)).join("")}>Impostors</color> among us`,
+      title: "Crewmate",
+      subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }

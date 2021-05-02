@@ -7,7 +7,7 @@ export class BeginCameraAnimation extends BaseRpcPacket {
     public keyframes: CameraAnimationKeyframe[],
     public reset: boolean,
   ) {
-    super(0x93);
+    super(0x8d);
   }
 
   static deserialize(reader: MessageReader): BeginCameraAnimation {

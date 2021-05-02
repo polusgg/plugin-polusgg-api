@@ -1,10 +1,9 @@
-import { Game } from "@nodepolus/framework/src/api/game";
-import { Lobby } from "@nodepolus/framework/src/lobby";
-import { Player } from "@nodepolus/framework/src/player";
-import { Coroutine } from "./coroutine";
+import { Bindable, Coroutine } from "./coroutine";
 
 export class CoroutineManagerService {
-  beginCoroutine<T extends Coroutine>(bindTo: Player | Lobby | Game, coroutine: T): T {
-    
+  beginCoroutine<T extends Coroutine<B>, B extends Bindable>(bindTo: B, coroutine: T): T {
+    coroutine.bind(bindTo).begin();
+
+    return coroutine;
   }
 }

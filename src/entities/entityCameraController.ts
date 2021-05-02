@@ -40,8 +40,8 @@ export class EntityCameraController extends BaseInnerNetEntity {
     }
   }
 
-  async beginAnimation(keyframes: CameraAnimationKeyframe[], reset: boolean): Promise<void> {
-    await this.getCameraController().beginAnimation(keyframes, reset);
+  async beginAnimation(connection: Connection, keyframes: CameraAnimationKeyframe[], reset: boolean): Promise<void> {
+    await this.getCameraController().beginAnimation(connection, keyframes, reset);
   }
 }
 

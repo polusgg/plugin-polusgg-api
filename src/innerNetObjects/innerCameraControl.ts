@@ -43,7 +43,7 @@ export class InnerCameraController extends BaseInnerNetObject {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   handleRpc(_connection: Connection, _type: RpcPacketType, _packet: BaseRpcPacket, _sendTo?: Connection[]): void { }
 
-  async beginAnimation(keyframes: CameraAnimationKeyframe[], reset: boolean): Promise<void> {
-    await this.sendRpcPacket(new BeginCameraAnimation(keyframes, reset));
+  async beginAnimation(connection: Connection, keyframes: CameraAnimationKeyframe[], reset: boolean): Promise<void> {
+    await this.sendRpcPacket(new BeginCameraAnimation(keyframes, reset), [connection]);
   }
 }

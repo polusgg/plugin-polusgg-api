@@ -10,7 +10,7 @@ import { Connection } from "@nodepolus/framework/src/protocol/connection";
 
 export class AnimationService {
   async beginCameraAnimation(connection: Connection, cameraController: EntityCameraController, keyframes: CameraAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
-    await cameraController.beginAnimation(keyframes, reset);
+    await cameraController.beginAnimation(connection, keyframes, reset);
 
     return new Promise(resolve => {
       setTimeout(resolve, keyframes.map(keyframe => keyframe.getDuration()).reduce((sum, current) => sum + current, 0));

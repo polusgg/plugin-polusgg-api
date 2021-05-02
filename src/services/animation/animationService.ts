@@ -6,9 +6,10 @@ import { BeginPlayerAnimation } from "../../packets/rpc/playerControl/beginAnima
 import { PlayerAnimationKeyframe } from "./keyframes/player";
 import { SetOutlinePacket } from "../../packets/rpc/playerControl/setOutline";
 import { SetOpacityPacket } from "../../packets/rpc/playerControl/setOpacity";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
 
 export class AnimationService {
-  async beginCameraAnimation(cameraController: EntityCameraController, keyframes: CameraAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
+  async beginCameraAnimation(connection: Connection, cameraController: EntityCameraController, keyframes: CameraAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
     await cameraController.beginAnimation(keyframes, reset);
 
     return new Promise(resolve => {

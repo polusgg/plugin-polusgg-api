@@ -1,7 +1,7 @@
 import { BaseInnerNetEntity } from "@nodepolus/framework/src/protocol/entities/baseEntity";
 import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
-import { InnerPointOfInterest } from "../innerNetObjects";
+import { InnerGraphic, InnerPointOfInterest } from "../innerNetObjects";
 import { InnerCustomNetworkTransformGeneric } from "../innerNetObjects/innerCustomNetworkTransformGeneric";
 import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { Vector2 } from "@nodepolus/framework/src/types";
@@ -21,7 +21,8 @@ export class EntityPointOfInterest extends BaseInnerNetEntity {
     super(0x87, owner.getLobby()!, owner.getId(), SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerPointOfInterest(this, cameraControllerNetId, resourceId),
+      new InnerPointOfInterest(this, cameraControllerNetId),
+      new InnerGraphic(this, resourceId),
       new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, customNetworkTransformNetId),
     ];
   }
@@ -57,16 +58,16 @@ export class EntityPointOfInterest extends BaseInnerNetEntity {
     ], this.getLobby().getCode()));
   }
 
-  getResourceId(): number {
-    return this.getPointOfInterest().getResourceId();
-  }
-
   getPointOfInterest(): InnerPointOfInterest {
     return this.getObject(0);
   }
 
-  getCustomNetworkTransform(): InnerCustomNetworkTransformGeneric {
+  getGraphic(): InnerGraphic {
     return this.getObject(1);
+  }
+
+  getCustomNetworkTransform(): InnerCustomNetworkTransformGeneric {
+    return this.getObject(2);
   }
 
   despawn(): void {

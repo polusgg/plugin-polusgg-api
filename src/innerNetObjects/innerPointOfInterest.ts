@@ -7,12 +7,8 @@ import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
 import { EntityPointOfInterest } from "../entities";
 
 export class InnerPointOfInterest extends BaseInnerNetObject {
-  constructor(parent: BaseInnerNetEntity, netId: number, protected readonly resourceId: number) {
+  constructor(parent: BaseInnerNetEntity, netId: number) {
     super(0x86, parent, netId);
-  }
-
-  getResourceId(): number {
-    return this.resourceId;
   }
 
   getParent(): EntityPointOfInterest {
@@ -20,15 +16,15 @@ export class InnerPointOfInterest extends BaseInnerNetObject {
   }
 
   clone(): InnerPointOfInterest {
-    return new InnerPointOfInterest(this.parent, this.netId, this.resourceId);
+    return new InnerPointOfInterest(this.parent, this.netId);
   }
 
   serializeData(): DataPacket {
-    return new DataPacket(this.netId, new MessageWriter().writePackedUInt32(this.resourceId));
+    return new DataPacket(this.netId, new MessageWriter());
   }
 
   serializeSpawn(): SpawnPacketObject {
-    return new SpawnPacketObject(this.netId, new MessageWriter().writePackedUInt32(this.resourceId));
+    return new SpawnPacketObject(this.netId, new MessageWriter());
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function

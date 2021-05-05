@@ -10,9 +10,12 @@ export type Executor<EventType> = (event: EventType) => void;
 export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>> {
   private readonly filters: Filter<ServerEvents[EventName]>[] = [];
   private readonly executors: Executor<ServerEvents[EventName]>[] = [];
+  private readonly boundFunction: (event: ServerEvents[EventName]) => void;
 
-  constructor(name: EventName) {
-    server.on<EventName>(name, this.handle.bind(this));
+  constructor(private readonly eventName: EventName) {
+    this.boundFunction = this.handle.bind(this);
+
+    server.on<EventName>(eventName, this.boundFunction);
   }
 
   where(filterFunction: Filter<ServerEvents[EventName]>): this {
@@ -25,6 +28,10 @@ export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>>
     this.executors.push(executorFunction);
 
     return this;
+  }
+
+  destroy(): void {
+    server.off<EventName>(this.eventName, this.boundFunction);
   }
 
   private handle(event: ServerEvents[EventName]): void {

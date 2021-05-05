@@ -26,6 +26,8 @@ export type RoleMetadata = {
 
 export class BaseRole {
   protected readonly metadata!: RoleMetadata;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private readonly caughtEvents: EventCatcher<any>[] = [];
 
   constructor(protected readonly owner: PlayerInstance) { }
 
@@ -40,7 +42,11 @@ export class BaseRole {
   }
 
   catch<NameType extends Extract<keyof ServerEvents, string>>(eventName: NameType, ownsMethod: (event: ServerEvents[NameType]) => Ownable): EventCatcher<NameType> {
-    return new EventCatcher(eventName).where(event => this.owns(ownsMethod(event)));
+    const catcher = new EventCatcher(eventName).where(event => this.owns(ownsMethod(event)));
+
+    this.caughtEvents.push(catcher);
+
+    return catcher;
   }
 
   owns(thing: Ownable): boolean {
@@ -69,6 +75,12 @@ export class BaseRole {
 
   getManager<T extends BaseManager>(id: string): T {
     return this.owner.getLobby().getMeta<T>(`pgg.manager.${id}`);
+  }
+
+  onDestroy(): void {
+    for (let i = 0; i < this.caughtEvents.length; i++) {
+      this.caughtEvents[i].destroy();
+    }
   }
 
   getManagerType(): typeof BaseManager { throw new Error("needs to be overwritten") }

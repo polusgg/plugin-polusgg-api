@@ -3,6 +3,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { Player } from "@nodepolus/framework/src/player";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { Server } from "@nodepolus/framework/src/server";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { BaseManager } from "../../baseManager/baseManager";
@@ -38,6 +39,8 @@ export type RoleAssignmentData = {
   assignWith: RoleAlignment;
 };
 
+declare const server: Server;
+
 export class RoleManagerService {
   //@TODO: Setters and getters for defaultEndGameData
   public defaultEndGameData: EndGameScreenData = {
@@ -48,6 +51,26 @@ export class RoleManagerService {
     displayQuit: true,
     displayPlayAgain: true,
   };
+
+  constructor() {
+    server.on("game.ended", event => {
+      event
+        .getGame()
+        .getLobby()
+        .getPlayers()
+        .forEach(p => {
+          this.onPlayerDespawned(p);
+        });
+    });
+
+    server.on("player.left", event => {
+      this.onPlayerDespawned(event.getPlayer());
+    });
+  }
+
+  onPlayerDespawned(player: PlayerInstance): void {
+    player.getMeta<BaseRole | undefined>("pgg.api.role")?.onDestroy();
+  }
 
   async setEndGameData(connection: Connection | undefined, endGameData: EndGameScreenData): Promise<void> {
     connection?.setMeta("pgg.api.endGameData", endGameData);

@@ -11,6 +11,16 @@ export type BaseLobbyOptionsEvents = {
   "option.*.changed": GameOption<NumberValue | BooleanValue | EnumValue>;
 };
 
+export enum GameOptionPriority {
+  Highest = 100,
+  Higher = 200,
+  High = 300,
+  Normal = 400,
+  Low = 500,
+  Lower = 600,
+  Lowest = 700,
+}
+
 export type SpecializedLobbyOptionsEvents<T extends Record<string, NumberValue | BooleanValue | EnumValue>, A extends Extract<keyof T, string>> = Record<`option.${A}.changed`, GameOption<T[A]>>;
 
 export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | EnumValue>> extends Emittery<BaseLobbyOptionsEvents & SpecializedLobbyOptionsEvents<T, Extract<keyof T, string>>> {
@@ -20,8 +30,8 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
     super();
   }
 
-  async createOption<K extends Extract<keyof T, string>, V extends T[K]>(category: string, key: K, value: V): Promise<GameOption<V>> {
-    const option = new GameOption<V>(this.lobby, category, key, value);
+  async createOption<K extends Extract<keyof T, string>, V extends T[K]>(category: string, key: K, value: V, priority: number | GameOptionPriority = GameOptionPriority.Normal): Promise<GameOption<V>> {
+    const option = new GameOption<V>(this.lobby, category, priority, key, value);
 
     await option.setValue(value);
 

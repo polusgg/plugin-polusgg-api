@@ -5,7 +5,7 @@ import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packe
 import { ServiceType } from "../../types/enums";
 
 export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {
-  constructor(protected readonly lobby: LobbyInstance, protected readonly category: string, protected readonly key: string, protected value: V) {}
+  constructor(protected readonly lobby: LobbyInstance, protected readonly category: string, protected priority: number, protected readonly key: string, protected value: V) {}
 
   async setValue(value: V, sendTo: Connection[] = this.lobby.getConnections()): Promise<void> {
     this.value = value;
@@ -19,7 +19,7 @@ export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {
       const connection = sendTo[i];
       const sequenceId = Services.get(ServiceType.GameOptions).nextSequenceId(this.getLobby(), connection);
 
-      proms[i] = connection.writeReliable(new SetGameOption(sequenceId, this.category, this.key, value));
+      proms[i] = connection.writeReliable(new SetGameOption(sequenceId, this.category, this.priority, this.key, value));
     }
 
     await Promise.all(proms);
@@ -31,6 +31,10 @@ export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {
 
   getCategory(): string {
     return this.category;
+  }
+
+  getPriority(): number {
+    return this.priority;
   }
 
   getKey(): string {

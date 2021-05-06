@@ -2,7 +2,7 @@ import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packe
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { GameOptionsData } from "@nodepolus/framework/src/types";
 import { Server } from "@nodepolus/framework/src/server";
-import { LobbyOptions } from "./gameOptionsSet";
+import { GameOptionPriority, LobbyOptions } from "./gameOptionsSet";
 import { MaxValue } from "@nodepolus/framework/src/util/constants";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Player } from "@nodepolus/framework/src/player";
@@ -63,24 +63,24 @@ export class GameOptionsService {
       event.getLobby().setMeta("pgg.options", options);
       event.getLobby().setMeta("pgg.optionSequenceId", new Map());
 
-      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]));
-      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"));
-      options.createOption("Meeting Settings", "Max Button Presses", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"));
-      options.createOption("Meeting Settings", "Button Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"));
-      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 30, 0, 300, true, "{0}s"));
-      options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"));
-      options.createOption("Meeting Settings", "Anon Votes", new BooleanValue(false));
-      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false));
-      options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"));
-      options.createOption("Player Settings", "Crew Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"));
-      options.createOption("Player Settings", "Impostor Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"));
-      options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"));
-      options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]));
-      options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"));
-      options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"));
-      options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"));
-      options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false));
-      options.createOption("Task Settings", "Taskbar Mode", new EnumValue(0, ["Always", "Meetings", "Never"]));
+      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]), GameOptionPriority.Higher + 5);
+      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher + 5);
+      options.createOption("Meeting Settings", "Max Button Presses", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher + 4);
+      options.createOption("Meeting Settings", "Button Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher + 4);
+      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher + 4);
+      options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher + 4);
+      options.createOption("Meeting Settings", "Anon Votes", new BooleanValue(false), GameOptionPriority.Higher + 4);
+      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher + 4);
+      options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher + 3);
+      options.createOption("Player Settings", "Crew Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher + 3);
+      options.createOption("Player Settings", "Impostor Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher + 3);
+      options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher + 3);
+      options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher + 3);
+      options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher + 1);
+      options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher + 1);
+      options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher + 1);
+      options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher + 2);
+      options.createOption("Task Settings", "Taskbar Mode", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher + 2);
 
       options.on("option.*.changed", changedEvent => {
         if (applyOption[changedEvent.getKey()] !== undefined) {
@@ -108,7 +108,7 @@ export class GameOptionsService {
       Object.entries(options.getAllOptions()).forEach(([_name, option]) => {
         const sequenceId = this.nextSequenceId(event.getLobby(), event.getPlayer().getConnection()!);
 
-        event.getLobby().sendRootGamePacket(new SetGameOption(sequenceId, option.getCategory(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
+        event.getLobby().sendRootGamePacket(new SetGameOption(sequenceId, option.getCategory(), option.getPriority(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
       });
     });
   }

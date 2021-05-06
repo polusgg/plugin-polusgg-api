@@ -226,11 +226,11 @@ export class Button extends Emittery<ButtonEvents> {
     return this.getTargets(range)[0];
   }
 
-  async reset(): Promise<void> {
+  async reset(counts: boolean = true): Promise<void> {
     const data = this
       .getEntity()
       .getClickBehaviour()
-      .setIsCountingDown(false)
+      .setIsCountingDown(counts)
       .setCurrentTime(this.getMaxTime())
       .serializeData();
 

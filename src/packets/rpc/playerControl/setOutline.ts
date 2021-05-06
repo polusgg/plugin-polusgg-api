@@ -6,7 +6,7 @@ export class SetOutlinePacket extends BaseRpcPacket {
     public enabled: boolean,
     public color: [number, number, number, number] | number[],
   ) {
-    super(0x90);
+    super(0x8a);
   }
 
   static deserialize(reader: MessageReader): SetOutlinePacket {

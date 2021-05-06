@@ -7,7 +7,7 @@ export class BeginPlayerAnimation extends BaseRpcPacket {
     public keyframes: PlayerAnimationKeyframe[],
     public reset: boolean,
   ) {
-    super(0x93);
+    super(0x8c);
   }
 
   static deserialize(reader: MessageReader): BeginPlayerAnimation {

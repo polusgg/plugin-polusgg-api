@@ -5,7 +5,7 @@ export class SetOpacityPacket extends BaseRpcPacket {
   constructor(
     public opacity: number,
   ) {
-    super(0x92);
+    super(0x8b);
   }
 
   static deserialize(reader: MessageReader): SetOpacityPacket {

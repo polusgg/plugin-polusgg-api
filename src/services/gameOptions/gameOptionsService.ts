@@ -33,6 +33,10 @@ export type LobbyDefaultOptions = {
 
 export class GameOptionsService {
   constructor() {
+    server.on("lobby.options.updated", event => {
+      event.cancel();
+    });
+
     server.on("server.lobby.created", event => {
       const options = new LobbyOptions<LobbyDefaultOptions>(event.getLobby());
 
@@ -40,7 +44,7 @@ export class GameOptionsService {
 
       const applyOption = {
         Map: (vanillaOptions: GameOptionsData, option: EnumValue) => { vanillaOptions.setLevels([option.index]) },
-        "Impostor Count": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setLevels([option.value]) },
+        "Impostor Count": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setImpostorCount(option.value) },
         "Max Button Presses": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setEmergencyMeetingCount(option.value) },
         "Button Cooldown": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setEmergencyCooldown(option.value) },
         "Discussion Time": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setDiscussionTime(option.value) },
@@ -63,24 +67,24 @@ export class GameOptionsService {
       event.getLobby().setMeta("pgg.options", options);
       event.getLobby().setMeta("pgg.optionSequenceId", new Map());
 
-      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]), GameOptionPriority.Higher + 5);
-      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher + 5);
-      options.createOption("Meeting Settings", "Max Button Presses", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher + 4);
-      options.createOption("Meeting Settings", "Button Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher + 4);
-      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher + 4);
-      options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher + 4);
-      options.createOption("Meeting Settings", "Anon Votes", new BooleanValue(false), GameOptionPriority.Higher + 4);
-      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher + 4);
-      options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher + 3);
-      options.createOption("Player Settings", "Crew Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher + 3);
-      options.createOption("Player Settings", "Impostor Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher + 3);
-      options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher + 3);
-      options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher + 3);
-      options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher + 1);
-      options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher + 1);
-      options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher + 1);
-      options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher + 2);
-      options.createOption("Task Settings", "Taskbar Mode", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher + 2);
+      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]), GameOptionPriority.Higher - 5);
+      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher - 5);
+      options.createOption("Meeting Settings", "Max Button Presses", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Button Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Anon Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);
+      options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
+      options.createOption("Player Settings", "Crew Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
+      options.createOption("Player Settings", "Impostor Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
+      options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher - 3);
+      options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher - 3);
+      options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 1);
+      options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher - 1);
+      options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher - 1);
+      options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 2);
+      options.createOption("Task Settings", "Taskbar Mode", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
 
       options.on("option.*.changed", changedEvent => {
         if (applyOption[changedEvent.getKey()] !== undefined) {

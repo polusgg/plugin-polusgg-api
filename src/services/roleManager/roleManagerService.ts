@@ -5,7 +5,7 @@ import { Player } from "@nodepolus/framework/src/player";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Server } from "@nodepolus/framework/src/server";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
-import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
+import { shuffleArray, shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { BaseManager } from "../../baseManager/baseManager";
 import { BaseRole } from "../../baseRole";
 import { RoleAlignment } from "../../baseRole/baseRole";
@@ -113,6 +113,8 @@ export class RoleManagerService {
         });
       }
     }
+
+    shuffleArray(assignmentArray);
 
     const fixedImpostorAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = new Array(options.getOption("Impostor Count").getValue().value).fill(0).map(_ => ({
       role: Impostor,

@@ -7,6 +7,8 @@ import { PlayerAnimationKeyframe } from "./keyframes/player";
 import { SetOutlinePacket } from "../../packets/rpc/playerControl/setOutline";
 import { SetOpacityPacket } from "../../packets/rpc/playerControl/setOpacity";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
+import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 
 export class AnimationService {
   async beginCameraAnimation(connection: Connection, cameraController: EntityCameraController, keyframes: CameraAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
@@ -25,8 +27,18 @@ export class AnimationService {
     });
   }
 
-  async setOutline(player: PlayerInstance, color: [number, number, number, number] | number[]): Promise<void> {
-    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new SetOutlinePacket(true, color));
+  async setOutline(player: PlayerInstance, color: [number, number, number, number] | number[], setFor: Connection[] = player.getLobby().getConnections()): Promise<void> {
+    const proms = new Array<Promise<void>>(setFor.length);
+
+    for (let i = 0; i < setFor.length; i++) {
+      const connection = setFor[i];
+
+      proms[i] = connection.writeReliable(new GameDataPacket([
+        new RpcPacket((player as Player).getEntity().getPlayerControl().getNetId(), new SetOutlinePacket(true, color)),
+      ], connection.getLobby()!.getCode()));
+    }
+
+    await Promise.all(proms);
   }
 
   async clearOutline(player: PlayerInstance): Promise<void> {

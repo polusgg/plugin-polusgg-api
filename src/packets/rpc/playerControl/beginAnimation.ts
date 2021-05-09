@@ -22,7 +22,9 @@ export class BeginPlayerAnimation extends BaseRpcPacket {
 
   serialize(writer: MessageWriter): void {
     for (let i = 0; i < this.keyframes.length; i++) {
+      writer.startMessage();
       this.keyframes[i].serialize(writer);
+      writer.endMessage();
     }
 
     writer.writeBoolean(this.reset);

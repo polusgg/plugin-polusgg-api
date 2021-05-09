@@ -66,7 +66,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
 
     return new DataPacket(
       this.netId,
-      writer.writeVector2(this.position),
+      writer.writeVector2(this.position).writePackedInt32(this.attachedTo),
     );
   }
 

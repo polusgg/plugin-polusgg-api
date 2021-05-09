@@ -20,7 +20,7 @@ export class AnimationService {
   }
 
   async beginPlayerAnimation(player: PlayerInstance, keyframes: PlayerAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
-    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new BeginPlayerAnimation(keyframes, reset));
+    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new BeginPlayerAnimation(keyframes, reset), player.getLobby().getConnections());
 
     return new Promise(resolve => {
       setTimeout(resolve, keyframes.map(keyframe => keyframe.getDuration()).reduce((sum, current) => sum + current, 0));
@@ -42,7 +42,7 @@ export class AnimationService {
   }
 
   async clearOutline(player: PlayerInstance): Promise<void> {
-    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new SetOutlinePacket(false, [0, 0, 0, 0]));
+    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new SetOutlinePacket(false, [0, 0, 0, 0]), player.getLobby().getConnections());
   }
 
   async setOpacity(player: PlayerInstance, opacity: number): Promise<void> {
@@ -50,6 +50,6 @@ export class AnimationService {
       throw new RangeError("Opacity out of range. Needs to be between 0 and 1");
     }
 
-    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new SetOpacityPacket(Math.floor(opacity * 255)));
+    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new SetOpacityPacket(Math.floor(opacity * 255)), player.getLobby().getConnections());
   }
 }

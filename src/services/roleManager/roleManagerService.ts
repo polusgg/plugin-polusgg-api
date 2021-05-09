@@ -126,6 +126,8 @@ export class RoleManagerService {
     const shuffledImpostors = shuffleArrayClone(game.getLobby().getPlayers().filter(p => p.isImpostor()));
     const shuffledPlayers = shuffleArrayClone(game.getLobby().getPlayers());
 
+    console.log(shuffledImpostors);
+
     for (let i = 0; i < shuffledImpostors.length; i++) {
       fixedImpostorAlignedRoles[i] = impostorAlignedRoles[i] ?? { role: Impostor, assignWith: RoleAlignment.Impostor };
     }
@@ -138,14 +140,20 @@ export class RoleManagerService {
       shuffledPlayers.splice(shuffledPlayers.indexOf(impostor), 1);
     });
 
-    shuffleArrayClone(nonImpostorAlignedRoles).forEach((assignment, index) => {
+    const fixedNonImpostorAlignedRoles = new Array <{ role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }>(shuffledPlayers.length);
+
+    for (let i = 0; i < fixedNonImpostorAlignedRoles.length; i++) {
+      fixedNonImpostorAlignedRoles[i] = nonImpostorAlignedRoles[i] ?? { role: Crewmate, assignWith: RoleAlignment.Crewmate };
+    }
+
+    shuffleArrayClone(fixedNonImpostorAlignedRoles).forEach((assignment, index) => {
       const role = this.assignRole(shuffledPlayers[index], assignment.role, assignment.startGameScreen);
 
       managers.push(role.getManagerType());
     });
 
-    for (let i = 0; i < shuffledPlayers.length; i++) {
-      const player = shuffledPlayers[i];
+    for (let i = 0; i < game.getLobby().getPlayers().length; i++) {
+      const player = game.getLobby().getPlayers()[i];
 
       if (player.getMeta<BaseRole | undefined>("pgg.api.role") === undefined) {
         const role = this.assignRole(player, Crewmate);

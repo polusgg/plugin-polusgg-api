@@ -9,4 +9,5 @@ export enum ServiceType {
   GameOptions,
   Animation,
   Name,
+  CoroutineManagerService,
 }

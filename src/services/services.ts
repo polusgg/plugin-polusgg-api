@@ -9,6 +9,7 @@ import { SoundManagerService } from "./soundManager";
 import { GameOptionsService } from "./gameOptions/gameOptionsService";
 import { AnimationService } from "./animation/animationService";
 import { NameService } from "./name";
+import { CoroutineManagerService } from "./coroutineManager/coroutineManagerService";
 
 const RESOURCE_SERVICE = new ResourceService();
 const ROLE_MANAGER_SERVICE = new RoleManagerService();
@@ -20,6 +21,7 @@ const SOUND_MANAGER_SERVICE = new SoundManagerService();
 const GAME_OPTIONS_SERVICE = new GameOptionsService();
 const ANIMATION_SERVICE = new AnimationService();
 const NAME_SERVICE = new NameService();
+const COROUTINE_MANAGER_SERVICE = new CoroutineManagerService();
 
 /* eslint-disable @typescript-eslint/indent */
 type ServiceFromType<T extends ServiceType> =
@@ -33,6 +35,7 @@ type ServiceFromType<T extends ServiceType> =
   T extends ServiceType.GameOptions ? GameOptionsService :
   T extends ServiceType.Animation ? AnimationService :
   T extends ServiceType.Name ? NameService :
+  T extends ServiceType.CoroutineManagerService ? CoroutineManagerService :
   undefined;
 /* eslint-enable @typescript-eslint/indent */
 
@@ -70,6 +73,9 @@ export class Services {
         break;
       case ServiceType.Name:
         service = NAME_SERVICE;
+        break;
+      case ServiceType.CoroutineManagerService:
+        service = COROUTINE_MANAGER_SERVICE;
         break;
     }
 

@@ -16,6 +16,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     protected readonly parent: BaseInnerNetEntity,
     protected alignment: EdgeAlignments = EdgeAlignments.None,
     protected position: Vector2 = Vector2.zero(),
+    protected z: number = 0,
     protected attachedTo: number = -1,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
@@ -28,6 +29,16 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
 
   setPosition(position: Vector2): this {
     this.position = position;
+
+    return this;
+  }
+
+  getZ(): number {
+    return this.z;
+  }
+
+  setZ(z: number): this {
+    this.z = z;
 
     return this;
   }
@@ -66,7 +77,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
 
     return new DataPacket(
       this.netId,
-      writer.writeVector2(this.position).writePackedInt32(this.attachedTo),
+      writer.writeVector2(this.position).writeFloat32(this.z).writePackedInt32(this.attachedTo),
     );
   }
 
@@ -82,12 +93,12 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
 
     return new SpawnPacketObject(
       this.netId,
-      writer.writeVector2(this.position).writePackedInt32(this.attachedTo),
+      writer.writeVector2(this.position).writeFloat32(this.z).writePackedInt32(this.attachedTo),
     );
   }
 
   clone(): InnerCustomNetworkTransformGeneric {
-    return new InnerCustomNetworkTransformGeneric(this.parent, this.alignment, this.position, this.netId);
+    return new InnerCustomNetworkTransformGeneric(this.parent, this.alignment, this.position, this.z, this.attachedTo, this.netId);
   }
 
   setAttachedTo(object: Attachable): this {

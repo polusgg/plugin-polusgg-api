@@ -14,6 +14,8 @@ export class EntityImage extends BaseInnerNetEntity {
     resourceId: number,
     position: Vector2,
     alignment: EdgeAlignments = EdgeAlignments.LeftBottom,
+    z: number = -50,
+    attachedTo: number = -1,
     graphicNetId: number = lobby.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
   ) {
@@ -21,7 +23,7 @@ export class EntityImage extends BaseInnerNetEntity {
 
     this.innerNetObjects = [
       new InnerGraphic(this, resourceId, graphicNetId),
-      new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, alignment, position, z, attachedTo, customNetworkTransformNetId),
     ];
   }
 

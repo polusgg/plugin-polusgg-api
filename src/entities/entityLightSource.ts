@@ -15,6 +15,8 @@ export class EntityLightSource extends BaseInnerNetEntity {
     owner: Connection,
     radius: number,
     position: Vector2 = Vector2.zero(),
+    z: number = -50,
+    attachedTo: number = -1,
     lightSourceNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
   ) {
@@ -22,7 +24,7 @@ export class EntityLightSource extends BaseInnerNetEntity {
 
     this.innerNetObjects = [
       new InnerLightSource(this, lightSourceNetId, radius),
-      new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, z, attachedTo, customNetworkTransformNetId),
     ];
   }
 

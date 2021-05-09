@@ -21,6 +21,8 @@ export class EntityButton extends BaseInnerNetEntity {
     saturated: boolean = true,
     color: [number, number, number, number] = [255, 255, 255, 255],
     isCountingDown: boolean = true,
+    z: number = -50,
+    attachedTo: number = -1,
     customNetworkTransformNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     graphicNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     clickBehaviourNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
@@ -28,7 +30,7 @@ export class EntityButton extends BaseInnerNetEntity {
     super(0x81, owner.getLobby()!, owner.getId(), SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, alignment, position, z, attachedTo, customNetworkTransformNetId),
       new InnerGraphic(this, resourceId, graphicNetId),
       new InnerClickBehaviour(this, maxTimer, currentTime, saturated, color, isCountingDown, clickBehaviourNetId),
     ];

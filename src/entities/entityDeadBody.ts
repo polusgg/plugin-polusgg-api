@@ -19,6 +19,8 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     hasFallen: boolean = false,
     bodyFacing: BodyDirection = BodyDirection.FacingLeft,
     alignment: EdgeAlignments = EdgeAlignments.None,
+    z: number = -50,
+    attachedTo: number = -1,
     deadBodyNetId: number = lobby.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
     clickBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
@@ -27,7 +29,7 @@ export class EntityDeadBody extends BaseInnerNetEntity {
 
     this.innerNetObjects = [
       new InnerDeadBody(this, color, shadowColor, hasFallen, bodyFacing, deadBodyNetId),
-      new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, alignment, position, z, attachedTo, customNetworkTransformNetId),
       new InnerClickBehaviour(this, 0, 0, true, [0, 0, 0, 0], false, clickBehaviourNetId),
     ];
   }

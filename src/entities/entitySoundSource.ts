@@ -22,6 +22,8 @@ export class EntitySoundSource extends BaseInnerNetEntity {
     soundFalloffStartingRadius: number = 10000,
     seek: number = 0,
     alignment: EdgeAlignments = EdgeAlignments.None,
+    z: number = -50,
+    attachedTo: number = -1,
     soundSourceNetId: number = lobby.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
   ) {
@@ -29,7 +31,7 @@ export class EntitySoundSource extends BaseInnerNetEntity {
 
     this.innerNetObjects = [
       new InnerSoundSource(this, soundSourceNetId, duration, resourceId, soundType, volumeModifier, looping, paused, pitch, soundFalloffMultiplier, soundFalloffStartingRadius, seek),
-      new InnerCustomNetworkTransformGeneric(this, alignment, position, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, alignment, position, z, attachedTo, customNetworkTransformNetId),
     ];
   }
 

@@ -15,6 +15,8 @@ export class EntityPointOfInterest extends BaseInnerNetEntity {
     owner: Connection,
     resourceId: number,
     position: Vector2 = Vector2.zero(),
+    z: number = -50,
+    attachedTo: number = -1,
     pointOfInterestNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     graphicNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
@@ -24,7 +26,7 @@ export class EntityPointOfInterest extends BaseInnerNetEntity {
     this.innerNetObjects = [
       new InnerPointOfInterest(this, pointOfInterestNetId),
       new InnerGraphic(this, resourceId, graphicNetId),
-      new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, -500, -1, customNetworkTransformNetId),
+      new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, z, attachedTo, customNetworkTransformNetId),
     ];
   }
 

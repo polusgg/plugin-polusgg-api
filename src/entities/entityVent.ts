@@ -18,13 +18,15 @@ export class EntityVent extends BaseInnerNetEntity {
     enterVentAnimationResourceId: number,
     exitVentAnimationResourceId: number,
     position: Vector2 = Vector2.zero(),
+    z: number = -50,
+    attachedTo: number = -1,
     ventNetId: number = lobby.getHostInstance().getNextNetId(),
   ) {
     super(0x84, lobby, GLOBAL_OWNER, SpawnFlag.None);
 
     this.innerNetObjects = [
       new InnerVent(this, ventNetId, ventSpriteResourceId, enterVentAnimationResourceId, exitVentAnimationResourceId, ventId, leftConnection, rightConnection, centerConnection),
-      new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position),
+      new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, z, attachedTo),
     ];
   }
 

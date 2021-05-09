@@ -5,6 +5,8 @@ import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { Attachable } from "@polusgg/plugin-polusgg-api/src/types/attachable";
+import { GameDataPacket } from "@polusgg/plugin-polusgg-api/node_modules/@nodepolus/framework/src/protocol/packets/root";
 
 // TODO: Rewrite to not suck ass
 
@@ -30,6 +32,14 @@ export class EntityButton extends BaseInnerNetEntity {
       new InnerGraphic(this, resourceId, graphicNetId),
       new InnerClickBehaviour(this, maxTimer, currentTime, saturated, color, isCountingDown, clickBehaviourNetId),
     ];
+  }
+
+  async attach(to: Attachable): Promise<void> {
+    const data = this.getCustomNetworkTransform().setAttachedTo(to).serializeData();
+
+    return this.getLobby().findSafeConnection(this.getOwnerId()).writeReliable(new GameDataPacket([
+      data,
+    ], this.getLobby().getCode()));
   }
 
   getCustomNetworkTransform(): InnerCustomNetworkTransformGeneric {

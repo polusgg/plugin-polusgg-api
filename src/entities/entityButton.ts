@@ -5,8 +5,8 @@ import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
-import { Attachable } from "@polusgg/plugin-polusgg-api/src/types/attachable";
-import { GameDataPacket } from "@polusgg/plugin-polusgg-api/node_modules/@nodepolus/framework/src/protocol/packets/root";
+import { Attachable } from "../types/attachable";
+import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 
 // TODO: Rewrite to not suck ass
 

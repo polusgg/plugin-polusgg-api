@@ -7,5 +7,5 @@ export enum EdgeAlignments {
   Top = 8,
   Bottom = 4,
   LeftTop = 9,
-  None = 11,
+  None = 0,
 }

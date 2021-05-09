@@ -15,15 +15,16 @@ export class EntityPointOfInterest extends BaseInnerNetEntity {
     owner: Connection,
     resourceId: number,
     position: Vector2 = Vector2.zero(),
-    cameraControllerNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
+    pointOfInterestNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
+    graphicNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
   ) {
     super(0x87, owner.getLobby()!, owner.getId(), SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerPointOfInterest(this, cameraControllerNetId),
-      new InnerGraphic(this, resourceId),
-      new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, customNetworkTransformNetId),
+      new InnerPointOfInterest(this, pointOfInterestNetId),
+      new InnerGraphic(this, resourceId, graphicNetId),
+      new InnerCustomNetworkTransformGeneric(this, EdgeAlignments.None, position, -500, -1, customNetworkTransformNetId),
     ];
   }
 

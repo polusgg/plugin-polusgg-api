@@ -7,7 +7,10 @@ import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
 import { EntityPointOfInterest } from "../entities";
 
 export class InnerPointOfInterest extends BaseInnerNetObject {
-  constructor(parent: BaseInnerNetEntity, netId: number) {
+  constructor(
+    parent: BaseInnerNetEntity,
+    netId: number = parent.getLobby()!.getHostInstance().getNextNetId(),
+  ) {
     super(0x86, parent, netId);
   }
 

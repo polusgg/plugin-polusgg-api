@@ -116,50 +116,38 @@ export class RoleManagerService {
 
     shuffleArray(assignmentArray);
 
-    const fixedImpostorAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = new Array(options.getOption("Impostor Count").getValue().value).fill(0).map(_ => ({
-      role: Impostor,
-      assignWith: RoleAlignment.Impostor,
-    }));
+    const players = shuffleArrayClone(game.getLobby().getPlayers());
 
-    const impostorAlignedRoles = assignmentArray.filter(i => i.assignWith === RoleAlignment.Impostor);
-    const nonImpostorAlignedRoles = assignmentArray.filter(i => i.assignWith !== RoleAlignment.Impostor).slice(0, game.getLobby().getPlayers().length - fixedImpostorAlignedRoles.length);
-    const shuffledImpostors = shuffleArrayClone(game.getLobby().getPlayers().filter(p => p.isImpostor()));
-    const shuffledPlayers = shuffleArrayClone(game.getLobby().getPlayers());
+    const impostorAlignedRolesFromAssignment = assignmentArray.filter(assignment => assignment.assignWith === RoleAlignment.Impostor);
+    const otherAlignedRolesFromAssignment = assignmentArray.filter(assignment => assignment.assignWith !== RoleAlignment.Impostor);
 
-    console.log(shuffledImpostors);
+    const impostorAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData }[] = [];
+    const otherAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = [];
 
-    for (let i = 0; i < shuffledImpostors.length; i++) {
-      fixedImpostorAlignedRoles[i] = impostorAlignedRoles[i] ?? { role: Impostor, assignWith: RoleAlignment.Impostor };
-    }
-
-    shuffleArrayClone(fixedImpostorAlignedRoles).forEach((assignment, index) => {
-      const impostor = shuffledImpostors[index];
-      const role = this.assignRole(impostor, assignment.role, assignment.startGameScreen);
-
-      managers.push(role.getManagerType());
-      shuffledPlayers.splice(shuffledPlayers.indexOf(impostor), 1);
-    });
-
-    const fixedNonImpostorAlignedRoles = new Array <{ role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }>(shuffledPlayers.length);
-
-    for (let i = 0; i < fixedNonImpostorAlignedRoles.length; i++) {
-      fixedNonImpostorAlignedRoles[i] = nonImpostorAlignedRoles[i] ?? { role: Crewmate, assignWith: RoleAlignment.Crewmate };
-    }
-
-    shuffleArrayClone(fixedNonImpostorAlignedRoles).forEach((assignment, index) => {
-      const role = this.assignRole(shuffledPlayers[index], assignment.role, assignment.startGameScreen);
-
-      managers.push(role.getManagerType());
-    });
-
-    for (let i = 0; i < game.getLobby().getPlayers().length; i++) {
-      const player = game.getLobby().getPlayers()[i];
-
-      if (player.getMeta<BaseRole | undefined>("pgg.api.role") === undefined) {
-        const role = this.assignRole(player, Crewmate);
-
-        managers.push(role.getManagerType());
+    for (let i = 0; i < options.getOption("Impostor Count").getValue().value; i++) {
+      if (i >= impostorAlignedRolesFromAssignment.length) {
+        impostorAlignedRoles.push({ role: Impostor });
+      } else {
+        impostorAlignedRoles.push(impostorAlignedRolesFromAssignment[i]);
       }
+    }
+
+    for (let i = 0; i < players.length - (options.getOption("Impostor Count").getValue().value); i++) {
+      if (i >= otherAlignedRolesFromAssignment.length) {
+        otherAlignedRoles.push({ role: Crewmate, assignWith: RoleAlignment.Crewmate });
+      } else {
+        otherAlignedRoles.push(otherAlignedRolesFromAssignment[i]);
+      }
+    }
+
+    const allRoleAssignments = [...impostorAlignedRoles, ...otherAlignedRoles];
+
+    if (allRoleAssignments.length !== players.length) {
+      throw new Error("Crying rn. The normalized length of all the roles did not match up with the number of players.");
+    }
+
+    for (let i = 0; i < allRoleAssignments.length; i++) {
+      managers.push(this.assignRole(players[i], allRoleAssignments[i].role, allRoleAssignments[i].startGameScreen).getManagerType());
     }
 
     const uniqueManagers = [...new Set(managers)];

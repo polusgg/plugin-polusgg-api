@@ -53,7 +53,7 @@ export default class PolusGGApi extends BasePlugin {
       const impostorRoleDecls = roles.filter(r => r.role === Impostor);
       const impostorCounts = impostorRoleDecls.reduce((a, r) => a + r.playerCount, 0);
 
-      console.log(roles);
+      event.setImpostors([]);
 
       if (impostorRoleDecls.length > 0) {
         event.setImpostors(shuffleArrayClone(event.getGame().getLobby().getPlayers()).slice(0, impostorCounts));

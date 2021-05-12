@@ -118,6 +118,10 @@ export class RoleManagerService {
 
     const players = shuffleArrayClone(game.getLobby().getPlayers());
 
+    if (players.length === 0) {
+      return;
+    }
+
     const impostorAlignedRolesFromAssignment = assignmentArray.filter(assignment => assignment.assignWith === RoleAlignment.Impostor);
     const otherAlignedRolesFromAssignment = assignmentArray.filter(assignment => assignment.assignWith !== RoleAlignment.Impostor);
 
@@ -132,6 +136,8 @@ export class RoleManagerService {
       }
     }
 
+    console.log(players.length - (options.getOption("Impostor Count").getValue().value));
+
     for (let i = 0; i < players.length - (options.getOption("Impostor Count").getValue().value); i++) {
       if (i >= otherAlignedRolesFromAssignment.length) {
         otherAlignedRoles.push({ role: Crewmate, assignWith: RoleAlignment.Crewmate });
@@ -143,6 +149,7 @@ export class RoleManagerService {
     const allRoleAssignments = [...impostorAlignedRoles, ...otherAlignedRoles];
 
     if (allRoleAssignments.length !== players.length) {
+      console.log({ impostorAlignedRoles, otherAlignedRoles });
       throw new Error("Crying rn. The normalized length of all the roles did not match up with the number of players.");
     }
 

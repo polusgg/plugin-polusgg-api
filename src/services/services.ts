@@ -9,70 +9,24 @@ import { SoundManagerService } from "./soundManager";
 import { GameOptionsService } from "./gameOptions/gameOptionsService";
 import { AnimationService } from "./animation/animationService";
 import { NameService } from "./name";
+import { DeadBodyService } from "./deadBody/deadBodyService";
 
-const RESOURCE_SERVICE = new ResourceService();
-const ROLE_MANAGER_SERVICE = new RoleManagerService();
-const BUTTON_MANAGER_SERVICE = new ButtonManagerService();
-const CAMERA_MANAGER_SERVICE = new CameraManagerService();
-const POINT_OF_INTEREST_MANAGER_SERVICE = new PointOfInterestManagerService();
-const LIGHT_MANAGER_SERVICE = new LightManagerService();
-const SOUND_MANAGER_SERVICE = new SoundManagerService();
-const GAME_OPTIONS_SERVICE = new GameOptionsService();
-const ANIMATION_SERVICE = new AnimationService();
-const NAME_SERVICE = new NameService();
-
-/* eslint-disable @typescript-eslint/indent */
-type ServiceFromType<T extends ServiceType> =
-  T extends ServiceType.Resource ? ResourceService :
-  T extends ServiceType.RoleManager ? RoleManagerService :
-  T extends ServiceType.Button ? ButtonManagerService :
-  T extends ServiceType.CameraManager ? CameraManagerService :
-  T extends ServiceType.PointOfInterestManager ? PointOfInterestManagerService :
-  T extends ServiceType.LightManager ? LightManagerService :
-  T extends ServiceType.SoundManager ? SoundManagerService :
-  T extends ServiceType.GameOptions ? GameOptionsService :
-  T extends ServiceType.Animation ? AnimationService :
-  T extends ServiceType.Name ? NameService :
-  undefined;
-/* eslint-enable @typescript-eslint/indent */
+const serviceFromType = {
+  [ServiceType.Resource]: new ResourceService(),
+  [ServiceType.RoleManager]: new RoleManagerService(),
+  [ServiceType.Button]: new ButtonManagerService(),
+  [ServiceType.CameraManager]: new CameraManagerService(),
+  [ServiceType.PointOfInterestManager]: new PointOfInterestManagerService(),
+  [ServiceType.LightManager]: new LightManagerService(),
+  [ServiceType.SoundManager]: new SoundManagerService(),
+  [ServiceType.GameOptions]: new GameOptionsService(),
+  [ServiceType.Animation]: new AnimationService(),
+  [ServiceType.Name]: new NameService(),
+  [ServiceType.DeadBody]: new DeadBodyService(),
+};
 
 export class Services {
-  static get<T extends ServiceType>(serviceType: T): ServiceFromType<T> {
-    let service;
-
-    switch (serviceType) {
-      case ServiceType.Resource:
-        service = RESOURCE_SERVICE;
-        break;
-      case ServiceType.RoleManager:
-        service = ROLE_MANAGER_SERVICE;
-        break;
-      case ServiceType.Button:
-        service = BUTTON_MANAGER_SERVICE;
-        break;
-      case ServiceType.CameraManager:
-        service = CAMERA_MANAGER_SERVICE;
-        break;
-      case ServiceType.PointOfInterestManager:
-        service = POINT_OF_INTEREST_MANAGER_SERVICE;
-        break;
-      case ServiceType.LightManager:
-        service = LIGHT_MANAGER_SERVICE;
-        break;
-      case ServiceType.SoundManager:
-        service = SOUND_MANAGER_SERVICE;
-        break;
-      case ServiceType.GameOptions:
-        service = GAME_OPTIONS_SERVICE;
-        break;
-      case ServiceType.Animation:
-        service = ANIMATION_SERVICE;
-        break;
-      case ServiceType.Name:
-        service = NAME_SERVICE;
-        break;
-    }
-
-    return service as ServiceFromType<T>;
+  static get<T extends ServiceType>(serviceType: T): (typeof serviceFromType)[T] {
+    return serviceFromType[serviceType];
   }
 }

@@ -1,9 +1,10 @@
 import { AssetBundleDeclaration } from "../types/assetBundleDeclaration";
-import fetch from "node-fetch";
 import { Asset } from "./asset";
-import { URL } from "url";
+import got from "got";
 
-const rootPath = "https://polusgg-assetbundles.nyc3.digitaloceanspaces.com/";
+const fetchAssetBundleApi = got.extend({
+  prefixUrl: "https://client-assetbundles.polus.gg/",
+});
 
 export class AssetBundle {
   protected static readonly cache: Map<string, AssetBundle> = new Map();
@@ -18,17 +19,14 @@ export class AssetBundle {
     }
   }
 
-  static async load(fileName: string, path?: string): Promise<AssetBundle> {
-    const address = new URL(rootPath, path);
-
+  static async load(fileName: string): Promise<AssetBundle> {
     if (this.cache.has(fileName)) {
       return this.cache.get(fileName)!;
     }
 
-    const response = await fetch(`${address.href}${fileName}/${fileName}.json`);
-    const content = await response.json() as AssetBundleDeclaration;
+    const { body } = await fetchAssetBundleApi<AssetBundleDeclaration>(`${fileName}/${fileName}.json`);
 
-    const bundle = new AssetBundle(content, `${address.href}${fileName}/${fileName}`);
+    const bundle = new AssetBundle(body, `${fileName}/${fileName}`);
 
     this.cache.set(fileName, bundle);
 
@@ -107,7 +105,7 @@ export class AssetBundle {
     return this.address;
   }
 
-  getHash(): number[] {
+  getHash(): string {
     return this.declaration.hash;
   }
 }

@@ -29,6 +29,6 @@
   "dependencies": {
     "@nodepolus/framework": "latest",
     "emittery": "^0.8.1",
-    "node-fetch": "^2.6.1"
+    "got": "^11.8.2"
   }
 }

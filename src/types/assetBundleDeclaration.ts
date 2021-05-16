@@ -26,6 +26,6 @@ export type AssetDeclaration = BaseAssetDeclaration | AudioAssetDeclaration;
 
 export type AssetBundleDeclaration = {
   assetBundleId: number;
-  hash: number[];
+  hash: string;
   assets: AssetDeclaration[];
 };

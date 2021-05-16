@@ -21,7 +21,7 @@ export class FetchResourcePacket extends BaseRootPacket {
     return new FetchResourcePacket(
       reader.readPackedUInt32(),
       reader.readString(),
-      Buffer.from(reader.readBytes(16).getBuffer()),
+      Buffer.from(reader.readBytes(32).getBuffer()),
       reader.readByte(),
     );
   }

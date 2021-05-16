@@ -29,7 +29,7 @@ export class ResourceService {
     connection.writeReliable(new FetchResourcePacket(
       assetBundle.getId(),
       assetBundle.getAddress(),
-      Buffer.from(assetBundle.getHash()),
+      Buffer.from(assetBundle.getHash(), "hex"),
       ResourceType.AssetBundle,
     ));
 

@@ -217,12 +217,22 @@ export class Button extends Emittery<ButtonEvents> {
     return alignment === EdgeAlignments.None ? position : alignment;
   }
 
-  getTargets(range: number): PlayerInstance[] {
+  getTargetsUnfiltered(range: number): PlayerInstance[] {
     return this
       .getLobby()
       .getPlayers()
       .filter(p => p.getConnection()?.getId() !== this.getOwner().getId() && p.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) <= range)
       .sort((p1, p2) => p1.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) - p2.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()));
+  }
+
+  getTargets(range: number): PlayerInstance[] {
+    return this
+      .getTargetsUnfiltered(range)
+      .filter(player => player.getMeta<boolean>("pgg.api.targetable"));
+  }
+
+  getTargetUnfiltered(range: number): PlayerInstance | undefined {
+    return this.getTargetsUnfiltered(range)[0];
   }
 
   getTarget(range: number): PlayerInstance | undefined {

@@ -10,6 +10,7 @@ import { GameOptionsService } from "./gameOptions/gameOptionsService";
 import { AnimationService } from "./animation/animationService";
 import { NameService } from "./name";
 import { DeadBodyService } from "./deadBody/deadBodyService";
+import { CoroutineManagerService } from "./coroutineManager/coroutineManagerService";
 
 const serviceFromType = {
   [ServiceType.Resource]: new ResourceService(),

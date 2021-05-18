@@ -10,4 +10,5 @@ export enum ServiceType {
   Animation,
   Name,
   DeadBody,
+  CoroutineManager,
 }

@@ -23,6 +23,7 @@ const serviceFromType = {
   [ServiceType.Animation]: new AnimationService(),
   [ServiceType.Name]: new NameService(),
   [ServiceType.DeadBody]: new DeadBodyService(),
+  [ServiceType.CoroutineManager]: new CoroutineManagerService(),
 };
 
 export class Services {

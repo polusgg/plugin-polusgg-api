@@ -11,6 +11,7 @@ import { AnimationService } from "./animation/animationService";
 import { NameService } from "./name";
 import { DeadBodyService } from "./deadBody/deadBodyService";
 import { CoroutineManagerService } from "./coroutineManager/coroutineManagerService";
+import { VentService } from "./vent";
 
 const serviceFromType = {
   [ServiceType.Resource]: new ResourceService(),
@@ -25,6 +26,7 @@ const serviceFromType = {
   [ServiceType.Name]: new NameService(),
   [ServiceType.DeadBody]: new DeadBodyService(),
   [ServiceType.CoroutineManager]: new CoroutineManagerService(),
+  [ServiceType.Vent]: new VentService(),
 };
 
 export class Services {

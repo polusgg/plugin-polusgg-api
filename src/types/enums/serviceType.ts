@@ -11,4 +11,5 @@ export enum ServiceType {
   Name,
   DeadBody,
   CoroutineManager,
+  Vent,
 }

@@ -1,5 +1,5 @@
 import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
-import { Vector2 } from "@nodepolus/framework/src/types";
+import { Bitfield, Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { Palette } from "@nodepolus/framework/src/static";
 
 export class PlayerAnimationKeyframe {
@@ -46,36 +46,123 @@ export class PlayerAnimationKeyframe {
     this.angle = angle;
   }
 
-  static deserialize(reader: MessageReader): PlayerAnimationKeyframe {
-    return new PlayerAnimationKeyframe({
+  static deserialize(reader: MessageReader, enableBits: Bitfield): PlayerAnimationKeyframe {
+    const keyframe: {
+      offset: number;
+      duration: number;
+      opacity: number;
+      hatOpacity: number;
+      petOpacity: number;
+      skinOpacity: number;
+      primaryColor: [number, number, number, number] | number[];
+      secondaryColor: [number, number, number, number] | number[];
+      tertiaryColor: [number, number, number, number] | number[];
+      scale: Vector2;
+      position: Vector2;
+      angle: number;
+    } = {
       offset: reader.readPackedUInt32(),
       duration: reader.readPackedUInt32(),
-      opacity: reader.readFloat32(),
-      hatOpacity: reader.readFloat32(),
-      petOpacity: reader.readFloat32(),
-      skinOpacity: reader.readFloat32(),
-      primaryColor: [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()],
-      secondaryColor: [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()],
-      tertiaryColor: [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()],
-      scale: reader.readVector2(),
-      position: reader.readVector2(),
-      angle: reader.readFloat32(),
-    });
+      opacity: 1,
+      hatOpacity: 1,
+      petOpacity: 1,
+      skinOpacity: 1,
+      primaryColor: Palette.white() as Mutable<[number, number, number, number]>,
+      secondaryColor: Palette.white() as Mutable<[number, number, number, number]>,
+      tertiaryColor: Palette.white() as Mutable<[number, number, number, number]>,
+      scale: Vector2.one(),
+      position: Vector2.zero(),
+      angle: 0,
+    };
+
+    if (enableBits.has(0)) {
+      keyframe.opacity = reader.readFloat32();
+    }
+
+    if (enableBits.has(1)) {
+      keyframe.hatOpacity = reader.readFloat32();
+    }
+
+    if (enableBits.has(2)) {
+      keyframe.petOpacity = reader.readFloat32();
+    }
+
+    if (enableBits.has(3)) {
+      keyframe.skinOpacity = reader.readFloat32();
+    }
+
+    if (enableBits.has(4)) {
+      keyframe.primaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
+    }
+
+    if (enableBits.has(5)) {
+      keyframe.secondaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
+    }
+
+    if (enableBits.has(6)) {
+      keyframe.tertiaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
+    }
+
+    if (enableBits.has(7)) {
+      keyframe.scale = reader.readVector2();
+    }
+
+    if (enableBits.has(8)) {
+      keyframe.position = reader.readVector2();
+    }
+
+    if (enableBits.has(9)) {
+      keyframe.angle = reader.readFloat32();
+    }
+
+    return new PlayerAnimationKeyframe(keyframe);
   }
 
-  serialize(writer: MessageWriter): void {
+  serialize(writer: MessageWriter, enableBits: Bitfield): void {
     writer.writePackedUInt32(this.offset);
     writer.writePackedUInt32(this.duration);
-    writer.writeFloat32(this.opacity);
-    writer.writeFloat32(this.hatOpacity);
-    writer.writeFloat32(this.petOpacity);
-    writer.writeFloat32(this.skinOpacity);
-    writer.writeBytes(this.primaryColor);
-    writer.writeBytes(this.secondaryColor);
-    writer.writeBytes(this.tertiaryColor);
-    writer.writeVector2(this.scale);
-    writer.writeVector2(this.position);
-    writer.writeFloat32(this.angle);
+
+    writer.writeUInt16(enableBits.toNumber());
+
+    if (enableBits.has(0)) {
+      writer.writeFloat32(this.opacity);
+    }
+
+    if (enableBits.has(1)) {
+      writer.writeFloat32(this.hatOpacity);
+    }
+
+    if (enableBits.has(2)) {
+      writer.writeFloat32(this.petOpacity);
+    }
+
+    if (enableBits.has(3)) {
+      writer.writeFloat32(this.skinOpacity);
+    }
+
+    if (enableBits.has(4)) {
+      writer.writeBytes(this.primaryColor);
+    }
+
+    if (enableBits.has(5)) {
+      writer.writeBytes(this.secondaryColor);
+    }
+
+    if (enableBits.has(6)) {
+      writer.writeBytes(this.tertiaryColor);
+    }
+
+    if (enableBits.has(7)) {
+      writer.writeVector2(this.scale);
+    }
+
+    if (enableBits.has(8)) {
+      writer.writeVector2(this.position);
+    }
+
+    if (enableBits.has(9)) {
+      writer.writeFloat32(this.angle);
+    }
   }
 
   getOffset(): number {

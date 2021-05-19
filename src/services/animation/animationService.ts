@@ -9,6 +9,7 @@ import { SetOpacityPacket } from "../../packets/rpc/playerControl/setOpacity";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
+import { CameraAnimationFields } from "../../types/cameraAnimationFields";
 
 export class AnimationService {
   async beginCameraAnimation(connection: Connection, cameraController: EntityCameraController, keyframes: CameraAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
@@ -19,8 +20,11 @@ export class AnimationService {
     });
   }
 
-  async beginPlayerAnimation(player: PlayerInstance, keyframes: PlayerAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
-    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new BeginPlayerAnimation(keyframes, reset), player.getLobby().getConnections());
+  async beginPlayerAnimation(player: PlayerInstance, enabledFields: CameraAnimationFields, keyframes: PlayerAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
+    // yeah it's ugly but if you think it's that bad then rewrite it yourself.
+    const bitfield = [enabledFields.opacity, enabledFields.hatOpacity, enabledFields.petOpacity, enabledFields.skinOpacity, enabledFields.primaryColor, enabledFields.primaryColor, enabledFields.secondaryColor, enabledFields.tertiaryColor, enabledFields.scale, enabledFields.position, enabledFields.angle];
+
+    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new BeginPlayerAnimation(bitfield, keyframes, reset), player.getLobby().getConnections());
 
     return new Promise(resolve => {
       setTimeout(resolve, keyframes.map(keyframe => keyframe.getDuration()).reduce((sum, current) => sum + current, 0));

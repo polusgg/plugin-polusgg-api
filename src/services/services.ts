@@ -9,8 +9,7 @@ import { SoundManagerService } from "./soundManager";
 import { GameOptionsService } from "./gameOptions/gameOptionsService";
 import { AnimationService } from "./animation/animationService";
 import { NameService } from "./name";
-import { DeadBodyService } from "@polusgg/plugin-polusgg-api/src/services/deadBody/deadBodyService";
-import { NotificationService } from "@polusgg/plugin-polusgg-api/src/services/notification/notificationService";
+import { NotificationService } from "./notification/notificationService";
 import { DeadBodyService } from "./deadBody/deadBodyService";
 import { CoroutineManagerService } from "./coroutineManager/coroutineManagerService";
 import { VentService } from "./vent";
@@ -27,7 +26,7 @@ const serviceFromType = {
   [ServiceType.Animation]: new AnimationService(),
   [ServiceType.Name]: new NameService(),
   [ServiceType.DeadBody]: new DeadBodyService(),
-  [ServiceType.Notification]: new NotificationService()
+  [ServiceType.Notification]: new NotificationService(),
   [ServiceType.CoroutineManager]: new CoroutineManagerService(),
   [ServiceType.Vent]: new VentService(),
 };

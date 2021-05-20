@@ -1,4 +1,4 @@
-export type CameraAnimationFields = {
+export type CameraAnimationFields = Partial<{
   opacity: boolean;
   hatOpacity: boolean;
   petOpacity: boolean;
@@ -9,4 +9,4 @@ export type CameraAnimationFields = {
   scale: boolean;
   position: boolean;
   angle: boolean;
-};
+}>;

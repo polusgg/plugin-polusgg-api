@@ -13,6 +13,7 @@ import { NotificationService } from "./notification/notificationService";
 import { DeadBodyService } from "./deadBody/deadBodyService";
 import { CoroutineManagerService } from "./coroutineManager/coroutineManagerService";
 import { VentService } from "./vent";
+import { CosmeticService } from "./cosmetics/cosmeticService";
 
 const serviceFromType = {
   [ServiceType.Resource]: new ResourceService(),
@@ -29,6 +30,7 @@ const serviceFromType = {
   [ServiceType.Notification]: new NotificationService(),
   [ServiceType.CoroutineManager]: new CoroutineManagerService(),
   [ServiceType.Vent]: new VentService(),
+  [ServiceType.Cosmetic]: new CosmeticService(),
 };
 
 export class Services {

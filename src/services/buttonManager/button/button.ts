@@ -11,7 +11,7 @@ import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Asset } from "../../../assets";
 import { ButtonCountdownUpdated } from "../events/buttonCountdownUpdated";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { Attachable } from "@polusgg/plugin-polusgg-api/src/types/attachable";
+import { Attachable } from "../../../../src/types/attachable";
 
 export type ButtonEvents = ClickBehaviourEvents & {
   "button.countdown.started": ButtonCountdownUpdated;

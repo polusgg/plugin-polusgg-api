@@ -13,4 +13,5 @@ export enum ServiceType {
   Vent,
   CoroutineManager,
   Notification,
+  Cosmetic,
 }

@@ -7,13 +7,13 @@ import { ServiceType } from "../../types/enums";
 import { EntityButton } from "../../entities";
 import { Services } from "../services";
 import { Button } from ".";
-import { Asset } from "../../assets";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { SetCountingDown } from "../../packets/rpc/clickBehaviour/setCountingDown";
 import { BaseInnerNetObject } from "@nodepolus/framework/src/protocol/entities/baseEntity";
 import { InnerClickBehaviour } from "../../innerNetObjects";
 import { ButtonCountdownUpdated } from "./events/buttonCountdownUpdated";
 import { ClickPacket } from "../../packets/rpc/clickBehaviour";
+import { ButtonFields } from "@polusgg/plugin-polusgg-api/src/types/buttonFields";
 
 declare const server: Server;
 
@@ -33,16 +33,7 @@ export class ButtonManagerService {
     RpcPacket.registerPacket(0x86, ClickPacket.deserialize, this.handleClickButton.bind(this));
   }
 
-  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment }: {
-    asset: Asset;
-    position: Vector2;
-    maxTimer: number;
-    currentTime?: number;
-    saturated?: boolean;
-    color?: [number, number, number, number];
-    isCountingDown?: boolean;
-    alignment: EdgeAlignments;
-  }): Promise<Button> {
+  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment }: ButtonFields): Promise<Button> {
     const lobby = connection.getLobby();
 
     if (lobby === undefined) {

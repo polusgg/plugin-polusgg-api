@@ -5,7 +5,7 @@ import { PlayerAnimationKeyframe } from "../../../services/animation/keyframes/p
 
 export class BeginPlayerAnimation extends BaseRpcPacket {
   constructor(
-    public enableBits: [boolean] | boolean[],
+    public enableBits: Bitfield,
     public keyframes: PlayerAnimationKeyframe[],
     public reset: boolean,
   ) {
@@ -20,17 +20,15 @@ export class BeginPlayerAnimation extends BaseRpcPacket {
       keyframes.push(PlayerAnimationKeyframe.deserialize(reader.readMessage()!, bitfield));
     }
 
-    return new BeginPlayerAnimation(bitfield.getBits(), keyframes, reader.readBoolean());
+    return new BeginPlayerAnimation(bitfield, keyframes, reader.readBoolean());
   }
 
   serialize(writer: MessageWriter): void {
-    const bitfield = new Bitfield(this.enableBits);
-
-    writer.writeUInt16(bitfield.toNumber());
+    writer.writeUInt16(this.enableBits.toNumber());
 
     for (let i = 0; i < this.keyframes.length; i++) {
       writer.startMessage();
-      this.keyframes[i].serialize(writer, bitfield);
+      this.keyframes[i].serialize(writer, this.enableBits);
       writer.endMessage();
     }
 
@@ -38,6 +36,6 @@ export class BeginPlayerAnimation extends BaseRpcPacket {
   }
 
   clone(): BeginPlayerAnimation {
-    return new BeginPlayerAnimation(this.enableBits.map(x => x), this.keyframes.map(c => c.clone()), this.reset);
+    return new BeginPlayerAnimation(this.enableBits.clone(), this.keyframes.map(c => c.clone()), this.reset);
   }
 }

@@ -24,9 +24,9 @@ export class AssetBundle {
       return this.cache.get(fileName)!;
     }
 
-    const { body } = await fetchAssetBundleApi<AssetBundleDeclaration>(`${fileName}/${fileName}.json`);
+    const { body } = await fetchAssetBundleApi<string>(`${fileName}/${fileName}.json`);
 
-    const bundle = new AssetBundle(body, `${fileName}/${fileName}`);
+    const bundle = new AssetBundle(JSON.parse(body) as AssetBundleDeclaration, `${fileName}/${fileName}`);
 
     this.cache.set(fileName, bundle);
 

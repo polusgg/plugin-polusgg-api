@@ -10,3 +10,16 @@ export type PlayerAnimationFields = Partial<{
   position: boolean;
   angle: boolean;
 }>;
+
+export enum PlayerAnimationField {
+  Opacity,
+  HatOpacity,
+  PetOpacity,
+  SkinOpacity,
+  PrimaryColor,
+  SecondaryColor,
+  TertiaryColor,
+  Scale,
+  Position,
+  Angle,
+}

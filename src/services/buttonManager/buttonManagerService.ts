@@ -11,7 +11,7 @@ import { BaseInnerNetObject } from "@nodepolus/framework/src/protocol/entities/b
 import { InnerClickBehaviour } from "../../innerNetObjects";
 import { ButtonCountdownUpdated } from "./events/buttonCountdownUpdated";
 import { ClickPacket } from "../../packets/rpc/clickBehaviour";
-import { ButtonFields } from "@polusgg/plugin-polusgg-api/src/types/buttonFields";
+import { ButtonFields } from "../../types/buttonFields";
 
 declare const server: Server;
 

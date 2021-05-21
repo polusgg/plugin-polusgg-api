@@ -9,7 +9,7 @@ import { SetOpacityPacket } from "../../packets/rpc/playerControl/setOpacity";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
-import { CameraAnimationFields } from "../../types/cameraAnimationFields";
+import { PlayerAnimationFields } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 
 export class AnimationService {
   async beginCameraAnimation(connection: Connection, cameraController: EntityCameraController, keyframes: CameraAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
@@ -20,7 +20,7 @@ export class AnimationService {
     });
   }
 
-  async beginPlayerAnimation(player: PlayerInstance, enabledFields: CameraAnimationFields, keyframes: PlayerAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
+  async beginPlayerAnimation(player: PlayerInstance, enabledFields: PlayerAnimationFields, keyframes: PlayerAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
     // yeah it's ugly but if you think it's that bad then rewrite it yourself.
     const bitfield = [enabledFields.opacity, enabledFields.hatOpacity, enabledFields.petOpacity, enabledFields.skinOpacity, enabledFields.primaryColor, enabledFields.primaryColor, enabledFields.secondaryColor, enabledFields.tertiaryColor, enabledFields.scale, enabledFields.position, enabledFields.angle];
 

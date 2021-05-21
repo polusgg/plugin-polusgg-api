@@ -1,4 +1,4 @@
-export type CameraAnimationFields = Partial<{
+export type PlayerAnimationFields = Partial<{
   opacity: boolean;
   hatOpacity: boolean;
   petOpacity: boolean;

@@ -18,32 +18,33 @@ export class PlayerAnimationKeyframe {
 
   constructor(
     { offset, duration, opacity, hatOpacity, petOpacity, skinOpacity, primaryColor, secondaryColor, tertiaryColor, scale, position, angle }: {
-      offset: number;
+      offset?: number;
       duration: number;
-      opacity: number;
+      opacity?: number;
       hatOpacity?: number;
       petOpacity?: number;
       skinOpacity?: number;
-      primaryColor: [number, number, number, number] | number[];
-      secondaryColor: [number, number, number, number] | number[];
+      primaryColor?: [number, number, number, number] | number[];
+      secondaryColor?: [number, number, number, number] | number[];
       tertiaryColor?: [number, number, number, number] | number[];
-      scale: Vector2;
-      position: Vector2;
-      angle: number;
+      scale?: Vector2;
+      position?: Vector2;
+      angle?: number;
     },
   ) {
-    this.offset = offset;
+    this.offset = offset ?? 0;
     this.duration = duration;
+    opacity = opacity ?? 1;
     this.opacity = opacity;
     this.hatOpacity = hatOpacity ?? opacity;
     this.petOpacity = petOpacity ?? opacity;
     this.skinOpacity = skinOpacity ?? opacity;
-    this.primaryColor = primaryColor;
-    this.secondaryColor = secondaryColor;
+    this.primaryColor = primaryColor ?? [...Palette.white()];
+    this.secondaryColor = secondaryColor ?? [...Palette.white()];
     this.tertiaryColor = tertiaryColor ?? [...Palette.playerVisor()];
-    this.scale = scale;
-    this.position = position;
-    this.angle = angle;
+    this.scale = scale ?? Vector2.one();
+    this.position = position ?? Vector2.zero();
+    this.angle = angle ?? 0;
   }
 
   static deserialize(reader: MessageReader, enableBits: Bitfield): PlayerAnimationKeyframe {

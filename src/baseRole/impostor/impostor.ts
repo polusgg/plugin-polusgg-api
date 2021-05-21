@@ -25,20 +25,26 @@ export class Impostor extends BaseRole {
 
   private readonly role: PlayerRole;
   private button: Button | undefined;
+  private onClicked: (() => void) | undefined;
+  private targetPredicate: ((players: PlayerInstance[]) => PlayerInstance) | undefined;
+  private range: number;
 
   constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor) {
     super(owner);
 
     this.role = role;
+    this.onClicked = undefined;
+    this.targetPredicate = undefined;
+    this.range = this.owner.getLobby().getOptions().getKillDistance();
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("Global")).then(this.onReady.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("Global")).then(this.onReadyImpostor.bind(this));
     } else {
-      this.onReady();
+      this.onReadyImpostor();
     }
   }
 
-  async onReady(): Promise<void> {
+  async onReadyImpostor(): Promise<void> {
     Services.get(ServiceType.RoleManager).setBaseRole(this.owner as Player, this.role);
 
     this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
@@ -65,8 +71,8 @@ export class Impostor extends BaseRole {
         return;
       }
 
-      const target = this.button.getTargets(this.owner.getLobby().getOptions().getKillDistance())
-        .filter(player => !player.isImpostor())[0] as PlayerInstance | undefined;
+      const target = this.targetPredicate === undefined ? this.button.getTargets(this.range)
+        .filter(player => !player.isImpostor())[0] as PlayerInstance | undefined : this.targetPredicate(this.button.getTargetsUnfiltered(this.range));
 
       if (target === undefined) {
         return;
@@ -74,7 +80,11 @@ export class Impostor extends BaseRole {
 
       this.button.reset();
 
-      this.owner.murder(target);
+      if (this.onClicked === undefined) {
+        this.owner.murder(target);
+      } else {
+        this.onClicked();
+      }
     });
   }
 
@@ -97,6 +107,18 @@ export class Impostor extends BaseRole {
 
   getImpostorButton(): Button | undefined {
     return this.button;
+  }
+
+  getPlayerRole(): PlayerRole {
+    return this.role;
+  }
+
+  setOnClicked(callback: () => void) {
+    this.onClicked = callback;
+  }
+
+  setTargetPredicate(callback: (players: PlayerInstance[]) => PlayerInstance) {
+    this.targetPredicate = callback;
   }
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {

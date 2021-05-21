@@ -23,38 +23,58 @@ export class Impostor extends BaseRole {
     alignment: RoleAlignment.Impostor,
   };
 
-  constructor(owner: PlayerInstance) {
+  private readonly role: PlayerRole;
+  private button: Button | undefined;
+
+  constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor) {
     super(owner);
 
-    Services.get(ServiceType.RoleManager).setBaseRole(owner as Player, PlayerRole.Impostor);
+    this.role = role;
 
-    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("Global")).then(this.onReady.bind(this));
+    } else {
+      this.onReady();
+    }
+  }
+
+  async onReady(): Promise<void> {
+    Services.get(ServiceType.RoleManager).setBaseRole(this.owner as Player, this.role);
+
+    this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("Global").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
-      maxTimer: owner.getLobby().getOptions().getKillCooldown(),
+      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
-    }).then(button => {
-      this.catch("player.died", event => event.getPlayer()).execute(_ => {
-        button.getEntity().despawn();
-      });
-      Services.get(ServiceType.CoroutineManager)
-        .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
-      button.on("clicked", () => {
-        if (!button.getSaturated()) {
-          return;
-        }
+    });
 
-        const target = button.getTargets(this.owner.getLobby().getOptions().getKillDistance())
-          .filter(player => !player.isImpostor())[0] as PlayerInstance | undefined;
+    this.catch("player.died", event => event.getPlayer()).execute(_ => {
+      if (this.button === undefined) {
+        return;
+      }
 
-        if (target === undefined) {
-          return;
-        }
+      this.button.getEntity().despawn();
+      this.button = undefined;
+    });
 
-        button.reset();
+    Services.get(ServiceType.CoroutineManager)
+      .beginCoroutine(this.owner, this.coSaturateButton(this.owner, this.button));
 
-        this.owner.murder(target);
-      });
+    this.button.on("clicked", () => {
+      if (this.button === undefined || !this.button.getSaturated()) {
+        return;
+      }
+
+      const target = this.button.getTargets(this.owner.getLobby().getOptions().getKillDistance())
+        .filter(player => !player.isImpostor())[0] as PlayerInstance | undefined;
+
+      if (target === undefined) {
+        return;
+      }
+
+      this.button.reset();
+
+      this.owner.murder(target);
     });
   }
 
@@ -73,6 +93,10 @@ export class Impostor extends BaseRole {
       }
       yield;
     }
+  }
+
+  getImpostorButton(): Button | undefined {
+    return this.button;
   }
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {

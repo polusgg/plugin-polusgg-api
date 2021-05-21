@@ -11,6 +11,7 @@ import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Asset } from "../../../assets";
 import { ButtonCountdownUpdated } from "../events/buttonCountdownUpdated";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
+import { Attachable } from "@polusgg/plugin-polusgg-api/src/types/attachable";
 
 export type ButtonEvents = ClickBehaviourEvents & {
   "button.countdown.started": ButtonCountdownUpdated;
@@ -104,6 +105,11 @@ export class Button extends Emittery<ButtonEvents> {
       .serializeData();
 
     return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+  }
+
+  async attach(to: Attachable): Promise<void> {
+    return await this.getEntity()
+      .attach(to);
   }
 
   async setColor(colorInput: [number, number, number, number] | [number, number, number]): Promise<void> {

@@ -10,6 +10,7 @@ import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
 import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
+import { SetPlayerBodyPacket } from "./src/packets/rpc/playerControl/setPlayerBody";
 
 export default class PolusGGApi extends BasePlugin {
   private readonly mods: BaseMod[] = [];
@@ -91,6 +92,10 @@ export default class PolusGGApi extends BasePlugin {
       this.getEntity().getPlayerControl().sendRpcPacket(new RevivePacket(), this.getLobby().getConnections());
 
       return new Promise(r => r());
+    };
+
+    Player.prototype.setBody = function setBody(this: Player, body: number): void {
+      this.getEntity().getPlayerControl().sendRpcPacket(new SetPlayerBodyPacket(body), this.getLobby().getConnections());
     };
   }
 

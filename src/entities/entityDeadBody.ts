@@ -8,8 +8,6 @@ import { InnerClickBehaviour, InnerDeadBody } from "../innerNetObjects";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { BodyDirection } from "../types/enums";
 
-// TODO: Rewrite to not suck ass
-
 export class EntityDeadBody extends BaseInnerNetEntity {
   constructor(
     lobby: LobbyInstance,

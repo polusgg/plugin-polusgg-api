@@ -7,8 +7,6 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 
-// TODO: Rewrite to not suck ass
-
 export class EntityConsole extends BaseInnerNetEntity {
   constructor(
     lobby: LobbyInstance,

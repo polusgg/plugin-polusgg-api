@@ -6,8 +6,6 @@ import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
 import { InnerGraphic } from "../innerNetObjects";
 import { Vector2 } from "@nodepolus/framework/src/types";
 
-// TODO: Rewrite to not suck ass
-
 export class EntityImage extends BaseInnerNetEntity {
   constructor(
     lobby: LobbyInstance,

@@ -8,8 +8,6 @@ import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Attachable } from "../types/attachable";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 
-// TODO: Rewrite to not suck ass
-
 export class EntityButton extends BaseInnerNetEntity {
   constructor(
     owner: Connection,

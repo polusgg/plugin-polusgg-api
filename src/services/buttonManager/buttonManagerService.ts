@@ -1,8 +1,6 @@
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
-import { EdgeAlignments } from "../../types/enums/edgeAlignment";
 import { Server } from "@nodepolus/framework/src/server";
-import { Vector2 } from "@nodepolus/framework/src/types";
 import { ServiceType } from "../../types/enums";
 import { EntityButton } from "../../entities";
 import { Services } from "../services";

@@ -1,6 +1,6 @@
-import { Vector2 } from "@polusgg/plugin-polusgg-api/node_modules/@nodepolus/framework/src/types";
-import { Asset } from "@polusgg/plugin-polusgg-api/src/assets";
-import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
+import { Vector2 } from "@nodepolus/framework/src/types";
+import { Asset } from "../assets";
+import { EdgeAlignments } from "./enums/edgeAlignment";
 
 export type ButtonFields = {
   asset: Asset;
@@ -11,4 +11,4 @@ export type ButtonFields = {
   color?: [number, number, number, number];
   isCountingDown?: boolean;
   alignment: EdgeAlignments;
-}
+};

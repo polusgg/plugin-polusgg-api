@@ -25,9 +25,10 @@ export class Impostor extends BaseRole {
 
   private readonly role: PlayerRole;
   private button: Button | undefined;
+  // todo add emittery instance as property instead of using stored callbacks
   private onClicked: (() => void) | undefined;
   private targetPredicate: ((players: PlayerInstance[]) => PlayerInstance) | undefined;
-  private range: number;
+  private readonly range: number;
 
   constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor) {
     super(owner);
@@ -71,8 +72,9 @@ export class Impostor extends BaseRole {
         return;
       }
 
-      const target = this.targetPredicate === undefined ? this.button.getTargets(this.range)
-        .filter(player => !player.isImpostor())[0] as PlayerInstance | undefined : this.targetPredicate(this.button.getTargetsUnfiltered(this.range));
+      const target = this.targetPredicate === undefined
+        ? this.button.getTargets(this.range).filter(player => !player.isImpostor())[0] as PlayerInstance | undefined
+        : this.targetPredicate(this.button.getTargetsUnfiltered(this.range));
 
       if (target === undefined) {
         return;
@@ -113,11 +115,11 @@ export class Impostor extends BaseRole {
     return this.role;
   }
 
-  setOnClicked(callback: () => void) {
+  setOnClicked(callback: () => void): void {
     this.onClicked = callback;
   }
 
-  setTargetPredicate(callback: (players: PlayerInstance[]) => PlayerInstance) {
+  setTargetPredicate(callback: (players: PlayerInstance[]) => PlayerInstance): void {
     this.targetPredicate = callback;
   }
 

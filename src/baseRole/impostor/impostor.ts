@@ -26,7 +26,7 @@ export class Impostor extends BaseRole {
   private readonly role: PlayerRole;
   private button: Button | undefined;
   // todo add emittery instance as property instead of using stored callbacks
-  private onClicked: (() => void) | undefined;
+  private onClicked: ((target: PlayerInstance) => void) | undefined;
   private targetPredicate: ((players: PlayerInstance[]) => PlayerInstance) | undefined;
   private readonly range: number;
 
@@ -74,7 +74,7 @@ export class Impostor extends BaseRole {
 
       const target = this.targetPredicate === undefined
         ? this.button.getTargets(this.range).filter(player => !player.isImpostor())[0] as PlayerInstance | undefined
-        : this.targetPredicate(this.button.getTargetsUnfiltered(this.range));
+        : this.targetPredicate(this.button.getTargets(this.range));
 
       if (target === undefined) {
         return;
@@ -85,7 +85,7 @@ export class Impostor extends BaseRole {
       if (this.onClicked === undefined) {
         this.owner.murder(target);
       } else {
-        this.onClicked();
+        this.onClicked(target);
       }
     });
   }
@@ -96,7 +96,13 @@ export class Impostor extends BaseRole {
     }
 
     while (true) {
-      const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
+      if (this.button === undefined) {
+        break;
+      }
+
+      const target = this.targetPredicate === undefined
+        ? this.button.getTargets(this.range).filter(x => !x.isImpostor())[0] as PlayerInstance | undefined
+        : this.targetPredicate(this.button.getTargets(this.range));
 
       const isSaturated = button.getSaturated();
 
@@ -115,7 +121,7 @@ export class Impostor extends BaseRole {
     return this.role;
   }
 
-  setOnClicked(callback: () => void): void {
+  setOnClicked(callback: (target: PlayerInstance) => void): void {
     this.onClicked = callback;
   }
 

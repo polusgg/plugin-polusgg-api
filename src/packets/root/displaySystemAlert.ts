@@ -5,7 +5,7 @@ export class DisplaySystemAlertPacket extends BaseRootPacket {
   constructor(
     public content: string,
   ) {
-    super(0x84);
+    super(0xFA);
   }
 
   static deserialize(reader: MessageReader): DisplaySystemAlertPacket {

@@ -12,8 +12,8 @@ export class DisplaySystemAlertPacket extends BaseRootPacket {
     return new DisplaySystemAlertPacket(reader.readString());
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter().writeString(this.content);
+  serialize(writer: MessageWriter): void {
+    writer.writeString(this.content);
   }
 
   clone(): DisplaySystemAlertPacket {

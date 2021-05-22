@@ -65,9 +65,10 @@ export default class PolusGGApi extends BasePlugin {
     });
 
     this.server.on("server.lobby.created", event => {
-      const options = Services.get(ServiceType.GameOptions).getGameOptions<{ gamemode: EnumValue }>(event.getLobby());
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const options = Services.get(ServiceType.GameOptions).getGameOptions<{ Gamemode: EnumValue }>(event.getLobby());
 
-      options.createOption("", "gamemode", {
+      options.createOption("", "Gamemode", {
         index: 0,
         options: this.mods.map(mod => mod.getMetadata().name),
       });
@@ -76,7 +77,7 @@ export default class PolusGGApi extends BasePlugin {
 
       let lastIndex = 0;
 
-      options.on("option.gamemode.changed", async option => {
+      options.on("option.Gamemode.changed", async option => {
         await this.mods[lastIndex].onDisable(event.getLobby());
 
         lastIndex = option.getValue().index;

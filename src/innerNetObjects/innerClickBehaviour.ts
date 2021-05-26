@@ -35,7 +35,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     return this;
   }
 
-  getSaturated(): boolean {
+  isSaturated(): boolean {
     return this.saturated;
   }
 
@@ -57,7 +57,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
 
   getCurrentTime(): number {
     if (this.isCountingDown) {
-      const timeSinceSet = Date.now() - this.lastCurrentTimeSet;
+      const timeSinceSet = (Date.now() - this.lastCurrentTimeSet) / 1000;
 
       return Math.max(this.currentTime - timeSinceSet, 0);
     }

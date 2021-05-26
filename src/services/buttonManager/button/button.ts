@@ -198,8 +198,8 @@ export class Button extends Emittery<ButtonEvents> {
     return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
   }
 
-  getSaturated(): boolean {
-    return this.getEntity().getClickBehaviour().getSaturated();
+  isSaturated(): boolean {
+    return this.getEntity().getClickBehaviour().isSaturated();
   }
 
   async setSaturated(saturated: boolean): Promise<void> {

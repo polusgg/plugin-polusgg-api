@@ -86,6 +86,10 @@ export default class PolusGGApi extends BasePlugin {
       });
     });
 
+    this.server.on("player.joined", event => {
+      event.getPlayer().setMeta("pgg.api.targetable", true);
+    });
+
     Player.prototype.revive = async function revive(this: Player): Promise<void> {
       this.getGameDataEntry().setDead(false);
       this.updateGameData();

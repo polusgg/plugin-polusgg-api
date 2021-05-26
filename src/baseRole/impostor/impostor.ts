@@ -17,6 +17,8 @@ export class ImpostorManager extends BaseManager {
   getTypeName(): string { return "impostor" }
 }
 
+// impostors do not play well with reviving at the moment, if there's an event for reviving then that should be handled properly
+
 export class Impostor extends BaseRole {
   protected readonly metadata = {
     name: "impostor",
@@ -27,7 +29,7 @@ export class Impostor extends BaseRole {
   private button: Button | undefined;
   // todo add emittery instance as property instead of using stored callbacks
   private onClicked: ((target: PlayerInstance) => void) | undefined;
-  private targetPredicate: ((players: PlayerInstance[]) => PlayerInstance) | undefined;
+  private targetSelector: ((players: PlayerInstance[]) => PlayerInstance) | undefined;
   private readonly range: number;
 
   constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor) {
@@ -35,8 +37,8 @@ export class Impostor extends BaseRole {
 
     this.role = role;
     this.onClicked = undefined;
-    this.targetPredicate = undefined;
-    this.range = this.owner.getLobby().getOptions().getKillDistance();
+    this.targetSelector = undefined;
+    this.range = this.owner.getLobby().getOptions().getKillDistance() + 1;
 
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("Global")).then(this.onReadyImpostor.bind(this));
@@ -68,13 +70,13 @@ export class Impostor extends BaseRole {
       .beginCoroutine(this.owner, this.coSaturateButton(this.owner, this.button));
 
     this.button.on("clicked", () => {
-      if (this.button === undefined || !this.button.getSaturated()) {
+      if (this.button === undefined || !this.button.isSaturated() || this.button.getCurrentTime() != 0) {
         return;
       }
 
-      const target = this.targetPredicate === undefined
+      const target = this.targetSelector === undefined
         ? this.button.getTargets(this.range).filter(player => !player.isImpostor())[0] as PlayerInstance | undefined
-        : this.targetPredicate(this.button.getTargets(this.range));
+        : this.targetSelector(this.button.getTargets(this.range));
 
       if (target === undefined) {
         return;
@@ -96,17 +98,18 @@ export class Impostor extends BaseRole {
     }
 
     while (true) {
-      if (this.button === undefined) {
+      //todo break out on custom predicate
+      if (player.isDead()) {
         break;
       }
 
-      const target = this.targetPredicate === undefined
-        ? this.button.getTargets(this.range).filter(x => !x.isImpostor())[0] as PlayerInstance | undefined
-        : this.targetPredicate(this.button.getTargets(this.range));
+      const target = this.targetSelector === undefined
+        ? button.getTargets(this.range).filter(x => !x.isImpostor())[0] as PlayerInstance | undefined
+        : this.targetSelector(button.getTargets(this.range));
 
-      const isSaturated = button.getSaturated();
+      const isSaturated = button.isSaturated();
 
-      if ((target === undefined) === isSaturated) {
+      if ((target === undefined && button.getCurrentTime() != 0) === isSaturated) {
         button.setSaturated(!isSaturated);
       }
       yield;
@@ -125,8 +128,8 @@ export class Impostor extends BaseRole {
     this.onClicked = callback;
   }
 
-  setTargetPredicate(callback: (players: PlayerInstance[]) => PlayerInstance): void {
-    this.targetPredicate = callback;
+  setTargetSelector(callback: (players: PlayerInstance[]) => PlayerInstance): void {
+    this.targetSelector = callback;
   }
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {

@@ -123,8 +123,6 @@ export class PlayerAnimationKeyframe {
     writer.writePackedUInt32(this.offset);
     writer.writePackedUInt32(this.duration);
 
-    writer.writeUInt16(enableBits.toNumber());
-
     if (enableBits.has(0)) {
       writer.writeFloat32(this.opacity);
     }

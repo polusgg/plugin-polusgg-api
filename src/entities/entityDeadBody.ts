@@ -4,7 +4,7 @@ import { GLOBAL_OWNER } from "@nodepolus/framework/src/util/constants";
 import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { SpawnFlag } from "@nodepolus/framework/src/types/enums";
-import { InnerClickBehaviour, InnerDeadBody } from "../innerNetObjects";
+import { InnerDeadBody } from "../innerNetObjects";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { BodyDirection } from "../types/enums";
 
@@ -21,14 +21,12 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     attachedTo: number = -1,
     deadBodyNetId: number = lobby.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),
-    clickBehaviourNetId: number = lobby.getHostInstance().getNextNetId(),
   ) {
     super(0x83, lobby, GLOBAL_OWNER, SpawnFlag.None);
 
     this.innerNetObjects = [
       new InnerDeadBody(this, color, shadowColor, hasFallen, bodyFacing, deadBodyNetId),
       new InnerCustomNetworkTransformGeneric(this, alignment, position, z, attachedTo, customNetworkTransformNetId),
-      new InnerClickBehaviour(this, 0, 0, true, [0, 0, 0, 0], false, clickBehaviourNetId),
     ];
   }
 

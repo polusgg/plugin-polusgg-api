@@ -31,7 +31,7 @@ export class ButtonManagerService {
     RpcPacket.registerPacket(0x86, ClickPacket.deserialize, this.handleClickButton.bind(this));
   }
 
-  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment }: ButtonFields): Promise<Button> {
+  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment }: ButtonFields, sendTo: Connection[] = [connection]): Promise<Button> {
     const lobby = connection.getLobby();
 
     if (lobby === undefined) {
@@ -42,9 +42,9 @@ export class ButtonManagerService {
 
     const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, saturated, color, isCountingDown);
 
-    lobby.spawn(button, [connection]);
+    lobby.spawn(button, sendTo);
 
-    const buttonInstance = new Button(button);
+    const buttonInstance = new Button(button, sendTo);
 
     buttonInstance.getEntity().getObjects().forEach(object => {
       this.buttonMap.get(lobby)!.set(object.getNetId(), buttonInstance);
@@ -86,7 +86,16 @@ export class ButtonManagerService {
       throw new Error("HandleClickButton sent from unknown InnerNetObject");
     }
 
-    this.findSafeButtonByNetId(connection, sender.getNetId()).emit("clicked", packet);
+    const button = this.findSafeButtonByNetId(connection, sender.getNetId());
+
+    if (button.isDestroyed()) {
+      throw new Error("HandleClickButton sent on a destroyed Button");
+    } else {
+      button.emit("clicked", {
+        connection,
+        packet,
+      });
+    }
   }
 
   private handleCountingDown(connection: Connection, packet: SetCountingDown, sender?: BaseInnerNetObject): void {

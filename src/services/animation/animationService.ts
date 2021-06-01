@@ -22,7 +22,7 @@ export class AnimationService {
   }
 
   async beginPlayerAnimation(player: PlayerInstance, enabledFields: PlayerAnimationField[], keyframes: PlayerAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
-    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new BeginPlayerAnimation(Bitfield.fromNumber(enabledFields.reduce((p, a) => a + p, 0)), keyframes, reset), player.getLobby().getConnections());
+    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new BeginPlayerAnimation(Bitfield.fromNumber(enabledFields.reduce((p, a) => p | (1 << a), 0)), keyframes, reset), player.getLobby().getConnections());
 
     return new Promise(resolve => {
       setTimeout(resolve, keyframes.map(keyframe => keyframe.getDuration()).reduce((sum, current) => sum + current, 0));
@@ -45,6 +45,10 @@ export class AnimationService {
 
   async clearOutline(player: PlayerInstance): Promise<void> {
     await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new SetOutlinePacket(false, [0, 0, 0, 0]), player.getLobby().getConnections());
+  }
+
+  async clearOutlineFor(player: PlayerInstance, connection: Connection): Promise<void> {
+    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new SetOutlinePacket(false, [0, 0, 0, 0]), [connection]);
   }
 
   async setOpacity(player: PlayerInstance, opacity: number): Promise<void> {

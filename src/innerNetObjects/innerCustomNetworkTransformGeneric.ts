@@ -58,7 +58,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     this.sendRpcPacket(new SnapToPacket(position), sendTo);
   }
 
-  handleRpc(connection: Connection, type: RpcPacketType, packet: BaseRpcPacket, sendTo: Connection[]): void {
+  handleRpc(_connection: Connection, type: RpcPacketType, packet: BaseRpcPacket, sendTo: Connection[]): void {
     switch (type) {
       case RpcPacketType.SnapTo:
         this.snapTo((packet as SnapToPacket).position, sendTo);
@@ -73,11 +73,17 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   }
 
   serializeData(): DataPacket {
-    const writer = new MessageWriter().writeByte(this.alignment);
+    const writer = new MessageWriter()
+      .writeByte(this.alignment)
+      .writeVector2(this.position)
+      .writeFloat32(this.z)
+      .writePackedInt32(this.attachedTo);
+
+    console.log("data", new MessageWriter().writePackedInt32(this.attachedTo).toString("hex"), writer.getBuffer().toString("hex"));
 
     return new DataPacket(
       this.netId,
-      writer.writeVector2(this.position).writeFloat32(this.z).writePackedInt32(this.attachedTo),
+      writer,
     );
   }
 
@@ -89,11 +95,17 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   }
 
   serializeSpawn(): SpawnPacketObject {
-    const writer = new MessageWriter().writeByte(this.alignment);
+    const writer = new MessageWriter()
+      .writeByte(this.alignment)
+      .writeVector2(this.position)
+      .writeFloat32(this.z)
+      .writePackedInt32(this.attachedTo);
+
+    console.log("spawn", new MessageWriter().writePackedInt32(this.attachedTo).toString("hex"), writer.getBuffer().toString("hex"));
 
     return new SpawnPacketObject(
       this.netId,
-      writer.writeVector2(this.position).writeFloat32(this.z).writePackedInt32(this.attachedTo),
+      writer,
     );
   }
 

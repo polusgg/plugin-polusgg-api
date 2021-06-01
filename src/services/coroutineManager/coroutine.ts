@@ -75,7 +75,7 @@ export class Coroutine<BoundTo extends Bindable> {
   }
 
   protected shouldEndPlayer(p: Player): boolean {
-    return p.getLobby().getPlayers().indexOf(p) > -1;
+    return p.getLobby().getPlayers().indexOf(p) <= -1;
   }
 
   protected shouldEndLobby(l: Lobby): boolean {

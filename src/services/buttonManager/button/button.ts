@@ -19,8 +19,11 @@ export type ButtonEvents = ClickBehaviourEvents & {
 };
 
 export class Button extends Emittery<ButtonEvents> {
+  private destroyed = false;
+
   constructor(
     protected readonly entity: EntityButton,
+    protected readonly sendTo: Connection[],
   ) {
     super();
   }
@@ -37,19 +40,21 @@ export class Button extends Emittery<ButtonEvents> {
     return this.getLobby().findSafeConnection(this.getEntity().getOwnerId());
   }
 
+  destroy(): void {
+    if (this.destroyed) {
+      return;
+    }
+
+    this.destroyed = true;
+    this.getEntity().despawn();
+  }
+
   async setPosition(x: number, y: number): Promise<void>;
   async setPosition(position: Exclude<EdgeAlignments, EdgeAlignments.None> | Vector2): Promise<void>;
   async setPosition(arg0: Exclude<EdgeAlignments, EdgeAlignments.None> | Vector2 | number, arg1?: number): Promise<void> {
     let data: DataPacket;
 
     if (arg0 instanceof Vector2 || arg1 !== undefined) {
-      // we are setting the position of the button to a Vec2,
-      // because of this: if the button has an EdgeAlignment we
-      // want to override this with our Vec2
-      if (this.getEntity().getCustomNetworkTransform().getAlignment() !== EdgeAlignments.None) {
-        this.getEntity().getCustomNetworkTransform().setAlignment(EdgeAlignments.None);
-      }
-
       let position: Vector2;
 
       if (arg0 instanceof Vector2) {
@@ -71,20 +76,13 @@ export class Button extends Emittery<ButtonEvents> {
         .serializeData();
     }
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    await this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()), this.sendTo);
   }
 
   async snapPosition(x: number, y: number): Promise<void>;
   async snapPosition(position: EdgeAlignments | Vector2): Promise<void>;
   async snapPosition(arg0: EdgeAlignments | Vector2 | number, arg1?: number): Promise<void> {
     if (arg0 instanceof Vector2 || arg1 !== undefined) {
-      // we are setting the position of the button to a Vec2,
-      // because of this: if the button has an EdgeAlignment we
-      // want to override this with our Vec2
-      if (this.getEntity().getCustomNetworkTransform().getAlignment() !== EdgeAlignments.None) {
-        this.getEntity().getCustomNetworkTransform().setAlignment(EdgeAlignments.None);
-      }
-
       let position: Vector2;
 
       if (arg0 instanceof Vector2) {
@@ -104,12 +102,16 @@ export class Button extends Emittery<ButtonEvents> {
       .setAlignment(arg0)
       .serializeData();
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    await this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()), this.sendTo);
   }
 
   async attach(to: Attachable): Promise<void> {
     return await this.getEntity()
-      .attach(to);
+      .attach(to, this.sendTo);
+  }
+
+  isDestroyed(): boolean {
+    return this.destroyed;
   }
 
   async setColor(colorInput: [number, number, number, number] | [number, number, number]): Promise<void> {
@@ -141,7 +143,7 @@ export class Button extends Emittery<ButtonEvents> {
       .setIsCountingDown(countingDown)
       .serializeData();
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    await this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()), this.sendTo);
   }
 
   isCountingDown(): boolean {
@@ -171,7 +173,7 @@ export class Button extends Emittery<ButtonEvents> {
       .setCurrentTime(currentTime)
       .serializeData();
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    await this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()), this.sendTo);
   }
 
   getCurrentTime(): number {
@@ -185,7 +187,7 @@ export class Button extends Emittery<ButtonEvents> {
       .setMaxTimer(maxTime)
       .serializeData();
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    await this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()), this.sendTo);
   }
 
   async setAsset(asset: Asset): Promise<void> {
@@ -195,7 +197,7 @@ export class Button extends Emittery<ButtonEvents> {
       .setAsset(asset.getId())
       .serializeData();
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    await this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()), this.sendTo);
   }
 
   isSaturated(): boolean {
@@ -209,7 +211,7 @@ export class Button extends Emittery<ButtonEvents> {
       .setSaturated(saturated)
       .serializeData();
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    await this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()), this.sendTo);
   }
 
   getMaxTime(): number {
@@ -253,6 +255,6 @@ export class Button extends Emittery<ButtonEvents> {
       .setCurrentTime(this.getMaxTime())
       .serializeData();
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    await this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()), this.sendTo);
   }
 }

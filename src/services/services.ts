@@ -14,6 +14,7 @@ import { DeadBodyService } from "./deadBody/deadBodyService";
 import { CoroutineManagerService } from "./coroutineManager/coroutineManagerService";
 import { VentService } from "./vent";
 import { CosmeticService } from "./cosmetics/cosmeticService";
+import { EndGameService } from "./endGame/endGameService";
 
 const serviceFromType = {
   [ServiceType.Resource]: new ResourceService(),
@@ -31,6 +32,7 @@ const serviceFromType = {
   [ServiceType.CoroutineManager]: new CoroutineManagerService(),
   [ServiceType.Vent]: new VentService(),
   [ServiceType.Cosmetic]: new CosmeticService(),
+  [ServiceType.EndGame]: new EndGameService(),
 };
 
 export class Services {

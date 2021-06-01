@@ -1,7 +1,7 @@
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Player } from "@nodepolus/framework/src/player";
 import { Palette } from "@nodepolus/framework/src/static";
-import { Vector2 } from "@nodepolus/framework/src/types";
+import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { AssetBundle } from "../../assets";
 import { BaseManager } from "../../baseManager/baseManager";
@@ -55,15 +55,11 @@ export class Impostor extends BaseRole {
       maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
+      currentTime: 10,
     });
 
     this.catch("player.died", event => event.getPlayer()).execute(_ => {
-      if (this.button === undefined) {
-        return;
-      }
-
-      this.button.getEntity().despawn();
-      this.button = undefined;
+      this.button?.destroy();
     });
 
     Services.get(ServiceType.CoroutineManager)
@@ -97,6 +93,10 @@ export class Impostor extends BaseRole {
       yield;
     }
 
+    const animService = Services.get(ServiceType.Animation);
+    let outlined = false;
+    let lastTarget: PlayerInstance | undefined;
+
     while (true) {
       //todo break out on custom predicate
       if (player.isDead()) {
@@ -104,13 +104,28 @@ export class Impostor extends BaseRole {
       }
 
       const target = this.targetSelector === undefined
-        ? button.getTargets(this.range).filter(x => !x.isImpostor())[0] as PlayerInstance | undefined
+        ? button.getTargets(this.range).filter(x => !x.isImpostor() && !x.isDead())[0] as PlayerInstance | undefined
         : this.targetSelector(button.getTargets(this.range));
 
       const isSaturated = button.isSaturated();
 
-      if ((target === undefined && button.getCurrentTime() != 0) === isSaturated) {
+      if ((target === undefined || button.getCurrentTime() != 0) === isSaturated) {
         button.setSaturated(!isSaturated);
+      }
+
+      if ((target === undefined) === outlined || lastTarget !== target) {
+        const players = this.owner.getLobby().getPlayers().filter(x => x !== this.owner);
+
+        for (let i = 0; i < players.length; i++) {
+          if (players[i] === target) {
+            animService.setOutline(players[i], Palette.impostorRed() as Mutable<[number, number, number, number]>, [this.owner.getSafeConnection()]);
+          } else {
+            animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
+          }
+        }
+
+        lastTarget = target;
+        outlined = !outlined;
       }
       yield;
     }

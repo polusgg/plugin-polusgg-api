@@ -10,7 +10,7 @@ import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 
 export class EntityButton extends BaseInnerNetEntity {
   constructor(
-    owner: Connection,
+    private readonly owner: Connection,
     resourceId: number,
     maxTimer: number,
     position: Vector2,
@@ -34,12 +34,12 @@ export class EntityButton extends BaseInnerNetEntity {
     ];
   }
 
-  async attach(to: Attachable): Promise<void> {
+  async attach(to: Attachable, sendTo: Connection[] = [this.owner]): Promise<void> {
     const data = this.getCustomNetworkTransform().setAttachedTo(to).serializeData();
 
-    return this.getLobby().findSafeConnection(this.getOwnerId()).writeReliable(new GameDataPacket([
+    await Promise.allSettled(sendTo.map(async conn => conn.writeReliable(new GameDataPacket([
       data,
-    ], this.getLobby().getCode()));
+    ], this.getLobby().getCode()))));
   }
 
   getCustomNetworkTransform(): InnerCustomNetworkTransformGeneric {

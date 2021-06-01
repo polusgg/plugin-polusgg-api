@@ -93,7 +93,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
   serializeData(): DataPacket {
     return new DataPacket(this.netId, new MessageWriter()
       .writeFloat32(this.maxTimer)
-      .writeFloat32(this.currentTime)
+      .writeFloat32(this.getCurrentTime())
       .writeBoolean(this.isCountingDown)
       .writeBoolean(this.saturated)
       .writeBytes(this.color),
@@ -113,7 +113,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
   serializeSpawn(): SpawnPacketObject {
     return new SpawnPacketObject(this.netId, new MessageWriter()
       .writeFloat32(this.maxTimer)
-      .writeFloat32(this.currentTime)
+      .writeFloat32(this.getCurrentTime())
       .writeBoolean(this.isCountingDown)
       .writeBoolean(this.saturated)
       .writeBytes(this.color),
@@ -130,9 +130,18 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
 
   handleRpc(connection: Connection, type: RpcPacketType, packet: BaseRpcPacket, _sendTo: Connection[]): void {
     switch (type) {
-      case 0x86:
-        Services.get(ServiceType.Button).findSafeButtonByNetId(this.getLobby(), this.getNetId()).emit("clicked", packet as ClickPacket);
+      case 0x86: {
+        const button = Services.get(ServiceType.Button).findSafeButtonByNetId(this.getLobby(), this.getNetId());
+
+        if (!button.isDestroyed()) {
+          button.emit("clicked", {
+            connection,
+            packet: packet as ClickPacket,
+          });
+        }
+
         break;
+      }
       default:
         break;
     }

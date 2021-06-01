@@ -14,4 +14,5 @@ export enum ServiceType {
   CoroutineManager,
   Notification,
   Cosmetic,
+  EndGame,
 }

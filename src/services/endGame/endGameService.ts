@@ -64,6 +64,24 @@ export class EndGameService {
     this.recalculateEndGame(game);
   }
 
+  unregisterEndGameIntent(game: Game, endGameIntentName: EndGameIntent["intentName"]): void {
+    if (!this.intents.has(game)) {
+      this.intents.set(game, []);
+
+      return;
+    }
+
+    const index = this.intents.get(game)!.findIndex(intent => intent.intentName === endGameIntentName);
+
+    if (index !== -1) {
+      this.intents.get(game)!.splice(index);
+
+      return;
+    }
+
+    throw new Error(`Unable to find intent by name ${endGameIntentName}`);
+  }
+
   registerExclusion(game: Game, exclusion: EndGameExclusion): void {
     if (!this.exclusions.has(game)) {
       this.exclusions.set(game, []);
@@ -74,6 +92,24 @@ export class EndGameService {
     }
 
     this.recalculateEndGame(game);
+  }
+
+  unregisterExclusion(game: Game, exclusionName: EndGameExclusion["intentName"]): void {
+    if (!this.exclusions.has(game)) {
+      this.exclusions.set(game, []);
+
+      return;
+    }
+
+    const index = this.exclusions.get(game)!.findIndex(exclusion => exclusion.intentName === exclusionName);
+
+    if (index !== -1) {
+      this.exclusions.get(game)!.splice(index);
+
+      return;
+    }
+
+    throw new Error(`Unable to find intent by name ${exclusionName}`);
   }
 
   recalculateEndGame(game: Game): void {

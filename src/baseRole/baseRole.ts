@@ -41,6 +41,10 @@ export class BaseRole {
     return this.metadata.alignment;
   }
 
+  setAlignment(alignment: RoleAlignment): void {
+    this.metadata.alignment = alignment;
+  }
+
   catch<NameType extends Extract<keyof ServerEvents, string>>(eventName: NameType, ownsMethod: (event: ServerEvents[NameType]) => Ownable): EventCatcher<NameType> {
     const catcher = new EventCatcher(eventName).where(event => this.owns(ownsMethod(event)));
 

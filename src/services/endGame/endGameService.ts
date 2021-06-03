@@ -1,11 +1,11 @@
 import { Game } from "@nodepolus/framework/src/api/game";
-import { Player } from "@nodepolus/framework/src/player";
+import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { OverwriteGameOver } from "../../packets/root";
 import { EndGameScreenData } from "../roleManager/roleManagerService";
 
 type EndGameIntent = {
-  endGameData: Map<Player, EndGameScreenData>;
+  endGameData: Map<PlayerInstance, EndGameScreenData>;
   intentName: string;
 };
 

@@ -48,6 +48,14 @@ export default class PolusGGApi extends BasePlugin {
 
     BaseMod.owner = this;
 
+    this.server.on("game.ended", event => {
+      if (event.getReason() !== 7) {
+        Services.get(ServiceType.EndGame).recalculateEndGame(event.getGame());
+
+        event.cancel();
+      }
+    });
+
     this.server.on("game.started", event => {
       const roles = this.mods.filter(mod => mod.getEnabled(event.getGame().getLobby())).map(e => e.getRoles(event.getGame().getLobby())).flat();
       const impostorRoleDecls = roles.filter(r => r.role === Impostor);

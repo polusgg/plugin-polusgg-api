@@ -13,6 +13,7 @@ import { Impostor } from "../../baseRole/impostor/impostor";
 import { DisplayStartGameScreenPacket } from "../../packets/root";
 import { SetRolePacket } from "../../packets/rpc/playerControl";
 import { ServiceType } from "../../types/enums";
+import { WinSound } from "../../types/enums/winSound";
 import { LobbyDefaultOptions } from "../gameOptions/gameOptionsService";
 import { Services } from "../services";
 
@@ -20,6 +21,7 @@ export type EndGameScreenData = {
   title: string | TextComponent;
   subtitle: string | TextComponent;
   color: [number, number, number, number];
+  winSound: WinSound;
   yourTeam: PlayerInstance[];
   displayQuit?: boolean;
   displayPlayAgain?: boolean;

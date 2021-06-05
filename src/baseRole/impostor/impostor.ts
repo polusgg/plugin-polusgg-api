@@ -10,6 +10,7 @@ import { Button } from "../../services/buttonManager";
 import { StartGameScreenData } from "../../services/roleManager/roleManagerService";
 import { ServiceType } from "../../types/enums";
 import { EdgeAlignments } from "../../types/enums/edgeAlignment";
+import { WinSoundType } from "../../types/enums/winSound";
 import { BaseRole, RoleAlignment } from "../baseRole";
 
 export class ImpostorManager extends BaseManager {
@@ -50,10 +51,10 @@ export class Impostor extends BaseRole {
   async onReadyImpostor(): Promise<void> {
     const endGame = Services.get(ServiceType.EndGame);
 
-    this.catch("player.murdered", event => event.getKiller())
+    this.catch("player.died", event => event.getPlayer().getLobby())
       .where(() => this.getAlignment() === RoleAlignment.Impostor)
       .where(event => event.getPlayer().getLobby().getPlayers()
-        .filter(player => !player.isImpostor() && !player.isDead()).length == 0)
+        .filter(player => !player.isImpostor() && !player.isDead()).length <= 1)
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
@@ -62,15 +63,16 @@ export class Impostor extends BaseRole {
             color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers()
               .filter(sus => sus.isImpostor()),
+            winSound: WinSoundType.ImpostorWin,
           }])),
         intentName: "impostorKill",
       }));
 
-    this.catch("meeting.closed", event => event.getGame())
+    this.catch("meeting.ended", event => event.getGame())
       .where(() => this.getAlignment() === RoleAlignment.Impostor)
       .where(event => event.getGame().getLobby().getPlayers()
         .filter(player => !player.isImpostor() && !player.isDead())
-        .length == 2,
+        .length <= 1,
       )
       .execute(event => endGame.registerEndGameIntent(event.getGame(), {
         endGameData: new Map(event.getGame().getLobby().getPlayers()
@@ -80,22 +82,23 @@ export class Impostor extends BaseRole {
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getGame().getLobby().getPlayers()
               .filter(sus => !sus.isImpostor()),
+            winSound: WinSoundType.ImpostorWin,
           }])),
         intentName: "impostorVote",
       }));
 
-    this.catch("player.left", event => event.getPlayer())
-      .where(() => this.getAlignment() === RoleAlignment.Impostor)
-      .where(event => event.getLobby().getPlayers().filter(player => player.isImpostor() && player !== event.getPlayer()).length == 0)
+    this.catch("player.left", event => event.getLobby())
+      .where(event => event.getLobby().getPlayers().filter(player => !player.isImpostor() && player !== event.getPlayer()).length == 0)
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
-            title: "Defeat",
-            subtitle: "<color=#FF1919FF>Impostor</color> disconnected",
-            color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
+            title: player.isImpostor() ? "Victory" : "Defeat",
+            subtitle: "<color=#FF1919FF>Crewmates</color> disconnected",
+            color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers(),
+            winSound: WinSoundType.ImpostorWin,
           }])),
-        intentName: "impostorDisconnected",
+        intentName: "crewmateDisconnected",
       }));
 
     Services.get(ServiceType.RoleManager).setBaseRole(this.owner as Player, this.role);

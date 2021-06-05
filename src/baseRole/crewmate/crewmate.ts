@@ -5,6 +5,7 @@ import { BaseManager } from "../../baseManager/baseManager";
 import { Services } from "../../services";
 import { StartGameScreenData } from "../../services/roleManager/roleManagerService";
 import { ServiceType } from "../../types/enums";
+import { WinSoundType } from "../../types/enums/winSound";
 import { BaseRole, RoleAlignment } from "../baseRole";
 
 export class CrewmateManager extends BaseManager {
@@ -35,16 +36,17 @@ export class Crewmate extends BaseRole {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
             title: player.isImpostor() ? "Defeat" : "Victory",
-            subtitle: "<color=#8CFFFFFF>Crew</color> won by tasks",
+            subtitle: "<color=#8CFFFFFF>Crewmates</color> won by tasks",
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers()
               .filter(sus => !sus.isImpostor()),
+            winSound: WinSoundType.CrewmateWin,
           }])),
         intentName: "crewmateTasks",
       }));
 
     // this is going to call this code for every crewmate at least once
-    this.catch("meeting.closed", event => event.getGame())
+    this.catch("meeting.ended", event => event.getGame())
       .where(() => this.getAlignment() === RoleAlignment.Crewmate)
       .where(event => event.getGame().getLobby().getPlayers()
         .filter(player => player.isImpostor() && !player.isDead())
@@ -58,21 +60,23 @@ export class Crewmate extends BaseRole {
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getGame().getLobby().getPlayers()
               .filter(sus => !sus.isImpostor()),
+            winSound: WinSoundType.CrewmateWin,
           }])),
         intentName: "crewmateVote",
       }));
 
-    this.catch("player.left", event => event.getPlayer())
-      .where(event => event.getLobby().getPlayers().filter(player => !player.isImpostor() && player !== event.getPlayer()).length == 0)
+    this.catch("player.left", event => event.getLobby())
+      .where(event => event.getLobby().getPlayers().filter(player => player.isImpostor()).length == 0)
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
-            title: "Defeat",
-            subtitle: "<color=#FF1919FF>Crewmates</color> disconnected",
-            color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
+            title: "Victory",
+            subtitle: "<color=#FF1919FF>Impostor</color> disconnected",
+            color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers(),
+            winSound: WinSoundType.ImpostorWin,
           }])),
-        intentName: "crewmateDisconnected",
+        intentName: "impostorDisconnected",
       }));
   }
 

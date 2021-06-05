@@ -1,7 +1,9 @@
 import { Game } from "@nodepolus/framework/src/api/game";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { GameState } from "@nodepolus/framework/src/types/enums";
 import { OverwriteGameOver } from "../../packets/root";
+import { WinSoundType } from "../../types/enums/winSound";
 import { EndGameScreenData } from "../roleManager/roleManagerService";
 
 type EndGameIntent = {
@@ -21,7 +23,8 @@ export class EndGameService {
     color: [127, 127, 127, 255],
     yourTeam: [],
     displayQuit: true,
-    displayPlayAgain: true,
+    displayPlayAgain: false,
+    winSound: WinSoundType.Disconnect,
   };
 
   protected intents: Map<Game, EndGameIntent[]> = new Map();
@@ -30,8 +33,6 @@ export class EndGameService {
   async setEndGameData(connection: Connection | undefined, endGameData: EndGameScreenData): Promise<void> {
     connection?.setMeta("pgg.api.endGameData", endGameData);
 
-    console.log(endGameData);
-
     return connection?.writeReliable(new OverwriteGameOver(
       endGameData.title.toString(),
       endGameData.subtitle.toString(),
@@ -39,10 +40,15 @@ export class EndGameService {
       endGameData.yourTeam.map(player => player.getId()),
       endGameData.displayQuit ?? true,
       endGameData.displayPlayAgain ?? true,
+      endGameData.winSound,
     ));
   }
 
   endGame(game: Game): void {
+    if (game.getLobby().getGameState() !== GameState.Started) {
+      return;
+    }
+
     game.getLobby().getConnections().forEach(connection => {
       if (connection.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData") === undefined) {
         this.setEndGameData(connection, this.defaultEndGameData);
@@ -58,6 +64,7 @@ export class EndGameService {
     }
 
     if (!this.intents.get(game)!.some(item => item.intentName === endGameIntent.intentName)) {
+      console.log("intent registered under", endGameIntent.intentName);
       this.intents.get(game)!.push(endGameIntent);
     }
 
@@ -105,18 +112,20 @@ export class EndGameService {
 
     if (index !== -1) {
       this.exclusions.get(game)!.splice(index);
-
-      return;
     }
 
-    throw new Error(`Unable to find intent by name ${exclusionName}`);
+    this.recalculateEndGame(game);
   }
 
   recalculateEndGame(game: Game): void {
+    if (!this.intents.has(game)) {
+      return;
+    }
+
     for (let i = 0; i < this.intents.get(game)!.length; i++) {
       const intent = this.intents.get(game)![i];
 
-      if (!this.exclusions.get(game)!.some(exclusion => exclusion.intentName === intent.intentName)) {
+      if (!this.exclusions.has(game) || !this.exclusions.get(game)!.some(exclusion => exclusion.intentName === intent.intentName)) {
         [...intent.endGameData.entries()].forEach(([player, data]) => {
           if (player.getConnection() !== undefined) {
             this.setEndGameData(player.getConnection(), data);
@@ -124,6 +133,10 @@ export class EndGameService {
         });
 
         this.endGame(game);
+      } else if (this.exclusions.has(game)) {
+        const blocked = this.exclusions.get(game)!.filter(exclusion => exclusion.intentName === intent.intentName).length;
+
+        console.log(intent.intentName, "blocked by", blocked, "exclusion");
       }
     }
   }

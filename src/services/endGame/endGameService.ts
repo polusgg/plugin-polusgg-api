@@ -44,7 +44,7 @@ export class EndGameService {
     ));
   }
 
-  endGame(game: Game): void {
+  async endGame(game: Game): Promise<void> {
     // if (game.getLobby().getGameState() !== GameState.Started) {
     //   console.log("?????????????");
 
@@ -57,7 +57,7 @@ export class EndGameService {
       }
     });
 
-    game.getLobby().getHostInstance().endGame(0x07);
+    await game.getLobby().getHostInstance().endGame(0x07);
   }
 
   registerEndGameIntent(game: Game, endGameIntent: EndGameIntent): void {
@@ -122,7 +122,7 @@ export class EndGameService {
     this.recalculateEndGame(game);
   }
 
-  recalculateEndGame(game: Game): void {
+  async recalculateEndGame(game: Game): Promise<void> {
     if (!this.intents.has(game)) {
       return;
     }
@@ -138,7 +138,7 @@ export class EndGameService {
         });
 
         console.log(intent.intentName);
-        this.endGame(game);
+        await this.endGame(game);
 
         break;
       } else if (this.exclusions.has(game)) {

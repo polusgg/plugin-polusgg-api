@@ -51,7 +51,7 @@ export class Impostor extends BaseRole {
   async onReadyImpostor(): Promise<void> {
     const endGame = Services.get(ServiceType.EndGame);
 
-    this.catch("player.died", event => event.getPlayer().getLobby())
+    this.catch("player.murdered", event => event.getPlayer().getLobby())
       .where(() => this.getAlignment() === RoleAlignment.Impostor)
       .where(event => event.getPlayer().getLobby().getPlayers()
         .filter(player => !player.isImpostor() && !player.isDead()).length <= 1)
@@ -86,6 +86,8 @@ export class Impostor extends BaseRole {
           }])),
         intentName: "impostorVote",
       }));
+
+    // this.catch("game.ended", event => this.)
 
     this.catch("player.left", event => event.getLobby())
       .where(event => event.getLobby().getPlayers().filter(player => !player.isImpostor() && player !== event.getPlayer()).length == 0)

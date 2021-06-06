@@ -1,7 +1,7 @@
 import { Game } from "@nodepolus/framework/src/api/game";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
-import { GameState } from "@nodepolus/framework/src/types/enums";
+// import { GameState } from "@nodepolus/framework/src/types/enums";
 import { OverwriteGameOver } from "../../packets/root";
 import { WinSoundType } from "../../types/enums/winSound";
 import { EndGameScreenData } from "../roleManager/roleManagerService";
@@ -45,9 +45,11 @@ export class EndGameService {
   }
 
   endGame(game: Game): void {
-    if (game.getLobby().getGameState() !== GameState.Started) {
-      return;
-    }
+    // if (game.getLobby().getGameState() !== GameState.Started) {
+    //   console.log("?????????????");
+
+    //   return;
+    // }
 
     game.getLobby().getConnections().forEach(connection => {
       if (connection.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData") === undefined) {
@@ -81,7 +83,7 @@ export class EndGameService {
     const index = this.intents.get(game)!.findIndex(intent => intent.intentName === endGameIntentName);
 
     if (index !== -1) {
-      this.intents.get(game)!.splice(index);
+      this.intents.get(game)!.splice(index, 1);
 
       return;
     }
@@ -96,6 +98,7 @@ export class EndGameService {
 
     if (!this.exclusions.get(game)!.some(item => item.intentName === exclusion.intentName)) {
       this.exclusions.get(game)!.push(exclusion);
+      console.log("amogn", this.exclusions.get(game)!);
     }
 
     this.recalculateEndGame(game);
@@ -111,7 +114,9 @@ export class EndGameService {
     const index = this.exclusions.get(game)!.findIndex(exclusion => exclusion.intentName === exclusionName);
 
     if (index !== -1) {
-      this.exclusions.get(game)!.splice(index);
+      this.exclusions.get(game)!.splice(index, 1);
+    } else {
+      console.warn("could not find exclusion to splice", exclusionName);
     }
 
     this.recalculateEndGame(game);
@@ -132,7 +137,10 @@ export class EndGameService {
           }
         });
 
+        console.log(intent.intentName);
         this.endGame(game);
+
+        break;
       } else if (this.exclusions.has(game)) {
         const blocked = this.exclusions.get(game)!.filter(exclusion => exclusion.intentName === intent.intentName).length;
 

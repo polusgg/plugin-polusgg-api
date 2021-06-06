@@ -30,7 +30,10 @@ export class Crewmate extends BaseRole {
       .where(() => this.getAlignment() === RoleAlignment.Crewmate)
       .where(event => event.getPlayer().getLobby().getPlayers()
         .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate)
-        .filter(player => player.getTasks().filter(x => !x[1]).length < 1).length == 0,
+        .filter(player => !player.getLobby().getGameData()?.getGameData()
+          .getSafePlayer(player.getId())
+          .isDoneWithTasks(),
+        ).length == 0,
       )
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()

@@ -9,8 +9,13 @@ import { WinSoundType } from "../../types/enums/winSound";
 import { BaseRole, RoleAlignment } from "../baseRole";
 
 export class CrewmateManager extends BaseManager {
-  getId(): string { return "crewmate" }
-  getTypeName(): string { return "crewmate" }
+  getId(): string {
+    return "crewmate";
+  }
+
+  getTypeName(): string {
+    return "crewmate";
+  }
 }
 
 export class Crewmate extends BaseRole {
@@ -22,12 +27,18 @@ export class Crewmate extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
-    const endGame = Services.get(ServiceType.EndGame);
+    if (this.getAlignment() === RoleAlignment.Crewmate) {
+      Crewmate.setupWinConditions(this);
+    }
 
     // todo not duplicate code for crewmate wins on sheriff!!!!
+  }
 
-    this.catch("player.task.completed", event => event.getPlayer())
-      .where(() => this.getAlignment() === RoleAlignment.Crewmate)
+  static setupWinConditions(role: BaseRole): void {
+    const endGame = Services.get(ServiceType.EndGame);
+
+    role.catch("player.task.completed", event => event.getPlayer())
+      .where(() => role.getAlignment() === RoleAlignment.Crewmate)
       .where(event => event.getPlayer().getLobby().getPlayers()
         .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate)
         .filter(player => !player.getLobby().getGameData()?.getGameData()
@@ -38,45 +49,47 @@ export class Crewmate extends BaseRole {
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
-            title: player.isImpostor() ? "Defeat" : "Victory",
+            title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "Defeat",
             subtitle: "<color=#8CFFFFFF>Crewmates</color> won by tasks",
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers()
-              .filter(sus => !sus.isImpostor()),
+              .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
             winSound: WinSoundType.CrewmateWin,
           }])),
         intentName: "crewmateTasks",
       }));
 
     // this is going to call this code for every crewmate at least once
-    this.catch("meeting.ended", event => event.getGame())
-      .where(() => this.getAlignment() === RoleAlignment.Crewmate)
+    role.catch("meeting.ended", event => event.getGame())
+      .where(() => role.getAlignment() === RoleAlignment.Crewmate)
       .where(event => event.getGame().getLobby().getPlayers()
-        .filter(player => player.isImpostor() && !player.isDead())
+        .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !player.isDead())
         .length == 0,
       )
       .execute(event => endGame.registerEndGameIntent(event.getGame(), {
         endGameData: new Map(event.getGame().getLobby().getPlayers()
           .map(player => [player, {
-            title: player.isImpostor() ? "Defeat" : "Victory",
+            title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "Defeat",
             subtitle: "<color=#8CFFFFFF>Crewmates</color> voted out the <color=#FF1919FF>Impostors</color>",
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getGame().getLobby().getPlayers()
-              .filter(sus => !sus.isImpostor()),
+              .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
             winSound: WinSoundType.CrewmateWin,
           }])),
         intentName: "crewmateVote",
       }));
 
-    this.catch("player.left", event => event.getLobby())
-      .where(event => event.getLobby().getPlayers().filter(player => player.isImpostor()).length == 0)
+    role.catch("player.left", event => event.getLobby())
+      .where(event => event.getLobby().getPlayers()
+        .filter(player2 => player2.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor).length == 0)
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
             title: "Victory",
             subtitle: "<color=#FF1919FF>Impostor</color> disconnected",
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
-            yourTeam: event.getPlayer().getLobby().getPlayers(),
+            yourTeam: event.getLobby().getPlayers()
+              .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
             winSound: WinSoundType.ImpostorWin,
           }])),
         intentName: "impostorDisconnected",
@@ -84,7 +97,9 @@ export class Crewmate extends BaseRole {
   }
 
   getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
-    const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
+    const impostors = player.getLobby()
+      .getPlayers()
+      .filter(players => players.isImpostor()).length;
 
     return {
       title: "Crewmate",
@@ -93,5 +108,7 @@ export class Crewmate extends BaseRole {
     };
   }
 
-  getManagerType(): typeof CrewmateManager { return CrewmateManager }
+  getManagerType(): typeof CrewmateManager {
+    return CrewmateManager;
+  }
 }

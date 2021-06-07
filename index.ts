@@ -50,7 +50,7 @@ export default class PolusGGApi extends BasePlugin {
 
     this.server.on("game.ended", event => {
       if (event.getReason() !== 7) {
-        Services.get(ServiceType.EndGame).recalculateEndGame(event.getGame());
+        // Services.get(ServiceType.EndGame).recalculateEndGame(event.getGame());
 
         event.cancel();
       }

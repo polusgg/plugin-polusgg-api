@@ -1,6 +1,6 @@
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
-import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { AlterGameTag, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
 import { Impostor } from "./src/baseRole/impostor/impostor";
@@ -82,6 +82,8 @@ export default class PolusGGApi extends BasePlugin {
       });
 
       this.mods[0].onEnable(event.getLobby());
+
+      event.getLobby().setGameTag(AlterGameTag.ChangePrivacy, 1);
 
       let lastIndex = 0;
 

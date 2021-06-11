@@ -30,8 +30,6 @@ export class Crewmate extends BaseRole {
     if (this.getAlignment() === RoleAlignment.Crewmate) {
       Crewmate.setupWinConditions(this);
     }
-
-    // todo not duplicate code for crewmate wins on sheriff!!!!
   }
 
   static setupWinConditions(role: BaseRole): void {
@@ -60,7 +58,7 @@ export class Crewmate extends BaseRole {
       }));
 
     // this is going to call this code for every crewmate at least once
-    role.catch("meeting.ended", event => event.getGame())
+    role.catch("meeting.ended", event => event.getGame().getLobby())
       .where(() => role.getAlignment() === RoleAlignment.Crewmate)
       .where(event => event.getGame().getLobby().getPlayers()
         .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !player.isDead())

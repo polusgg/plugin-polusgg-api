@@ -68,7 +68,11 @@ export class Impostor extends BaseRole {
       .getLobby())
       .where(() => role.getAlignment() === RoleAlignment.Impostor)
       .where(event => event.getPlayer().getLobby().getPlayers()
-        .filter(player => !player.isImpostor() && !player.isDead()).length <= 1)
+        .filter(player => {
+          console.log(player.getName(), player.isImpostor(), player.isDead());
+
+          return !player.isImpostor() && !player.isDead();
+        }).length <= 1)
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
@@ -96,8 +100,8 @@ export class Impostor extends BaseRole {
           .getPlayers()
           .map(player => [player, {
             title: player.isImpostor() ? "Victory" : "Defeat",
-            subtitle: "<color=#8CFFFFFF>Impostors</color> voted out the <color=#FF1919FF>Crewmates</color>",
-            color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
+            subtitle: "<color=#FF1919FF>Impostors</color> voted out the <color=#8CFFFFFF>Crewmates</color>",
+            color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
             yourTeam: event.getGame().getLobby().getPlayers()
               .filter(sus => !sus.isImpostor()),
             winSound: WinSoundType.ImpostorWin,
@@ -125,12 +129,12 @@ export class Impostor extends BaseRole {
     role.catch("player.left", event => event.getLobby())
       .where(event => event.getLobby()
         .getPlayers()
-        .filter(player => !player.isImpostor() && player !== event.getPlayer()).length == 0)
+        .filter(player => !player.isImpostor() && player !== event.getPlayer()).length <= 1)
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
             title: player.isImpostor() ? "Victory" : "Defeat",
-            subtitle: "<color=#FF1919FF>Crewmates</color> disconnected",
+            subtitle: "<color=#8CFFFFFF>Crewmates</color> disconnected",
             color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers(),
             winSound: WinSoundType.ImpostorWin,

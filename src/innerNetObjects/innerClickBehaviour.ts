@@ -129,7 +129,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
   }
 
   handleRpc(connection: Connection, type: RpcPacketType, packet: BaseRpcPacket, _sendTo: Connection[]): void {
-    switch (type) {
+    switch (type as number) {
       case 0x86: {
         const button = Services.get(ServiceType.Button).findSafeButtonByNetId(this.getLobby(), this.getNetId());
 

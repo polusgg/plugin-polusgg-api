@@ -47,7 +47,7 @@ export class DeadBodyService {
       return;
     }
 
-    if (sender.getType() !== 0x83) {
+    if (sender.getType() as number !== 0x83) {
       return;
     }
 

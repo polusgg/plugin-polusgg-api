@@ -49,7 +49,7 @@ export default class PolusGGApi extends BasePlugin {
     BaseMod.owner = this;
 
     this.server.on("game.ended", event => {
-        event.cancel();
+      event.cancel();
     });
 
     this.server.on("game.started", event => {

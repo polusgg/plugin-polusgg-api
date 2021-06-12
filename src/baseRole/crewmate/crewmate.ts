@@ -101,7 +101,7 @@ export class Crewmate extends BaseRole {
 
     return {
       title: "Crewmate",
-      subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
+      subtitle: `There ${(impostors > 1 ? "are" : "is")} ${impostors} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }

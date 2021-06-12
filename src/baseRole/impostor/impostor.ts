@@ -119,7 +119,7 @@ export class Impostor extends BaseRole {
               subtitle: "<color=#8CFFFFFF>Impostors</color> won by sabotage",
               color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
               yourTeam: event.getGame().getLobby().getPlayers()
-                .filter(sus => !sus.isImpostor()),
+                .filter(sus => sus.isImpostor()),
               winSound: WinSoundType.ImpostorWin,
             }])),
           intentName: "impostorSabotage",

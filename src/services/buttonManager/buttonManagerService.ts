@@ -103,7 +103,7 @@ export class ButtonManagerService {
       throw new Error("HandleCountingDown sent from unknown InnerNetObject");
     }
 
-    if (sender.getType() !== 0x83) {
+    if (sender.getType() as number !== 0x83) {
       throw new Error(`HandleCountingDown sent from a non-InnerClickBehaviour (${sender.getType()})`);
     }
 

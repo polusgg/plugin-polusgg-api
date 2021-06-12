@@ -49,11 +49,7 @@ export default class PolusGGApi extends BasePlugin {
     BaseMod.owner = this;
 
     this.server.on("game.ended", event => {
-      if (event.getReason() !== 7) {
-        // Services.get(ServiceType.EndGame).recalculateEndGame(event.getGame());
-
         event.cancel();
-      }
     });
 
     this.server.on("game.started", event => {

@@ -41,7 +41,7 @@ export class SetGameOption extends BaseRootPacket {
     public category: string,
     public priority: number,
     public name: string,
-    public value: NumberValue | BooleanValue | EnumValue | { index: number; options: string[] },
+    public value: NumberValue | BooleanValue | EnumValue,
   ) {
     super(0x89);
   }

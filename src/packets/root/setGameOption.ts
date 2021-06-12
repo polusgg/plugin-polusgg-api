@@ -29,6 +29,10 @@ export class EnumValue {
     public index: number,
     public options: string[],
   ) {}
+
+  getSelected(): string {
+    return this.options[this.index];
+  }
 }
 
 export class SetGameOption extends BaseRootPacket {

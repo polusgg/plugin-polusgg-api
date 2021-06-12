@@ -72,10 +72,10 @@ export default class PolusGGApi extends BasePlugin {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const options = Services.get(ServiceType.GameOptions).getGameOptions<{ Gamemode: EnumValue }>(event.getLobby());
 
-      options.createOption("", "Gamemode", {
-        index: 0,
-        options: this.mods.map(mod => mod.getMetadata().name),
-      });
+      options.createOption("", "Gamemode", new EnumValue(
+        0,
+        this.mods.map(mod => mod.getMetadata().name),
+      ));
 
       this.mods[0].onEnable(event.getLobby());
 

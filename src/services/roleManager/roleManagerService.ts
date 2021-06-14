@@ -156,9 +156,9 @@ export class RoleManagerService {
     return roleInstance;
   }
 
-  setBaseRole(player: Player, role: PlayerRole): void {
+  setBaseRole(player: PlayerInstance, role: PlayerRole): void {
     player.setRole(role);
     player.updateGameData();
-    player.getEntity().getPlayerControl().sendRpcPacket(new SetRolePacket(role), player.getLobby().getConnections());
+    (player as Player).getEntity().getPlayerControl().sendRpcPacket(new SetRolePacket(role), player.getLobby().getConnections());
   }
 }

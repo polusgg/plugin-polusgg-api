@@ -28,7 +28,7 @@ export class Crewmate extends BaseRole {
     super(owner);
 
     Services.get(ServiceType.RoleManager)
-      .setBaseRole(this.owner as Player, PlayerRole.Crewmate);
+      .setBaseRole(this.owner, PlayerRole.Crewmate);
   }
 
   getAssignmentScreen(player: PlayerInstance): StartGameScreenData {

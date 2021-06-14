@@ -48,7 +48,7 @@ export class Impostor extends BaseRole {
       .getKillDistance() + 1;
 
     Services.get(ServiceType.RoleManager)
-      .setBaseRole(this.owner as Player, this.role);
+      .setBaseRole(this.owner, this.role);
 
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource)

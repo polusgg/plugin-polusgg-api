@@ -12,7 +12,7 @@ export enum ServiceType {
   DeadBody,
   Vent,
   CoroutineManager,
-  Notification,
   Cosmetic,
   EndGame,
+  Hud,
 }

@@ -9,12 +9,12 @@ import { SoundManagerService } from "./soundManager";
 import { GameOptionsService } from "./gameOptions/gameOptionsService";
 import { AnimationService } from "./animation/animationService";
 import { NameService } from "./name";
-import { NotificationService } from "./notification/notificationService";
 import { DeadBodyService } from "./deadBody/deadBodyService";
 import { CoroutineManagerService } from "./coroutineManager/coroutineManagerService";
 import { VentService } from "./vent";
 import { CosmeticService } from "./cosmetics/cosmeticService";
 import { EndGameService } from "./endGame/endGameService";
+import { HudService } from "./hud/hudService";
 
 const serviceFromType = {
   [ServiceType.Resource]: new ResourceService(),
@@ -28,11 +28,11 @@ const serviceFromType = {
   [ServiceType.Animation]: new AnimationService(),
   [ServiceType.Name]: new NameService(),
   [ServiceType.DeadBody]: new DeadBodyService(),
-  [ServiceType.Notification]: new NotificationService(),
   [ServiceType.CoroutineManager]: new CoroutineManagerService(),
   [ServiceType.Vent]: new VentService(),
   [ServiceType.Cosmetic]: new CosmeticService(),
   [ServiceType.EndGame]: new EndGameService(),
+  [ServiceType.Hud]: new HudService(),
 };
 
 export class Services {

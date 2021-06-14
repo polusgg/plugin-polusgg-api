@@ -14,8 +14,8 @@ export class SetStringPacket extends BaseRootPacket {
     return new SetStringPacket(reader.readString(), reader.readByte());
   }
 
-  serialize(): MessageWriter {
-    return new MessageWriter().writeString(this.content).writeByte(this.location);
+  serialize(writer: MessageWriter): MessageWriter {
+    return writer.writeString(this.content).writeByte(this.location);
   }
 
   clone(): SetStringPacket {

@@ -2,7 +2,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Player } from "@nodepolus/framework/src/player";
 import { Palette } from "@nodepolus/framework/src/static";
 import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
-import { GameOverReason, GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { AssetBundle } from "../../assets";
 import { BaseManager } from "../../baseManager/baseManager";
 import { Services } from "../../services";
@@ -10,7 +10,6 @@ import { Button } from "../../services/buttonManager";
 import { StartGameScreenData } from "../../services/roleManager/roleManagerService";
 import { ServiceType } from "../../types/enums";
 import { EdgeAlignments } from "../../types/enums/edgeAlignment";
-import { WinSoundType } from "../../types/enums/winSound";
 import { BaseRole, RoleAlignment } from "../baseRole";
 
 export class ImpostorManager extends BaseManager {
@@ -41,16 +40,15 @@ export class Impostor extends BaseRole {
   constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor) {
     super(owner);
 
-    if (this.getAlignment() === RoleAlignment.Impostor) {
-      Impostor.setupWinConditions(this);
-    }
-
     this.role = role;
     this.onClicked = undefined;
     this.targetSelector = undefined;
     this.range = this.owner.getLobby()
       .getOptions()
       .getKillDistance() + 1;
+
+    Services.get(ServiceType.RoleManager)
+      .setBaseRole(this.owner as Player, this.role);
 
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource)
@@ -61,92 +59,7 @@ export class Impostor extends BaseRole {
     }
   }
 
-  static setupWinConditions(role: BaseRole) {
-    const endGame = Services.get(ServiceType.EndGame);
-
-    role.catch("player.murdered", event => event.getPlayer()
-      .getLobby())
-      .where(() => role.getAlignment() === RoleAlignment.Impostor)
-      .where(event => event.getPlayer().getLobby().getPlayers()
-        .filter(player => {
-          console.log(player.getName(), player.isImpostor(), player.isDead());
-
-          return !player.isImpostor() && !player.isDead();
-        }).length <= 1)
-      .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
-        endGameData: new Map(event.getPlayer().getLobby().getPlayers()
-          .map(player => [player, {
-            title: player.isImpostor() ? "Victory" : "Defeat",
-            subtitle: "<color=#FF1919FF>Impostors</color> won by kills",
-            color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
-            yourTeam: event.getPlayer()
-              .getLobby()
-              .getPlayers()
-              .filter(sus => sus.isImpostor()),
-            winSound: WinSoundType.ImpostorWin,
-          }])),
-        intentName: "impostorKill",
-      }));
-
-    role.catch("meeting.ended", event => event.getGame())
-      .where(() => role.getAlignment() === RoleAlignment.Impostor)
-      .where(event => event.getGame().getLobby().getPlayers()
-        .filter(player => !player.isImpostor() && !player.isDead())
-        .length <= 1,
-      )
-      .execute(event => endGame.registerEndGameIntent(event.getGame(), {
-        endGameData: new Map(event.getGame()
-          .getLobby()
-          .getPlayers()
-          .map(player => [player, {
-            title: player.isImpostor() ? "Victory" : "Defeat",
-            subtitle: "<color=#FF1919FF>Impostors</color> voted out the <color=#8CFFFFFF>Crewmates</color>",
-            color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
-            yourTeam: event.getGame().getLobby().getPlayers()
-              .filter(sus => !sus.isImpostor()),
-            winSound: WinSoundType.ImpostorWin,
-          }])),
-        intentName: "impostorVote",
-      }));
-
-    role.catch("game.ended", event => event.getGame().getLobby())
-      .where(event => event.getReason() === GameOverReason.ImpostorsBySabotage)
-      .execute(event => {
-        endGame.registerEndGameIntent(event.getGame(), {
-          endGameData: new Map(event.getGame().getLobby().getPlayers()
-            .map(player => [player, {
-              title: player.isImpostor() ? "Victory" : "Defeat",
-              subtitle: "<color=#8CFFFFFF>Impostors</color> won by sabotage",
-              color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
-              yourTeam: event.getGame().getLobby().getPlayers()
-                .filter(sus => sus.isImpostor()),
-              winSound: WinSoundType.ImpostorWin,
-            }])),
-          intentName: "impostorSabotage",
-        });
-      });
-
-    role.catch("player.left", event => event.getLobby())
-      .where(event => event.getLobby()
-        .getPlayers()
-        .filter(player => !player.isImpostor() && player !== event.getPlayer()).length <= 1)
-      .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
-        endGameData: new Map(event.getPlayer().getLobby().getPlayers()
-          .map(player => [player, {
-            title: player.isImpostor() ? "Victory" : "Defeat",
-            subtitle: "<color=#8CFFFFFF>Crewmates</color> disconnected",
-            color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
-            yourTeam: event.getPlayer().getLobby().getPlayers(),
-            winSound: WinSoundType.ImpostorWin,
-          }])),
-        intentName: "crewmateDisconnected",
-      }));
-  }
-
   async onReadyImpostor(): Promise<void> {
-    Services.get(ServiceType.RoleManager)
-      .setBaseRole(this.owner as Player, this.role);
-
     this.button = await Services.get(ServiceType.Button)
       .spawnButton(this.owner.getSafeConnection(), {
         asset: AssetBundle.loadSafeFromCache("Global")

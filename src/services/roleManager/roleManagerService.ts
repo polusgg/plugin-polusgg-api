@@ -16,6 +16,7 @@ import { ServiceType } from "../../types/enums";
 import { WinSound } from "../../types/enums/winSound";
 import { LobbyDefaultOptions } from "../gameOptions/gameOptionsService";
 import { Services } from "../services";
+import { RoleDestroyedReason } from "../../types/enums/roleDestroyedReason";
 
 export type EndGameScreenData = {
   title: string | TextComponent;
@@ -50,17 +51,17 @@ export class RoleManagerService {
         .getLobby()
         .getPlayers()
         .forEach(p => {
-          this.onPlayerDespawned(p);
+          this.onPlayerDespawned(p, RoleDestroyedReason.GameEnded);
         });
     });
 
     server.on("player.left", event => {
-      this.onPlayerDespawned(event.getPlayer());
+      this.onPlayerDespawned(event.getPlayer(), RoleDestroyedReason.Disconnect);
     });
   }
 
-  onPlayerDespawned(player: PlayerInstance): void {
-    player.getMeta<BaseRole | undefined>("pgg.api.role")?.onDestroy();
+  onPlayerDespawned(player: PlayerInstance, reason: RoleDestroyedReason): void {
+    player.getMeta<BaseRole | undefined>("pgg.api.role")?.onDestroy(reason);
   }
 
   assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
@@ -102,7 +103,7 @@ export class RoleManagerService {
       }
     }
 
-    console.log(players.length - (options.getOption("Impostor Count").getValue().value));
+    console.log("non-impostor count", players.length - (options.getOption("Impostor Count").getValue().value));
 
     for (let i = 0; i < players.length - (options.getOption("Impostor Count").getValue().value); i++) {
       if (i >= otherAlignedRolesFromAssignment.length) {

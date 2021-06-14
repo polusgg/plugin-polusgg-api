@@ -9,6 +9,7 @@ import { Lobby } from "@nodepolus/framework/src/lobby";
 import { Player } from "@nodepolus/framework/src/player";
 import { StartGameScreenData } from "../services/roleManager/roleManagerService";
 import { BaseManager } from "../baseManager/baseManager";
+import { RoleDestroyedReason } from "../types/enums/roleDestroyedReason";
 
 export type Ownable = LobbyInstance | PlayerInstance | Connection | Game | BaseInnerNetEntity | BaseInnerNetObject | undefined;
 
@@ -81,7 +82,7 @@ export class BaseRole {
     return this.owner.getLobby().getMeta<T>(`pgg.manager.${id}`);
   }
 
-  onDestroy(): void {
+  onDestroy(_destroyReason: RoleDestroyedReason): void {
     for (let i = 0; i < this.caughtEvents.length; i++) {
       this.caughtEvents[i].destroy();
     }

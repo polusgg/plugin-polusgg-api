@@ -10,6 +10,8 @@ import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
 import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
+import { VanillaWinConditions } from "./src/services/endGame/vanillaWinConditions";
+import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
 
 export default class PolusGGApi extends BasePlugin {
   private readonly mods: BaseMod[] = [];
@@ -49,7 +51,9 @@ export default class PolusGGApi extends BasePlugin {
     BaseMod.owner = this;
 
     this.server.on("game.ended", event => {
-      event.cancel();
+      if (event.getReason() !== 0x07) {
+        event.cancel();
+      }
     });
 
     this.server.on("game.started", event => {
@@ -96,12 +100,24 @@ export default class PolusGGApi extends BasePlugin {
       event.getPlayer().setMeta("pgg.api.targetable", true);
     });
 
+    VanillaWinConditions.setup(this.server);
+
     Player.prototype.revive = async function revive(this: Player): Promise<void> {
       this.getGameDataEntry().setDead(false);
       this.updateGameData();
       this.getEntity().getPlayerControl().sendRpcPacket(new RevivePacket(), this.getLobby().getConnections());
 
       return new Promise(r => r());
+    };
+
+    const fallbackIsImpostor = Player.prototype.isImpostor;
+
+    Player.prototype.isImpostor = function isImpostor(this: Player): boolean {
+      if (!this.hasMeta("pgg.api.role")) {
+        return fallbackIsImpostor();
+      }
+
+      return this.getMeta<BaseRole>("pgg.api.role").getAlignment() === RoleAlignment.Impostor;
     };
   }
 

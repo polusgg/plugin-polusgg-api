@@ -5,7 +5,6 @@ import { StartGameScreenData } from "../../services/roleManager/roleManagerServi
 import { BaseRole, RoleAlignment } from "../baseRole";
 import { Services } from "../../services";
 import { ServiceType } from "../../types/enums";
-import { Player } from "@nodepolus/framework/src/player";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 
 export class CrewmateManager extends BaseManager {

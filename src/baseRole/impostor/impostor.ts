@@ -1,5 +1,4 @@
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { Player } from "@nodepolus/framework/src/player";
 import { Palette } from "@nodepolus/framework/src/static";
 import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";

@@ -13,6 +13,12 @@ import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
 import { VanillaWinConditions } from "./src/services/endGame/vanillaWinConditions";
 import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
 
+declare global {
+  interface Object {
+    log(...data: any[]);
+  }
+}
+
 export default class PolusGGApi extends BasePlugin {
   private readonly mods: BaseMod[] = [];
 
@@ -21,6 +27,14 @@ export default class PolusGGApi extends BasePlugin {
       name: "Polus.gg API",
       version: [1, 0, 0],
     });
+
+    Object.prototype.log = function logToDispleaseRoobscoob(this: any, ...data: any[]): void {
+      data.unshift(this);
+
+      console.log.apply(console, [...data]);
+    };
+
+    "impostor".log("LMAO");
 
     RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
       connection.setMeta({

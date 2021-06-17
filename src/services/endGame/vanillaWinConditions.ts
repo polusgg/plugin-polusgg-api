@@ -12,7 +12,7 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 
 // moved win conditions into a separate class to create less events per role creation
 export class VanillaWinConditions {
-  static setup(server: Server) {
+  static setup(server: Server): void {
     const endGame = Services.get(ServiceType.EndGame);
 
     server.on("player.task.completed", event => {

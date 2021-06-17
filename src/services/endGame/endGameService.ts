@@ -30,10 +30,10 @@ export class EndGameService {
   protected intents: Map<Game, EndGameIntent[]> = new Map();
   protected exclusions: Map<Game, EndGameExclusion[]> = new Map();
 
-  async setEndGameData(connection: Connection | undefined, endGameData: EndGameScreenData): Promise<void> {
-    connection?.setMeta("pgg.api.endGameData", endGameData);
+  async setEndGameData(connection: Connection, endGameData: EndGameScreenData): Promise<void> {
+    connection.setMeta("pgg.api.endGameData", endGameData);
 
-    return connection?.writeReliable(new OverwriteGameOver(
+    return connection.writeReliable(new OverwriteGameOver(
       endGameData.title.toString(),
       endGameData.subtitle.toString(),
       endGameData.color,
@@ -133,7 +133,7 @@ export class EndGameService {
       if (!this.exclusions.has(game) || !this.exclusions.get(game)!.some(exclusion => exclusion.intentName === intent.intentName)) {
         [...intent.endGameData.entries()].forEach(([player, data]) => {
           if (player.getConnection() !== undefined) {
-            this.setEndGameData(player.getConnection(), data);
+            this.setEndGameData(player.getSafeConnection(), data);
           }
         });
 

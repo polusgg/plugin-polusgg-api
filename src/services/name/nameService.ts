@@ -33,12 +33,14 @@ export class NameService {
     });
 
     server.on("game.ended", event => {
-      event.getGame()
-        .getLobby()
-        .getConnections()
-        .forEach(connection => {
-          this.nameMap.set(connection, new Map());
-        });
+      if (event.isCancelled()) {
+        event.getGame()
+          .getLobby()
+          .getConnections()
+          .forEach(connection => {
+            this.nameMap.set(connection, new Map());
+          });
+      }
     });
 
     server.on("player.name.updated", async event => {

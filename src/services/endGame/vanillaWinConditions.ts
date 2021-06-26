@@ -73,7 +73,7 @@ export class VanillaWinConditions {
             }])),
           intentName: "crewmateVote",
         });
-      } else if (this.shouldEndGameImpostors(event.getGame().getLobby())) {
+      } else if (event.getGame().getLobby().getGameState() === GameState.Started && this.shouldEndGameImpostors(event.getGame().getLobby())) {
         endGame.registerEndGameIntent(event.getGame(), {
           endGameData: new Map(event.getGame()
             .getLobby()
@@ -140,7 +140,7 @@ export class VanillaWinConditions {
   }
 
   static shouldEndGameImpostors(lobby: LobbyInstance): boolean {
-    if (lobby.getGameState() == GameState.NotStarted) {
+    if (lobby.getGameState() !== GameState.Started) {
       return false;
     }
 

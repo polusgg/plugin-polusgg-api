@@ -71,7 +71,7 @@ export class GameOptionsService {
       options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher - 5);
       options.createOption("Meeting Settings", "Max Button Presses", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Button Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Anon Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);

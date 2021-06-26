@@ -30,14 +30,10 @@ export class Crewmate extends BaseRole {
       .setBaseRole(this.owner, PlayerRole.Crewmate);
   }
 
-  getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
-    const impostors = player.getLobby()
-      .getPlayers()
-      .filter(players => players.isImpostor()).length;
-
+  getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Crewmate",
-      subtitle: `There ${(impostors > 1 ? "are" : "is")} ${impostors} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
+      subtitle: `There ${(impostorCount != 1 ? "are" : "is")} ${impostorCount} <color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }

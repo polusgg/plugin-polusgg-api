@@ -98,7 +98,7 @@ export class ButtonManagerService {
     }
   }
 
-  private handleCountingDown(connection: Connection, packet: SetCountingDown, sender?: BaseInnerNetObject): void {
+  private async handleCountingDown(connection: Connection, packet: SetCountingDown, sender?: BaseInnerNetObject): Promise<void> {
     if (sender === undefined) {
       throw new Error("HandleCountingDown sent from unknown InnerNetObject");
     }
@@ -114,13 +114,13 @@ export class ButtonManagerService {
 
     const event = new ButtonCountdownUpdated();
 
-    button.emit(packet.requestCounting ? "button.countdown.started" : "button.countdown.stopped", event);
+    await button.emit(packet.requestCounting ? "button.countdown.started" : "button.countdown.stopped", event);
 
     if (event.isCancelled()) {
       return;
     }
 
-    button.setCurrentTime(packet.currentTimer);
-    button.setCountingDown(packet.requestCounting);
+    await button.setCurrentTime(packet.currentTimer);
+    await button.setCountingDown(packet.requestCounting);
   }
 }

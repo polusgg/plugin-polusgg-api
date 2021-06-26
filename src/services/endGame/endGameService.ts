@@ -45,18 +45,13 @@ export class EndGameService {
   }
 
   async endGame(game: Game): Promise<void> {
-    // if (game.getLobby().getGameState() !== GameState.Started) {
-    //   console.log("?????????????");
-
-    //   return;
-    // }
-
     game.getLobby().getConnections().forEach(connection => {
       if (connection.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData") === undefined) {
         this.setEndGameData(connection, this.defaultEndGameData);
       }
     });
 
+    console.log("ending the game", game.getLobby().getGameState());
     await game.getLobby().getHostInstance().endGame(0x07);
   }
 
@@ -137,7 +132,7 @@ export class EndGameService {
           }
         });
 
-        console.log(intent.intentName);
+        console.log("ending game with", intent.intentName);
         await this.endGame(game);
 
         break;

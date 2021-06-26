@@ -79,8 +79,6 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
       .writeFloat32(this.z)
       .writePackedInt32(this.attachedTo);
 
-    console.log("data", new MessageWriter().writePackedInt32(this.attachedTo).toString("hex"), writer.getBuffer().toString("hex"));
-
     return new DataPacket(
       this.netId,
       writer,
@@ -100,8 +98,6 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
       .writeVector2(this.position)
       .writeFloat32(this.z)
       .writePackedInt32(this.attachedTo);
-
-    console.log("spawn", new MessageWriter().writePackedInt32(this.attachedTo).toString("hex"), writer.getBuffer().toString("hex"));
 
     return new SpawnPacketObject(
       this.netId,

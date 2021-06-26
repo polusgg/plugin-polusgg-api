@@ -46,18 +46,32 @@ declare const server: Server;
 export class RoleManagerService {
   constructor() {
     server.on("game.ended", event => {
-      event
-        .getGame()
-        .getLobby()
-        .getPlayers()
-        .forEach(p => {
-          this.onPlayerDespawned(p, RoleDestroyedReason.GameEnded);
-        });
+      if (event.isCancelled()) {
+        event
+          .getGame()
+          .getLobby()
+          .getPlayers()
+          .forEach(p => {
+            this.onPlayerDespawned(p, RoleDestroyedReason.GameEnded);
+          });
+      }
     });
 
     server.on("player.left", event => {
       this.onPlayerDespawned(event.getPlayer(), RoleDestroyedReason.Disconnect);
     });
+  }
+
+  static adjustImpostorCount(playerCount: number): number {
+    if (playerCount <= 6) {
+      return 1;
+    }
+
+    if (playerCount <= 8) {
+      return 2;
+    }
+
+    return 3;
   }
 
   onPlayerDespawned(player: PlayerInstance, reason: RoleDestroyedReason): void {
@@ -95,17 +109,22 @@ export class RoleManagerService {
     const impostorAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData }[] = [];
     const otherAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = [];
 
-    for (let i = 0; i < options.getOption("Impostor Count").getValue().value; i++) {
+    const impostorCount = Math.min(options.getOption("Impostor Count").getValue().value, RoleManagerService.adjustImpostorCount(players.length));
+
+    console.log("pcount", players.length, impostorCount);
+
+    for (let i = 0; i < impostorCount; i++) {
       if (i >= impostorAlignedRolesFromAssignment.length) {
+        console.log("pushed impostor", i);
         impostorAlignedRoles.push({ role: Impostor });
       } else {
         impostorAlignedRoles.push(impostorAlignedRolesFromAssignment[i]);
       }
     }
 
-    console.log("non-impostor count", players.length - (options.getOption("Impostor Count").getValue().value));
+    console.log("non-impostor count", impostorCount);
 
-    for (let i = 0; i < players.length - (options.getOption("Impostor Count").getValue().value); i++) {
+    for (let i = 0; i < players.length - impostorCount; i++) {
       if (i >= otherAlignedRolesFromAssignment.length) {
         otherAlignedRoles.push({ role: Crewmate, assignWith: RoleAlignment.Crewmate });
       } else {
@@ -113,12 +132,12 @@ export class RoleManagerService {
       }
     }
 
-    const allRoleAssignments = [...impostorAlignedRoles, ...otherAlignedRoles];
+    const allRoleAssignments = [...otherAlignedRoles, ...impostorAlignedRoles];
 
-    if (allRoleAssignments.length !== players.length) {
-      console.log({ impostorAlignedRoles, otherAlignedRoles });
-      throw new Error("Crying rn. The normalized length of all the roles did not match up with the number of players.");
-    }
+    // if (allRoleAssignments.length !== players.length) {
+    //   console.log({ impostorAlignedRoles, otherAlignedRoles });
+    //   throw new Error("Crying rn. The normalized length of all the roles did not match up with the number of players.");
+    // }
 
     for (let i = 0; i < allRoleAssignments.length; i++) {
       managers.push(this.assignRole(players[i], allRoleAssignments[i].role, allRoleAssignments[i].startGameScreen).getManagerType());
@@ -137,7 +156,7 @@ export class RoleManagerService {
     // eslint-disable-next-line new-cap
     const roleInstance = new role(player);
 
-    startGameScreen ||= roleInstance.getAssignmentScreen(player);
+    startGameScreen ??= roleInstance.getAssignmentScreen(player, player.getLobby().getPlayers().filter(x => x.isImpostor()).length);
 
     player.setMeta("pgg.api.role", roleInstance);
 

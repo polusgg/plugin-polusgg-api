@@ -32,7 +32,7 @@ export class BaseRole {
 
   constructor(protected readonly owner: PlayerInstance) { }
 
-  getAssignmentScreen(_player: PlayerInstance): StartGameScreenData { throw new Error("needs to be overwritten") }
+  getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData { throw new Error("needs to be overwritten") }
 
   getName(): string {
     return this.metadata.name;

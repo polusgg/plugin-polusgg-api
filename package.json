@@ -1,7 +1,7 @@
 {
   "name": "@polusgg/plugin-polusgg-api",
   "np-plugin": true,
-  "version": "1.0.3-43",
+  "version": "1.0.3-44",
   "description": "Polus.gg API plugin (implementing the networking protocol used by client mods) for NodePolus",
   "repository": {
     "type": "git",

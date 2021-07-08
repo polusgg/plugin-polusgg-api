@@ -71,6 +71,13 @@ export class Impostor extends BaseRole {
         currentTime: 15,
       });
 
+    this.catch("meeting.ended", event => event.getGame())
+      .execute(() => {
+        if (this.button !== undefined) {
+          this.button.setCurrentTime(this.button.getMaxTime());
+        }
+      });
+
     this.catch("player.died", event => event.getPlayer())
       .execute(_ => {
         this.button?.destroy();

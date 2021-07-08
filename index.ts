@@ -1,9 +1,7 @@
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
-import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
-import { AlterGameTag, Level, PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { AlterGameTag, Level } from "@nodepolus/framework/src/types/enums";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
-import { Impostor } from "./src/baseRole/impostor/impostor";
 import { Player } from "@nodepolus/framework/src/player";
 import { FetchResourceResponsePacket, ResizePacket } from "./src/packets/root";
 import { ServiceType } from "./src/types/enums";
@@ -12,7 +10,6 @@ import { Services } from "./src/services";
 import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
 import { VanillaWinConditions } from "./src/services/endGame/vanillaWinConditions";
 import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
-import { RoleManagerService } from "./src/services/roleManager";
 import { SpawnPositions } from "@nodepolus/framework/src/static";
 
 declare global {
@@ -75,22 +72,23 @@ export default class PolusGGApi extends BasePlugin {
     });
 
     this.server.on("game.started", event => {
-      const roles = this.mods.filter(mod => mod.getEnabled(event.getGame().getLobby())).map(e => e.getRoles(event.getGame().getLobby())).flat();
-      const impostorRoleDecls = roles.filter(r => r.role === Impostor);
-      // const impostorCounts = impostorRoleDecls.reduce((a, r) => a + r.playerCount, 0);
-
       event.setImpostors([]);
 
-      if (impostorRoleDecls.length > 0) {
-        event.setImpostors(shuffleArrayClone(event.getGame().getLobby().getPlayers()).slice(0, RoleManagerService.adjustImpostorCount(event.getGame().getLobby().getPlayers().length)));
-      }
+      const roles = this.mods.filter(mod => mod.getEnabled(event.getGame().getLobby())).map(e => e.getRoles(event.getGame().getLobby())).flat();
+      // const impostorRoleDecls = roles.filter(r => r.assignWith === RoleAlignment.Impostor);
+      // const impostorCounts = impostorRoleDecls.reduce((a, r) => a + r.playerCount, 0);
 
-      event.getImpostors().forEach(p => p.setRole(PlayerRole.Impostor));
+      //
+      // if (impostorRoleDecls.length > 0) {
+      //   event.setImpostors(shuffleArrayClone(event.getGame().getLobby().getPlayers()).slice(0, RoleManagerService.adjustImpostorCount(event.getGame().getLobby().getPlayers().length)));
+      // }
+      //
+      // event.getImpostors().forEach(p => p.setRole(PlayerRole.Impostor));
 
-      Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles.filter(r => r.role !== Impostor));
+      Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles);
     });
 
-    this.server.on("server.lobby.created", event => {
+    this.server.on("server.lobby.created", async event => {
       event.getLobby().setGameTag(AlterGameTag.ChangePrivacy, 1);
 
       if (this.mods.length === 0) {
@@ -100,12 +98,12 @@ export default class PolusGGApi extends BasePlugin {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const options = Services.get(ServiceType.GameOptions).getGameOptions<{ Gamemode: EnumValue }>(event.getLobby());
 
-      options.createOption("", "Gamemode", new EnumValue(
+      await options.createOption("", "Gamemode", new EnumValue(
         0,
         this.mods.map(mod => mod.getMetadata().name),
       ));
 
-      this.mods[0].onEnable(event.getLobby());
+      await this.mods[0].onEnable(event.getLobby());
 
       let lastIndex = 0;
 
@@ -114,7 +112,7 @@ export default class PolusGGApi extends BasePlugin {
 
         lastIndex = option.getValue().index;
 
-        this.mods[lastIndex].onEnable(event.getLobby());
+        await this.mods[lastIndex].onEnable(event.getLobby());
       });
     });
 

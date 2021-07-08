@@ -92,6 +92,10 @@ export class VanillaWinConditions {
     });
 
     server.on("player.left", event => {
+      if (event.getLobby().getGameState() !== GameState.Started) {
+        return;
+      }
+
       if (event.getLobby().getPlayers().filter(x => x.isImpostor()).length === 0) {
         endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
           endGameData: new Map(event.getPlayer().getLobby().getPlayers()
@@ -101,7 +105,7 @@ export class VanillaWinConditions {
               color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
               yourTeam: event.getLobby().getPlayers()
                 .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
-              winSound: WinSoundType.ImpostorWin,
+              winSound: WinSoundType.CrewmateWin,
             }])),
           intentName: "impostorDisconnected",
         });
@@ -114,7 +118,7 @@ export class VanillaWinConditions {
               color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
               yourTeam: event.getLobby().getPlayers()
                 .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor),
-              winSound: WinSoundType.CrewmateWin,
+              winSound: WinSoundType.ImpostorWin,
             }])),
           intentName: "crewmateDisconnected",
         });

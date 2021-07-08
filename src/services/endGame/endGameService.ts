@@ -45,7 +45,7 @@ export class EndGameService {
   }
 
   async endGame(game?: Game): Promise<void> {
-    if (game === undefined) {
+    if (game === undefined || game.getLobby() === undefined) {
       return;
     }
 

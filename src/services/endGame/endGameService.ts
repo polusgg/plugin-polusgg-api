@@ -44,7 +44,11 @@ export class EndGameService {
     ));
   }
 
-  async endGame(game: Game): Promise<void> {
+  async endGame(game?: Game): Promise<void> {
+    if (game === undefined) {
+      return;
+    }
+
     game.getLobby().getConnections().forEach(connection => {
       if (connection.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData") === undefined) {
         this.setEndGameData(connection, this.defaultEndGameData);
@@ -55,7 +59,7 @@ export class EndGameService {
     await game.getLobby().getHostInstance().endGame(0x07);
   }
 
-  registerEndGameIntent(game: Game, endGameIntent: EndGameIntent): void {
+  async registerEndGameIntent(game: Game, endGameIntent: EndGameIntent): Promise<void> {
     if (!this.intents.has(game)) {
       this.intents.set(game, []);
     }
@@ -65,10 +69,10 @@ export class EndGameService {
       this.intents.get(game)!.push(endGameIntent);
     }
 
-    this.recalculateEndGame(game);
+    await this.recalculateEndGame(game);
   }
 
-  unregisterEndGameIntent(game: Game, endGameIntentName: EndGameIntent["intentName"]): void {
+  async unregisterEndGameIntent(game: Game, endGameIntentName: EndGameIntent["intentName"]): Promise<void> {
     if (!this.intents.has(game)) {
       this.intents.set(game, []);
 
@@ -86,7 +90,7 @@ export class EndGameService {
     throw new Error(`Unable to find intent by name ${endGameIntentName}`);
   }
 
-  registerExclusion(game: Game, exclusion: EndGameExclusion): void {
+  async registerExclusion(game: Game, exclusion: EndGameExclusion): Promise<void> {
     if (!this.exclusions.has(game)) {
       this.exclusions.set(game, []);
     }
@@ -96,10 +100,10 @@ export class EndGameService {
       console.log("amogn", this.exclusions.get(game)!);
     }
 
-    this.recalculateEndGame(game);
+    await this.recalculateEndGame(game);
   }
 
-  unregisterExclusion(game: Game, exclusionName: EndGameExclusion["intentName"]): void {
+  async unregisterExclusion(game: Game, exclusionName: EndGameExclusion["intentName"]): Promise<void> {
     if (!this.exclusions.has(game)) {
       this.exclusions.set(game, []);
 
@@ -114,7 +118,7 @@ export class EndGameService {
       console.warn("could not find exclusion to splice", exclusionName);
     }
 
-    this.recalculateEndGame(game);
+    await this.recalculateEndGame(game);
   }
 
   async recalculateEndGame(game: Game): Promise<void> {

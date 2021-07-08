@@ -26,7 +26,7 @@ export class ResourceService {
   }
 
   async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
-    connection.writeReliable(new FetchResourcePacket(
+    await connection.writeReliable(new FetchResourcePacket(
       assetBundle.getId(),
       assetBundle.getAddress(),
       Buffer.from(assetBundle.getHash(), "hex"),

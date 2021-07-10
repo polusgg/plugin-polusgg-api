@@ -1,7 +1,5 @@
 export enum ServiceType {
-  Resource,
   RoleManager,
-  Button,
   CameraManager,
   PointOfInterestManager,
   LightManager,
@@ -9,10 +7,7 @@ export enum ServiceType {
   GameOptions,
   Animation,
   Name,
-  DeadBody,
   Vent,
   CoroutineManager,
-  Cosmetic,
   EndGame,
-  Hud,
 }

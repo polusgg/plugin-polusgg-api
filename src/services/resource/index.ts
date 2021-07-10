@@ -1,1 +1,0 @@
-export { ResourceService } from "./resourceService";

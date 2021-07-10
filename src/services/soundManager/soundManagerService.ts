@@ -1,10 +1,8 @@
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root/gameDataPacket";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { Services } from "..";
-import { AudioAsset } from "../../assets";
-import { EntitySoundSource } from "../../entities/entitySoundSource";
-import { ServiceType } from "../../types/enums";
+import { AudioAsset } from "@nodepolus/framework/src/protocol/polus/assets";
+import { EntitySoundSource } from "@nodepolus/framework/src/protocol/polus/entities/entitySoundSource";
 import { SoundType } from "../../types/enums/soundType";
 import { SoundController } from "./soundController";
 
@@ -28,7 +26,7 @@ export class SoundManagerService {
           throw new Error("Lobby mismatch for soundManagerService.playSound connection[]");
         }
 
-        await Services.get(ServiceType.Resource).assertLoaded(connection[i], asset);
+        await connection[i].assertLoaded(asset);
 
         await connection[i].writeReliable(new GameDataPacket([
           entity.serializeSpawn(),
@@ -38,7 +36,7 @@ export class SoundManagerService {
       return new SoundController(entity, connection);
     }
 
-    await Services.get(ServiceType.Resource).assertLoaded(connection, asset);
+    await connection.assertLoaded(asset);
 
     const entity = new EntitySoundSource(connection.getLobby()!, asset.getId(), position, asset.getDurationMs(), soundType, volumeModifier, looping, paused, pitch, soundFalloffMultiplier, soundFalloffStartingRadius, seek);
 

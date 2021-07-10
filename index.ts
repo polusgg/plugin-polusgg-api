@@ -2,14 +2,14 @@ import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { AlterGameTag, Level, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
-import { RevivePacket } from "./src/packets/rpc/playerControl";
+import { RevivePacket } from "@nodepolus/framework/src/protocol/polus/packets/rpc/playerControl";
 import { Impostor } from "./src/baseRole/impostor/impostor";
 import { Player } from "@nodepolus/framework/src/player";
-import { FetchResourceResponsePacket, ResizePacket } from "./src/packets/root";
+import { FetchResourceResponsePacket, ResizePacket } from "@nodepolus/framework/src/protocol/polus/packets/root";
 import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
-import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
+import { EnumValue, SetGameOption } from "@nodepolus/framework/src/protocol/polus/packets/root/setGameOption";
 import { VanillaWinConditions } from "./src/services/endGame/vanillaWinConditions";
 import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
 import { RoleManagerService } from "./src/services/roleManager";
@@ -33,7 +33,7 @@ export default class PolusGGApi extends BasePlugin {
     Object.prototype.log = function logToDispleaseRoobscoob(this: any, ...data: any[]): void {
       data.unshift(this);
 
-      console.log.apply(console, [...data]);
+      console.log(console, [...data]);
     };
 
     SpawnPositions.forPlayerOnLevel(Level.Polus, 1, 4, true).log();

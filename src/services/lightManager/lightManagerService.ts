@@ -1,6 +1,6 @@
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root/gameDataPacket";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
-import { EntityLightSource } from "../../entities/entityLightSource";
+import { EntityLightSource } from "@nodepolus/framework/src/protocol/polus/entities/entityLightSource";
 import { Vector2 } from "@nodepolus/framework/src/types";
 
 export class LightManagerService {

@@ -1,7 +1,7 @@
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { EntitySoundSource } from "../../entities/entitySoundSource";
+import { EntitySoundSource } from "@nodepolus/framework/src/protocol/polus/entities/entitySoundSource";
 import { SoundType } from "../../types/enums/soundType";
 
 export class SoundController {

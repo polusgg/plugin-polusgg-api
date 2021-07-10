@@ -1,14 +1,13 @@
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Palette } from "@nodepolus/framework/src/static";
 import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
-import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
-import { AssetBundle } from "../../assets";
+import { EdgeAlignments, GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { AssetBundle } from "@nodepolus/framework/src/protocol/polus/assets";
 import { BaseManager } from "../../baseManager/baseManager";
 import { Services } from "../../services";
-import { Button } from "../../services/buttonManager";
+import { Button } from "@nodepolus/framework/src/protocol/polus/entityWrappers";
 import { StartGameScreenData } from "../../services/roleManager/roleManagerService";
 import { ServiceType } from "../../types/enums";
-import { EdgeAlignments } from "../../types/enums/edgeAlignment";
 import { BaseRole, RoleAlignment } from "../baseRole";
 
 export class ImpostorManager extends BaseManager {
@@ -50,8 +49,7 @@ export class Impostor extends BaseRole {
       .setBaseRole(this.owner, this.role);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource)
-        .load(owner.getConnection()!, AssetBundle.loadSafeFromCache("Global"))
+      owner.getConnection()!.loadBundle(AssetBundle.loadSafeFromCache("Global"))
         .then(this.onReadyImpostor.bind(this));
     } else {
       this.onReadyImpostor();
@@ -59,7 +57,7 @@ export class Impostor extends BaseRole {
   }
 
   async onReadyImpostor(): Promise<void> {
-    this.button = await Services.get(ServiceType.Button)
+    this.button = await this.owner.getLobby()
       .spawnButton(this.owner.getSafeConnection(), {
         asset: AssetBundle.loadSafeFromCache("Global")
           .getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),

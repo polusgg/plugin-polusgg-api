@@ -1,7 +1,7 @@
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { Server } from "@nodepolus/framework/src/server";
-import { EntityCameraController } from "../../entities";
+import { EntityCameraController } from "@nodepolus/framework/src/protocol/polus/entities";
 
 declare const server: Server;
 

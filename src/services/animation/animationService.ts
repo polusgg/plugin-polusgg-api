@@ -1,11 +1,11 @@
-import { CameraAnimationKeyframe } from "./keyframes/camera";
-import { EntityCameraController } from "../../entities";
+import { CameraAnimationKeyframe } from "@nodepolus/framework/src/protocol/polus/animation/camera";
+import { EntityCameraController } from "@nodepolus/framework/src/protocol/polus/entities";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Player } from "@nodepolus/framework/src/player";
-import { BeginPlayerAnimation } from "../../packets/rpc/playerControl/beginAnimation";
-import { PlayerAnimationKeyframe } from "./keyframes/player";
-import { SetOutlinePacket } from "../../packets/rpc/playerControl/setOutline";
-import { SetOpacityPacket } from "../../packets/rpc/playerControl/setOpacity";
+import { BeginPlayerAnimation } from "@nodepolus/framework/src/protocol/polus/packets/rpc/playerControl/beginAnimation";
+import { PlayerAnimationKeyframe } from "@nodepolus/framework/src/protocol/polus/animation/player";
+import { SetOutlinePacket } from "@nodepolus/framework/src/protocol/polus/packets/rpc/playerControl/setOutline";
+import { SetOpacityPacket } from "@nodepolus/framework/src/protocol/polus/packets/rpc/playerControl/setOpacity";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";

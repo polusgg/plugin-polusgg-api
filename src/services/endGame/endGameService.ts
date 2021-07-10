@@ -2,8 +2,8 @@ import { Game } from "@nodepolus/framework/src/api/game";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 // import { GameState } from "@nodepolus/framework/src/types/enums";
-import { OverwriteGameOver } from "../../packets/root";
-import { WinSoundType } from "../../types/enums/winSound";
+import { OverwriteGameOver } from "@nodepolus/framework/src/protocol/polus/packets/root";
+import { WinSoundType } from "@nodepolus/framework/src/types/enums/polus/polusWinSound";
 import { EndGameScreenData } from "../roleManager/roleManagerService";
 
 type EndGameIntent = {

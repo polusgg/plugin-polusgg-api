@@ -1,6 +1,6 @@
 import { Lobby } from "@nodepolus/framework/src/lobby";
 import { Vents } from "@nodepolus/framework/src/static";
-import { DespawnVentsPacket } from "../../packets/rpc/shipStatus/despawnVents";
+import { DespawnVentsPacket } from "@nodepolus/framework/src/protocol/polus/packets/rpc/shipStatus/despawnVents";
 
 export class VentService {
   async despawnAllVents(lobby: Lobby): Promise<void> {

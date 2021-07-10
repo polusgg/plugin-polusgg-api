@@ -2,8 +2,8 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import Emittery from "emittery";
 import { Services } from "..";
-import { DeleteGameOption } from "../../packets/root/deleteGameOption";
-import { NumberValue, BooleanValue, EnumValue } from "../../packets/root/setGameOption";
+import { DeleteGameOptionPacket } from "@nodepolus/framework/src/protocol/polus/packets/root/deleteGameOption";
+import { NumberValue, BooleanValue, EnumValue } from "@nodepolus/framework/src/protocol/polus/packets/root/setGameOption";
 import { ServiceType } from "../../types/enums";
 import { GameOption } from "./gameOption";
 
@@ -74,7 +74,7 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
       const connection = connections[i];
       const sid = Services.get(ServiceType.GameOptions).nextSequenceId(this.lobby, connection);
 
-      proms[i] = connection.writeReliable(new DeleteGameOption(sid, key));
+      proms[i] = connection.writeReliable(new DeleteGameOptionPacket(sid, key));
     }
 
     this.knownOptions.delete(key);

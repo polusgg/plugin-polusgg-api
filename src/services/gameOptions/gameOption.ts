@@ -1,7 +1,7 @@
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Services } from "..";
-import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packets/root/setGameOption";
+import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "@nodepolus/framework/src/protocol/polus/packets/root/setGameOption";
 import { ServiceType } from "../../types/enums";
 
 export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {

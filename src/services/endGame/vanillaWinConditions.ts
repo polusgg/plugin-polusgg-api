@@ -5,7 +5,7 @@ import { BaseRole } from "../../baseRole";
 import { RoleAlignment } from "../../baseRole/baseRole";
 import { Palette } from "@nodepolus/framework/src/static";
 import { Mutable } from "@nodepolus/framework/src/types";
-import { WinSoundType } from "../../types/enums/winSound";
+import { WinSoundType } from "@nodepolus/framework/src/types/enums/polus/polusWinSound";
 import { GameOverReason, GameState } from "@nodepolus/framework/src/types/enums";
 import { PlayerData } from "@nodepolus/framework/src/protocol/entities/gameData/types";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";

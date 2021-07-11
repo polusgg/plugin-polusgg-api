@@ -1,6 +1,6 @@
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
-import { AlterGameTag, Level, PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { AlterGameTag, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "@nodepolus/framework/src/protocol/polus/packets/rpc/playerControl";
 import { Impostor } from "./src/baseRole/impostor/impostor";
@@ -13,14 +13,6 @@ import { EnumValue, SetGameOption } from "@nodepolus/framework/src/protocol/polu
 import { VanillaWinConditions } from "./src/services/endGame/vanillaWinConditions";
 import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
 import { RoleManagerService } from "./src/services/roleManager";
-import { SpawnPositions } from "@nodepolus/framework/src/static";
-
-declare global {
-  interface Object {
-    log(...data: any[]);
-  }
-}
-
 export default class PolusGGApi extends BasePlugin {
   private readonly mods: BaseMod[] = [];
 
@@ -29,16 +21,6 @@ export default class PolusGGApi extends BasePlugin {
       name: "Polus.gg API",
       version: [1, 0, 0],
     });
-
-    Object.prototype.log = function logToDispleaseRoobscoob(this: any, ...data: any[]): void {
-      data.unshift(this);
-
-      console.log(console, [...data]);
-    };
-
-    SpawnPositions.forPlayerOnLevel(Level.Polus, 1, 4, true).log();
-
-    "impostor".log("LMAO");
 
     RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
       connection.setMeta({

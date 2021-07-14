@@ -139,8 +139,15 @@ export class RoleManagerService {
     //   throw new Error("Crying rn. The normalized length of all the roles did not match up with the number of players.");
     // }
 
+    const roleInstances: BaseRole[] = new Array(allRoleAssignments.length);
+
     for (let i = 0; i < allRoleAssignments.length; i++) {
-      managers.push(this.assignRole(players[i], allRoleAssignments[i].role, allRoleAssignments[i].startGameScreen).getManagerType());
+      roleInstances[i] = this.assignRole(players[i], allRoleAssignments[i].role, true);
+      managers.push(roleInstances[i].getManagerType());
+    }
+
+    for (let i = 0; i < roleInstances.length; i++) {
+      this.sendRoleScreen(players[i], roleInstances[i], allRoleAssignments[i].startGameScreen);
     }
 
     const uniqueManagers = [...new Set(managers)];
@@ -152,13 +159,8 @@ export class RoleManagerService {
     }
   }
 
-  assignRole<T extends typeof BaseRole>(player: PlayerInstance, role: T, startGameScreen?: StartGameScreenData): BaseRole {
-    // eslint-disable-next-line new-cap
-    const roleInstance = new role(player);
-
-    startGameScreen ??= roleInstance.getAssignmentScreen(player, player.getLobby().getPlayers().filter(x => x.isImpostor()).length);
-
-    player.setMeta("pgg.api.role", roleInstance);
+  sendRoleScreen(player: PlayerInstance, instance: BaseRole, startGameScreen?: StartGameScreenData): void {
+    startGameScreen ??= instance.getAssignmentScreen(player, player.getLobby().getPlayers().filter(el => el.isImpostor()).length);
 
     const connection = player.getConnection();
 
@@ -167,9 +169,20 @@ export class RoleManagerService {
         startGameScreen.title.toString(),
         startGameScreen.subtitle.toString(),
         startGameScreen.color,
-        player.getLobby().getPlayers().filter(p => p.getMeta<BaseRole>("pgg.api.role") === roleInstance)
+        player.getLobby().getPlayers().filter(p => p.getMeta<BaseRole>("pgg.api.role") === instance)
           .map(p => p.getId()),
       ));
+    }
+  }
+
+  assignRole<T extends typeof BaseRole>(player: PlayerInstance, role: T, preventRoleScreen: boolean = false): BaseRole {
+    // eslint-disable-next-line new-cap
+    const roleInstance = new role(player);
+
+    player.setMeta("pgg.api.role", roleInstance);
+
+    if (!preventRoleScreen) {
+      this.sendRoleScreen(player, roleInstance);
     }
 
     return roleInstance;

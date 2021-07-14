@@ -10,6 +10,8 @@ import { Player } from "@nodepolus/framework/src/player";
 import { StartGameScreenData } from "../services/roleManager/roleManagerService";
 import { BaseManager } from "../baseManager/baseManager";
 import { RoleDestroyedReason } from "../types/enums/roleDestroyedReason";
+import { Services } from "../services";
+import { Location, ServiceType } from "../types/enums";
 
 export type Ownable = LobbyInstance | PlayerInstance | Connection | Game | BaseInnerNetEntity | BaseInnerNetObject | undefined;
 
@@ -30,7 +32,11 @@ export class BaseRole {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly caughtEvents: EventCatcher<any>[] = [];
 
-  constructor(protected readonly owner: PlayerInstance) { }
+  constructor(protected readonly owner: PlayerInstance) {
+    Services.get(ServiceType.Hud).setHudString(owner, Location.TaskText, this.getDescriptionText());
+  }
+
+  getDescriptionText(): string { throw new Error("needs to be overwritten") }
 
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData { throw new Error("needs to be overwritten") }
 

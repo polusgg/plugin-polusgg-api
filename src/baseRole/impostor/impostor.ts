@@ -173,6 +173,11 @@ export class Impostor extends BaseRole {
     this.targetSelector = callback;
   }
 
+  getDescriptionText(): string {
+    return `<color=#ff1919>Role: Impostor
+Sabotage and kill the crewmates.</color>`;
+  }
+
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {
     return {
       title: `Impostor`,

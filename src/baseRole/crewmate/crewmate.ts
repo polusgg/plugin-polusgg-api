@@ -38,6 +38,11 @@ export class Crewmate extends BaseRole {
     };
   }
 
+  getDescriptionText(): string {
+    return `<color=#8cffff>Role: Crewmate
+Finish your tasks.</color>`;
+  }
+
   getManagerType(): typeof CrewmateManager {
     return CrewmateManager;
   }

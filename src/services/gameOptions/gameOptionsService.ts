@@ -13,22 +13,22 @@ declare const server: Server;
 export type LobbyDefaultOptions = {
   "Map": EnumValue;
   "Impostor Count": NumberValue;
-  "Max Button Presses": NumberValue;
-  "Button Cooldown": NumberValue;
+  "Emergency Meetings": NumberValue;
+  "Emergency Cooldown": NumberValue;
   "Discussion Time": NumberValue;
   "Voting Time": NumberValue;
-  "Anon Votes": BooleanValue;
+  "Anonymous Votes": BooleanValue;
   "Confirm Ejects": BooleanValue;
   "Player Speed": NumberValue;
-  "Crew Light Modifier": NumberValue;
-  "Impostor Light Modifier": NumberValue;
+  "Crewmate Vision": NumberValue;
+  "Impostor Vision": NumberValue;
   "Kill Cooldown": NumberValue;
   "Kill Distance": EnumValue;
   "Common Tasks": NumberValue;
   "Long Tasks": NumberValue;
   "Short Tasks": NumberValue;
   "Visual Tasks": BooleanValue;
-  "Taskbar Mode": EnumValue;
+  "Task Bar Updates": EnumValue;
 };
 
 export class GameOptionsService {
@@ -45,22 +45,22 @@ export class GameOptionsService {
       const applyOption = {
         Map: (vanillaOptions: GameOptionsData, option: EnumValue) => { vanillaOptions.setLevels([option.index]) },
         "Impostor Count": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setImpostorCount(option.value) },
-        "Max Button Presses": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setEmergencyMeetingCount(option.value) },
-        "Button Cooldown": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setEmergencyCooldown(option.value) },
+        "Emergency Meetings": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setEmergencyMeetingCount(option.value) },
+        "Emergency Cooldown": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setEmergencyCooldown(option.value) },
         "Discussion Time": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setDiscussionTime(option.value) },
         "Voting Time": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setVotingTime(option.value) },
-        "Anon Votes": (vanillaOptions: GameOptionsData, option: BooleanValue) => { vanillaOptions.setAnonymousVoting(option.value) },
+        "Anonymous Votes": (vanillaOptions: GameOptionsData, option: BooleanValue) => { vanillaOptions.setAnonymousVoting(option.value) },
         "Confirm Ejects": (vanillaOptions: GameOptionsData, option: BooleanValue) => { vanillaOptions.setConfirmEjects(option.value) },
         "Player Speed": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setPlayerSpeedModifier(option.value) },
-        "Crew Light Modifier": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setCrewmateLightModifier(option.value) },
-        "Impostor Light Modifier": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setImpostorLightModifier(option.value) },
+        "Crewmate Vision": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setCrewmateLightModifier(option.value) },
+        "Impostor Vision": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setImpostorLightModifier(option.value) },
         "Kill Cooldown": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setKillCooldown(option.value) },
         "Kill Distance": (vanillaOptions: GameOptionsData, option: EnumValue) => { vanillaOptions.setKillDistance(option.index) },
         "Common Tasks": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setCommonTaskCount(option.value) },
         "Long Tasks": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setLongTaskCount(option.value) },
         "Short Tasks": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setShortTaskCount(option.value) },
         "Visual Tasks": (vanillaOptions: GameOptionsData, option: BooleanValue) => { vanillaOptions.setVisualTasks(option.value) },
-        "Taskbar Mode": (vanillaOptions: GameOptionsData, option: EnumValue) => { vanillaOptions.setTaskBarUpdates(option.index) },
+        "Task Bar Updates": (vanillaOptions: GameOptionsData, option: EnumValue) => { vanillaOptions.setTaskBarUpdates(option.index) },
       } as const;
       /* eslint-enable @typescript-eslint/naming-convention */
 
@@ -69,22 +69,22 @@ export class GameOptionsService {
 
       options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]), GameOptionPriority.Higher - 5);
       options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher - 5);
-      options.createOption("Meeting Settings", "Max Button Presses", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Button Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Anon Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Emergency Meetings", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 4);
+      options.createOption("Meeting Settings", "Emergency Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
       options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Crew Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Impostor Light Modifier", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
+      options.createOption("Player Settings", "Crewmate Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
+      options.createOption("Player Settings", "Impostor Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
       options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher - 3);
       options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher - 3);
       options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 1);
       options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher - 1);
       options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher - 1);
       options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 2);
-      options.createOption("Task Settings", "Taskbar Mode", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
+      options.createOption("Task Settings", "Task Bar Updates", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
 
       options.on("option.*.changed", changedEvent => {
         if (applyOption[changedEvent.getKey()] !== undefined) {

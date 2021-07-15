@@ -1,11 +1,9 @@
-import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { AlterGameTag, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "@nodepolus/framework/src/protocol/polus/packets/rpc/playerControl";
 import { Impostor } from "./src/baseRole/impostor/impostor";
 import { Player } from "@nodepolus/framework/src/player";
-import { FetchResourceResponsePacket, ResizePacket } from "@nodepolus/framework/src/protocol/polus/packets/root";
 import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
@@ -13,6 +11,9 @@ import { EnumValue, SetGameOption } from "@nodepolus/framework/src/protocol/polu
 import { VanillaWinConditions } from "./src/services/endGame/vanillaWinConditions";
 import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
 import { RoleManagerService } from "./src/services/roleManager";
+import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
+import { FetchResourceResponsePacket, ResizePacket } from "@nodepolus/framework/src/protocol/polus/packets/root";
+
 export default class PolusGGApi extends BasePlugin {
   private readonly mods: BaseMod[] = [];
 

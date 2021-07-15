@@ -20,8 +20,8 @@ const serviceFromType = {
   [ServiceType.GameOptions]: new GameOptionsService(),
   [ServiceType.Animation]: new AnimationService(),
   [ServiceType.Name]: new NameService(),
-  [ServiceType.CoroutineManager]: new CoroutineManagerService(),
   [ServiceType.Vent]: new VentService(),
+  [ServiceType.CoroutineManager]: new CoroutineManagerService(),
   [ServiceType.EndGame]: new EndGameService(),
 };
 

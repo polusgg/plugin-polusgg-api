@@ -25,7 +25,7 @@ export class VanillaWinConditions {
         endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
           endGameData: new Map(event.getPlayer().getLobby().getPlayers()
             .map(player => [player, {
-              title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "Defeat",
+              title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
               subtitle: "<color=#8CFFFFFF>Crewmates</color> won by tasks",
               color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
               yourTeam: event.getPlayer().getLobby().getPlayers()
@@ -42,7 +42,7 @@ export class VanillaWinConditions {
         endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
           endGameData: new Map(event.getPlayer().getLobby().getPlayers()
             .map(player => [player, {
-              title: player.isImpostor() ? "Victory" : "Defeat",
+              title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
               subtitle: "<color=#FF1919FF>Impostors</color> won by kills",
               color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
               yourTeam: event.getPlayer()
@@ -64,7 +64,7 @@ export class VanillaWinConditions {
         endGame.registerEndGameIntent(event.getGame(), {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player, {
-              title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "Defeat",
+              title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
               subtitle: "<color=#8CFFFFFF>Crewmates</color> voted out the <color=#FF1919FF>Impostors</color>",
               color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
               yourTeam: event.getGame().getLobby().getPlayers()
@@ -79,7 +79,7 @@ export class VanillaWinConditions {
             .getLobby()
             .getPlayers()
             .map(player => [player, {
-              title: player.isImpostor() ? "Victory" : "Defeat",
+              title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
               subtitle: "<color=#FF1919FF>Impostors</color> voted out the <color=#8CFFFFFF>Crewmates</color>",
               color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
               yourTeam: event.getGame().getLobby().getPlayers()
@@ -113,7 +113,7 @@ export class VanillaWinConditions {
         endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
           endGameData: new Map(event.getPlayer().getLobby().getPlayers()
             .map(player => [player, {
-              title: player.isImpostor() ? "Victory" : "Defeat",
+              title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
               subtitle: "<color=#8CFFFFFF>Crewmates</color> disconnected",
               color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
               yourTeam: event.getLobby().getPlayers()
@@ -126,12 +126,14 @@ export class VanillaWinConditions {
     });
 
     server.on("game.ended", event => {
+      console.trace("game.ended", GameOverReason[event.getReason()], event);
+
       if (event.getReason() === GameOverReason.ImpostorsBySabotage) {
         endGame.registerEndGameIntent(event.getGame(), {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player, {
-              title: player.isImpostor() ? "Victory" : "Defeat",
-              subtitle: "<color=#8CFFFFFF>Impostors</color> won by sabotage",
+              title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+              subtitle: "<color=#FF1919FF>Impostors</color> won by sabotage",
               color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
               yourTeam: event.getGame().getLobby().getPlayers()
                 .filter(sus => sus.isImpostor()),

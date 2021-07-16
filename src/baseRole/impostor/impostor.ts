@@ -119,6 +119,7 @@ export class Impostor extends BaseRole {
     const animService = Services.get(ServiceType.Animation);
     let outlined = false;
     let lastTarget: PlayerInstance | undefined;
+    let wasInVent = false;
 
     while (true) {
       //todo break out on custom predicate
@@ -133,7 +134,31 @@ export class Impostor extends BaseRole {
 
       const isSaturated = button.isSaturated();
 
-      if ((target === undefined || button.getCurrentTime() != 0) === isSaturated) {
+      if ((this.owner.getVent() === undefined) === wasInVent) {
+        if (!wasInVent) button.setSaturated(false);
+
+        if (!wasInVent) {
+          const players = this.owner.getLobby()
+            .getPlayers()
+            .filter(x => x !== this.owner);
+
+          for (let i = 0; i < players.length; i++) {
+            animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
+          }
+        }
+
+        wasInVent = (this.owner.getVent() !== undefined);
+        while (this.owner.getVent() !== undefined) {
+          if (player.isDead()) {
+            break;
+          }
+
+          yield;
+        }
+        continue;
+      }
+
+      if ((target === undefined) === isSaturated) {
         button.setSaturated(!isSaturated);
       }
 
@@ -169,13 +194,16 @@ export class Impostor extends BaseRole {
     this.onClicked = callback;
   }
 
+  getTargetSelector(): ((players: PlayerInstance[]) => PlayerInstance) | undefined {
+    return this.targetSelector;
+  }
+
   setTargetSelector(callback: (players: PlayerInstance[]) => PlayerInstance): void {
     this.targetSelector = callback;
   }
 
   getDescriptionText(): string {
-    return `<color=#ff1919>Role: Impostor
-Sabotage and kill the crewmates.</color>`;
+    return "<color=#ff1919>Role: Impostor\nSabotage and kill the crewmates.</color>";
   }
 
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {

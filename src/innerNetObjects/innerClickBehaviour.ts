@@ -17,7 +17,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     public currentTime: number = 0,
     public saturated: boolean = true,
     public color: [number, number, number, number] = [255, 255, 255, 255],
-    public isCountingDown: boolean = true,
+    public countingDown: boolean = true,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
     super(0x83, parent, netId);
@@ -45,18 +45,18 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     return this;
   }
 
-  getIsCountingDown(): boolean {
-    return this.isCountingDown;
+  isCountingDown(): boolean {
+    return this.countingDown;
   }
 
   setIsCountingDown(isCountingDown: boolean): this {
-    this.isCountingDown = isCountingDown;
+    this.countingDown = isCountingDown;
 
     return this;
   }
 
   getCurrentTime(): number {
-    if (this.isCountingDown) {
+    if (this.countingDown) {
       const timeSinceSet = (Date.now() - this.lastCurrentTimeSet) / 1000;
 
       return Math.max(this.currentTime - timeSinceSet, 0);
@@ -94,7 +94,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     return new DataPacket(this.netId, new MessageWriter()
       .writeFloat32(this.maxTimer)
       .writeFloat32(this.getCurrentTime())
-      .writeBoolean(this.isCountingDown)
+      .writeBoolean(this.countingDown)
       .writeBoolean(this.saturated)
       .writeBytes(this.color),
     );
@@ -105,7 +105,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
 
     this.maxTimer = reader.readFloat32();
     this.currentTime = reader.readFloat32();
-    this.isCountingDown = reader.readBoolean();
+    this.countingDown = reader.readBoolean();
     this.saturated = reader.readBoolean();
     this.color = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
   }
@@ -114,14 +114,14 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     return new SpawnPacketObject(this.netId, new MessageWriter()
       .writeFloat32(this.maxTimer)
       .writeFloat32(this.getCurrentTime())
-      .writeBoolean(this.isCountingDown)
+      .writeBoolean(this.countingDown)
       .writeBoolean(this.saturated)
       .writeBytes(this.color),
     );
   }
 
   clone(): InnerClickBehaviour {
-    return new InnerClickBehaviour(this.parent, this.maxTimer, this.currentTime, this.saturated, this.color, this.isCountingDown, this.netId);
+    return new InnerClickBehaviour(this.parent, this.maxTimer, this.currentTime, this.saturated, this.color, this.countingDown, this.netId);
   }
 
   getParent(): BaseInnerNetEntity {

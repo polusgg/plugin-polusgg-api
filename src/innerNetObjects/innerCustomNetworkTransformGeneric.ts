@@ -115,6 +115,10 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     return this;
   }
 
+  public isAttached(): boolean {
+    return this.attachedTo != -1;
+  }
+
   protected findOwner(object: Attachable): number {
     if (object instanceof Player) {
       return object.getEntity().getCustomNetworkTransform().getNetId();

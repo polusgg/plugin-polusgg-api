@@ -147,7 +147,7 @@ export class Button extends Emittery<ButtonEvents> {
   }
 
   isCountingDown(): boolean {
-    return this.getEntity().getClickBehaviour().getIsCountingDown();
+    return this.getEntity().getClickBehaviour().isCountingDown();
   }
 
   async startCountingDown(): Promise<void> {
@@ -236,6 +236,7 @@ export class Button extends Emittery<ButtonEvents> {
   getTargets(range: number): PlayerInstance[] {
     return this
       .getTargetsUnfiltered(range)
+      .filter(p => p.getVent() === undefined)
       .filter(player => player.getMeta<boolean>("pgg.api.targetable"));
   }
 

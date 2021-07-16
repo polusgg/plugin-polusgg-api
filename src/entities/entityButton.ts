@@ -37,9 +37,9 @@ export class EntityButton extends BaseInnerNetEntity {
   async attach(to: Attachable, sendTo: Connection[] = [this.owner]): Promise<void> {
     const data = this.getCustomNetworkTransform().setAttachedTo(to).serializeData();
 
-    await Promise.allSettled(sendTo.map(async conn => conn.writeReliable(new GameDataPacket([
-      data,
-    ], this.getLobby().getCode()))));
+    this.owner.getLobby()?.sendRootGamePacket(new GameDataPacket([
+      data
+    ], this.owner.getLobby()!.getCode()), sendTo);
   }
 
   getCustomNetworkTransform(): InnerCustomNetworkTransformGeneric {

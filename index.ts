@@ -1,3 +1,4 @@
+import { inspect } from "util";
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
 import { AlterGameTag, Level } from "@nodepolus/framework/src/types/enums";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
@@ -30,7 +31,12 @@ export default class PolusGGApi extends BasePlugin {
     Object.prototype.log = function logToDispleaseRoobscoob(this: any, ...data: any[]): void {
       data.unshift(this);
 
-      console.log.apply(console, [...data]);
+      for (let i = 0; i < data.length; i++) {
+        process.stdout.write(inspect(data[i], { colors: true }));
+        process.stdout.write(" ");
+      }
+
+      process.stdout.write("\n");
     };
 
     SpawnPositions.forPlayerOnLevel(Level.Polus, 1, 4, true).log();

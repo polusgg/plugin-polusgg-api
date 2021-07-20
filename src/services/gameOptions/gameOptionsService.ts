@@ -67,6 +67,16 @@ export class GameOptionsService {
       event.getLobby().setMeta("pgg.options", options);
       event.getLobby().setMeta("pgg.optionSequenceId", new Map());
 
+      options.on("option.*.changed", changedEvent => {
+        if (applyOption[changedEvent.getKey()] !== undefined) {
+          applyOption[changedEvent.getKey()](changedEvent.getLobby().getOptions(), changedEvent.getValue());
+
+          if (changedEvent.getLobby().getPlayers().length >= 1) {
+            (changedEvent.getLobby().getPlayers()[0] as Player).getEntity().getPlayerControl().syncSettings(changedEvent.getLobby().getOptions(), changedEvent.getLobby().getConnections());
+          }
+        }
+      });
+
       options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]), GameOptionPriority.Higher - 5);
       options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher - 5);
       options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
@@ -85,13 +95,6 @@ export class GameOptionsService {
       options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher - 1);
       options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 2);
       options.createOption("Task Settings", "Task Bar Updates", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
-
-      options.on("option.*.changed", changedEvent => {
-        if (applyOption[changedEvent.getKey()] !== undefined) {
-          applyOption[changedEvent.getKey()](changedEvent.getLobby().getOptions(), changedEvent.getValue());
-          (changedEvent.getLobby().getPlayers()[0] as Player).getEntity().getPlayerControl().syncSettings(changedEvent.getLobby().getOptions(), changedEvent.getLobby().getConnections());
-        }
-      });
     });
 
     server.on("server.lobby.join", event => {

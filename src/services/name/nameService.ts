@@ -1,3 +1,4 @@
+import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { Player } from "@nodepolus/framework/src/player";
@@ -22,6 +23,11 @@ declare const server: Server;
 
 export class NameService {
   protected nameMap: Map<Connection, Map<PlayerInstance, { name: string; priority: NameServicePriority }[]>> = new Map();
+  protected lobbyMap: Map<LobbyInstance, {
+    player: PlayerInstance;
+    name: string | TextComponent;
+    priority: NameServicePriority;
+  }[]> = new Map();
 
   constructor() {
     server.on("connection.opened", event => {
@@ -30,6 +36,10 @@ export class NameService {
 
     server.on("connection.closed", event => {
       this.nameMap.delete(event.getConnection());
+    });
+
+    server.on("server.lobby.created", event => {
+      this.lobbyMap.set(event.getLobby(), []);
     });
 
     server.on("game.ended", event => {
@@ -57,6 +67,18 @@ export class NameService {
             new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetNamePacket(nameUnderstanding)),
           ], event.getPlayer().getLobby().getCode())]);
         }));
+    });
+
+    server.on("player.joined", evt => {
+      if (this.lobbyMap.has(evt.getLobby())) {
+        const data = this.lobbyMap.get(evt.getLobby())!;
+
+        for (let i = 0; i < data.length; i++) {
+          const el = data[i];
+
+          this.setFor(evt.getPlayer().getSafeConnection(), el.player, el.name, el.priority);
+        }
+      }
     });
   }
 
@@ -90,12 +112,48 @@ export class NameService {
     }));
   }
 
+  async removeForBatch(connections: Connection[], player: PlayerInstance, name: string | TextComponent): Promise<void> {
+    for (let i = 0; i < connections.length; i++) {
+      this.removeForNoUpdate(connections[i], player, name.toString());
+    }
+
+    await Promise.allSettled(connections.map(async otherConnection => {
+      // get otherConnection's understanding of this player's name
+      const nameUnderstanding = this.getFor(otherConnection, player);
+
+      // update the player's name
+      return otherConnection.sendReliable([new GameDataPacket([
+        new RpcPacket((player as Player).getEntity().getPlayerControl().getNetId(), new SetNamePacket(nameUnderstanding)),
+      ], player.getLobby().getCode())]);
+    }));
+  }
+
+  async setForLobby(player: PlayerInstance, name: string | TextComponent, priority: NameServicePriority = NameServicePriority.Normal): Promise<void> {
+    this.lobbyMap.get(player.getLobby())!.push({ player, name, priority });
+
+    await this.setForBatch(player.getLobby().getConnections(), player, name, priority);
+  }
+
+  async removeForLobby(player: PlayerInstance, name: string | TextComponent): Promise<void> {
+    const idx = this.lobbyMap.get(player.getLobby())!.findIndex(v => v.name === name && v.player === player);
+
+    if (idx === -1) {
+      throw new Error("Failed to find lobby string request");
+    }
+
+    this.lobbyMap.set(player.getLobby(), this.lobbyMap.get(player.getLobby())!.splice(idx, 1));
+
+    await this.removeForBatch(player.getLobby().getConnections(), player, name);
+  }
+
   getAllFor(connection: Connection, player: PlayerInstance): { name: string; priority: NameServicePriority }[] {
-    return this.nameMap.get(connection)!.get(player)!;
+    return this.nameMap.get(connection)?.get(player) ?? [{ name: player.getName().toString(), priority: -10000 }];
   }
 
   getFor(connection: Connection, player: PlayerInstance): string {
-    return this.getAllFor(connection, player).sort((a1, a2) => a2.priority - a1.priority)[0].name;
+    const r = this.getAllFor(connection, player).sort((a1, a2) => a1.priority - a2.priority);
+
+    return r[r.length - 1].name;
   }
 
   private setForNoUpdate(connection: Connection, player: PlayerInstance, name: string, priority: NameServicePriority): void {
@@ -104,5 +162,19 @@ export class NameService {
     }
 
     this.nameMap.get(connection)!.get(player)!.push({ name, priority });
+  }
+
+  private removeForNoUpdate(connection: Connection, player: PlayerInstance, name: string): void {
+    if (!this.nameMap.get(connection)!.has(player)) {
+      return;
+    }
+
+    const index = this.nameMap.get(connection)!.get(player)!.findIndex(v => v.name === name);
+
+    if (index === -1) {
+      throw new Error("Could not find name request to remove");
+    }
+
+    this.nameMap.get(connection)!.set(player, this.nameMap.get(connection)!.get(player)!.splice(index, 1));
   }
 }

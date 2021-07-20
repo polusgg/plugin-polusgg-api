@@ -7,6 +7,29 @@ export enum GameOptionType {
   EnumValue = 2,
 }
 
+export type NumberValueJson = {
+  value: number;
+  step: number;
+  lower: number;
+  upper: number;
+  zeroIsInfinity: boolean;
+  suffix: string;
+  type: "NUMBER";
+};
+
+export type BooleanValueJson = {
+  value: boolean;
+  type: "BOOLEAN";
+};
+
+export type EnumValueJson = {
+  index: number;
+  options: string[];
+  type: "ENUM";
+};
+
+export type ValueJson = NumberValueJson | BooleanValueJson | EnumValueJson;
+
 export class NumberValue {
   constructor(
     public value: number,
@@ -16,12 +39,51 @@ export class NumberValue {
     public zeroIsInfinity: boolean,
     public suffix: string,
   ) {}
+
+  toJson(): NumberValueJson {
+    return {
+      value: this.value,
+      step: this.step,
+      lower: this.lower,
+      upper: this.upper,
+      zeroIsInfinity: this.zeroIsInfinity,
+      suffix: this.suffix,
+      type: "NUMBER",
+    };
+  }
+
+  load(v: NumberValueJson): this {
+    this.value = v.value;
+
+    if (this.value > this.upper) {
+      this.value = this.upper;
+    }
+
+    if (this.value < this.lower) {
+      this.value = this.lower;
+    }
+
+    return this;
+  }
 }
 
 export class BooleanValue {
   constructor(
     public value: boolean,
   ) {}
+
+  toJson(): BooleanValueJson {
+    return {
+      value: this.value,
+      type: "BOOLEAN",
+    };
+  }
+
+  load(v: BooleanValueJson): this {
+    this.value = v.value;
+
+    return this;
+  }
 }
 
 export class EnumValue {
@@ -32,6 +94,27 @@ export class EnumValue {
 
   getSelected(): string {
     return this.options[this.index];
+  }
+
+  toJson(): EnumValueJson {
+    return {
+      index: this.index,
+      options: this.options,
+      type: "ENUM",
+    };
+  }
+
+  load(v: EnumValueJson): this {
+    const idxOld = this.options.findIndex(opt => opt == v.options[v.index]);
+
+    if (idxOld === -1) {
+      // the option was removed;
+      return this;
+    }
+
+    this.index = idxOld;
+
+    return this;
   }
 }
 

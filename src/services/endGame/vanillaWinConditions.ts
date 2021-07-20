@@ -126,8 +126,6 @@ export class VanillaWinConditions {
     });
 
     server.on("game.ended", event => {
-      console.trace("game.ended", GameOverReason[event.getReason()], event);
-
       if (event.getReason() === GameOverReason.ImpostorsBySabotage) {
         endGame.registerEndGameIntent(event.getGame(), {
           endGameData: new Map(event.getGame().getLobby().getPlayers()

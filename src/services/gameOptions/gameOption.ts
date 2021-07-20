@@ -1,8 +1,15 @@
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Services } from "..";
-import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packets/root/setGameOption";
+import { ValueJson, NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packets/root/setGameOption";
 import { ServiceType } from "../../types/enums";
+
+export type GameOptionJson = {
+  value: ValueJson;
+  category: string;
+  priority: number;
+  key: string;
+};
 
 export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {
   constructor(protected readonly lobby: LobbyInstance, protected readonly category: string, protected priority: number, protected readonly key: string, protected value: V) {}
@@ -23,6 +30,15 @@ export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {
     }
 
     await Promise.all(proms);
+  }
+
+  toJson(): GameOptionJson {
+    return {
+      value: this.getValue().toJson(),
+      category: this.getCategory(),
+      key: this.getKey(),
+      priority: this.getPriority(),
+    };
   }
 
   getValue(): V {

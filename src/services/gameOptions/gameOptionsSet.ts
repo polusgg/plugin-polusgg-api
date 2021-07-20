@@ -6,6 +6,7 @@ import { DeleteGameOption } from "../../packets/root/deleteGameOption";
 import { NumberValue, BooleanValue, EnumValue } from "../../packets/root/setGameOption";
 import { ServiceType } from "../../types/enums";
 import { GameOption } from "./gameOption";
+import { UserResponseStructure } from "@polusgg/module-polusgg-auth-api/src/types/userResponseStructure";
 
 export type BaseLobbyOptionsEvents = {
   "option.*.changed": GameOption<NumberValue | BooleanValue | EnumValue>;
@@ -33,6 +34,14 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
   async createOption<K extends Extract<keyof T, string>, V extends T[K]>(category: string, key: K, value: V, priority: number | GameOptionPriority = GameOptionPriority.Normal): Promise<GameOption<V>> {
     const option = new GameOption<V>(this.lobby, category, priority, key, value);
 
+    const { options } = (this.lobby.getActingHosts()[0] ?? this.lobby.getCreator()).getMeta<UserResponseStructure>("pgg.auth.self");
+
+    const match = options?.find(v => v.key === option.getKey());
+
+    if (match !== undefined && match.value.type === option.getValue().toJson().type) {
+      option.getValue().load(match.value as any);
+    }
+
     await option.setValue(value);
 
     this.lobby.setMeta(`pgg.options.${key}`, option);
@@ -49,9 +58,11 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
   getAllOptions<K extends Extract<keyof T, string>>(): Record<K, GameOption<T[K]>> {
     const record: Partial<Record<K, GameOption<T[K]>>> = {};
 
-    this.knownOptions.forEach(optionName => {
-      //@ts-expect-error
-      record[optionName] = this.getOption(optionName);
+    Array.from((this.lobby as unknown as { metadata: Map<string, unknown> }).metadata.keys()).forEach(optionName => {
+      if (optionName.startsWith("pgg.options.")) {
+        //@ts-expect-error
+        record[optionName] = this.getOption(optionName.split("pgg.options.")[1]);
+      }
     });
 
     return record as Record<K, GameOption<T[K]>>;
@@ -76,6 +87,8 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
 
       proms[i] = connection.writeReliable(new DeleteGameOption(sid, key));
     }
+
+    this.lobby.deleteMeta(`pgg.options.${key}`);
 
     this.knownOptions.delete(key);
 

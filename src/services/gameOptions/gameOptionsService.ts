@@ -77,24 +77,28 @@ export class GameOptionsService {
         }
       });
 
-      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]), GameOptionPriority.Higher - 5);
-      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher - 5);
-      options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Emergency Meetings", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Emergency Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
-      options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Crewmate Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Impostor Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher - 3);
-      options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 1);
-      options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher - 1);
+      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship"]), GameOptionPriority.Higher - 18);
+      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher - 17)
+;
+      options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 16);
+      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 15);
+      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 14);
+      options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 13);
+      options.createOption("Meeting Settings", "Emergency Meetings", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 12);
+      options.createOption("Meeting Settings", "Emergency Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 11);
+
+      options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 10);
+      options.createOption("Player Settings", "Crewmate Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 9);
+      options.createOption("Player Settings", "Impostor Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 8);
+      options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher - 7);
+      options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher - 6);
+
+      options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 5);
+      options.createOption("Task Settings", "Task Bar Updates", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 4);
+      options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 3);
+      options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher - 2);
       options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher - 1);
-      options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 2);
-      options.createOption("Task Settings", "Task Bar Updates", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
+
     });
 
     server.on("server.lobby.join", event => {

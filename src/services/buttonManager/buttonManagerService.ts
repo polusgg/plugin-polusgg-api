@@ -12,6 +12,7 @@ import { InnerClickBehaviour } from "../../innerNetObjects";
 import { ButtonCountdownUpdated } from "./events/buttonCountdownUpdated";
 import { ClickPacket } from "../../packets/rpc/clickBehaviour";
 import { ButtonFields } from "../../types/buttonFields";
+import { InnerCustomNetworkTransformGeneric } from "../../innerNetObjects/innerCustomNetworkTransformGeneric";
 
 declare const server: Server;
 
@@ -31,7 +32,7 @@ export class ButtonManagerService {
     RpcPacket.registerPacket(0x86, ClickPacket.deserialize, this.handleClickButton.bind(this));
   }
 
-  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment }: ButtonFields, sendTo: Connection[] = [connection]): Promise<Button> {
+  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment, z, attachedTo }: ButtonFields, sendTo: Connection[] = [connection]): Promise<Button> {
     const lobby = connection.getLobby();
 
     if (lobby === undefined) {
@@ -40,9 +41,11 @@ export class ButtonManagerService {
 
     await Services.get(ServiceType.Resource).assertLoaded(connection, asset);
 
-    const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, saturated, color, isCountingDown);
+    const parent = attachedTo === undefined ? undefined : InnerCustomNetworkTransformGeneric.findOwner(attachedTo);
 
-    lobby.spawn(button, sendTo);
+    const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, saturated, color, isCountingDown, z, parent);
+
+    await lobby.spawn(button, sendTo);
 
     const buttonInstance = new Button(button, sendTo);
 

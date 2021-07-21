@@ -36,7 +36,7 @@ export class Impostor extends BaseRole {
   private targetSelector: ((players: PlayerInstance[]) => PlayerInstance) | undefined;
   private readonly range: number;
 
-  constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor) {
+  constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor, private buttonBundle: string = "Global", private buttonAsset: string = "Assets/Mods/OfficialAssets/KillButton.png") {
     super(owner);
 
     this.role = role;
@@ -51,7 +51,7 @@ export class Impostor extends BaseRole {
 
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource)
-        .load(owner.getConnection()!, AssetBundle.loadSafeFromCache("Global"))
+        .load(owner.getConnection()!, AssetBundle.loadSafeFromCache(this.buttonBundle))
         .then(this.onReadyImpostor.bind(this));
     } else {
       this.onReadyImpostor();
@@ -61,8 +61,8 @@ export class Impostor extends BaseRole {
   async onReadyImpostor(): Promise<void> {
     this.button = await Services.get(ServiceType.Button)
       .spawnButton(this.owner.getSafeConnection(), {
-        asset: AssetBundle.loadSafeFromCache("Global")
-          .getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
+        asset: AssetBundle.loadSafeFromCache(this.buttonBundle)
+          .getSafeAsset(this.buttonAsset),
         maxTimer: this.owner.getLobby()
           .getOptions()
           .getKillCooldown(),

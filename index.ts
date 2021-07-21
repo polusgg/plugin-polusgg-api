@@ -37,11 +37,13 @@ export default class PolusGGApi extends BasePlugin {
       }
 
       process.stdout.write("\n");
+
+      return this;
     };
 
     SpawnPositions.forPlayerOnLevel(Level.Polus, 1, 4, true).log();
 
-    "impostor".log("LMAO");
+    "impostor".log("LMAO").log();
 
     RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
       connection.setMeta({

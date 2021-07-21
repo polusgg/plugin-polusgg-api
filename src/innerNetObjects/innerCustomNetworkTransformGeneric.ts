@@ -16,7 +16,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     protected readonly parent: BaseInnerNetEntity,
     protected alignment: EdgeAlignments = EdgeAlignments.None,
     protected position: Vector2 = Vector2.zero(),
-    protected z: number = 0,
+    protected z: number = -9,
     protected attachedTo: number = -1,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
@@ -110,7 +110,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
   }
 
   setAttachedTo(object: Attachable): this {
-    this.attachedTo = this.findOwner(object);
+    this.attachedTo = InnerCustomNetworkTransformGeneric.findOwner(object);
 
     return this;
   }
@@ -119,7 +119,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     return this.attachedTo != -1;
   }
 
-  protected findOwner(object: Attachable): number {
+  static findOwner(object: Attachable): number {
     if (object instanceof Player) {
       return object.getEntity().getCustomNetworkTransform().getNetId();
     }

@@ -19,7 +19,7 @@ export class EntityButton extends BaseInnerNetEntity {
     saturated: boolean = true,
     color: [number, number, number, number] = [255, 255, 255, 255],
     isCountingDown: boolean = true,
-    z: number = -50,
+    z: number = -9,
     attachedTo: number = -1,
     customNetworkTransformNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     graphicNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),

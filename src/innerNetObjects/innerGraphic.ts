@@ -5,8 +5,6 @@ import { BaseRpcPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
 import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
 import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
 
-// TODO: Rewrite to not suck ass
-
 export class InnerGraphic extends BaseInnerNetObject {
   constructor(
     parent: BaseInnerNetEntity,
@@ -26,6 +24,10 @@ export class InnerGraphic extends BaseInnerNetObject {
       new MessageWriter()
         .writePackedUInt32(this.resourceId),
     );
+  }
+
+  getAsset(): number {
+    return this.resourceId;
   }
 
   setAsset(id: number): this {

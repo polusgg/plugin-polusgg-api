@@ -15,7 +15,7 @@ export class EntityPointOfInterest extends BaseInnerNetEntity {
     owner: Connection,
     resourceId: number,
     position: Vector2 = Vector2.zero(),
-    z: number = -50,
+    z: number = 0,
     attachedTo: number = -1,
     pointOfInterestNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     graphicNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),

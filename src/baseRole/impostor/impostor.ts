@@ -136,7 +136,7 @@ export class Impostor extends BaseRole {
 
       if ((this.owner.getVent() === undefined) === wasInVent) {
         if (!wasInVent) {
-          button.setSaturated(false)
+          button.setSaturated(false);
         }
 
         if (!wasInVent) {
@@ -206,7 +206,8 @@ export class Impostor extends BaseRole {
   }
 
   getDescriptionText(): string {
-    return "<color=#ff1919>Role: Impostor\nSabotage and kill the crewmates.</color>";
+    return `<color=#ff1919>Role: Impostor\nSabotage and kill the crewmates.</color>
+Fake Tasks:`;
   }
 
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {

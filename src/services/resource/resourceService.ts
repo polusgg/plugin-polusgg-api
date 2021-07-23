@@ -5,6 +5,7 @@ import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { ResourceResponse } from "../../types";
 import { Asset, AssetBundle } from "../../assets";
 import { Server } from "@nodepolus/framework/src/server";
+import { DisconnectReason } from "@nodepolus/framework/src/types";
 
 declare const server: Server;
 
@@ -26,28 +27,25 @@ export class ResourceService {
   }
 
   async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
-    await connection.writeReliable(new FetchResourcePacket(
-      assetBundle.getId(),
-      assetBundle.getAddress(),
-      Buffer.from(assetBundle.getHash(), "hex"),
-      ResourceType.AssetBundle,
-    ));
-
-    const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number
-      && (p as FetchResourceResponsePacket).resourceId == assetBundle.getId()
-      && (p as FetchResourceResponsePacket).response.getType() !== 0x00,
-    ) as FetchResourceResponsePacket;
-
-    if (response.getType() == 0x01) {
-      this.getLoadedAssetBundlesForConnection(connection).push(assetBundle);
-
-      return {
-        isCached: (response as FetchResourceResponseEndedPacket).didCache,
-        resourceId: assetBundle.getId(),
-      };
+    try {
+      return await this.loadSingle(connection, assetBundle);
+    } catch(err) {
+      // failed the first attempt. 
+      // try again
+      try {
+        return await this.loadSingle(connection, assetBundle);
+      } catch(err) {
+        // failed the second attempt.
+        // TODO: Don't cache.
+        // try again
+        try {
+          return await this.loadSingle(connection, assetBundle);
+        } catch(err) {
+          connection.disconnect(DisconnectReason.custom("Failed to load assets. The issue has been reported to the developers."));
+          throw err;
+        }
+      }
     }
-
-    throw new Error(`Client sent Error: ${(response as FetchResourceResponseFailedPacket).reason.toString()}`);
   }
 
   async assertLoaded(connection: Connection, asset: Asset): Promise<void> {
@@ -75,5 +73,30 @@ export class ResourceService {
 
   getGlobalBundle(): AssetBundle {
     return this.globalAssetBundle;
+  }
+
+  private async loadSingle(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
+    await connection.writeReliable(new FetchResourcePacket(
+      assetBundle.getId(),
+      assetBundle.getAddress(),
+      Buffer.from(assetBundle.getHash(), "hex"),
+      ResourceType.AssetBundle,
+    ));
+
+    const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number
+      && (p as FetchResourceResponsePacket).resourceId == assetBundle.getId()
+      && (p as FetchResourceResponsePacket).response.getType() !== 0x00,
+    ) as FetchResourceResponsePacket;
+
+    if (response.getType() == 0x01) {
+      this.getLoadedAssetBundlesForConnection(connection).push(assetBundle);
+
+      return {
+        isCached: (response as FetchResourceResponseEndedPacket).didCache,
+        resourceId: assetBundle.getId(),
+      };
+    }
+
+    throw new Error(`Client sent Error: ${(response as FetchResourceResponseFailedPacket).reason.toString()}`);
   }
 }

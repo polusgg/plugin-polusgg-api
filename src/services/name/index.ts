@@ -1,1 +1,1 @@
-export { NameService, NameServicePriority } from "./nameService";
+export { NameService } from "./nameService";

@@ -115,7 +115,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     return this;
   }
 
-  public isAttached(): boolean {
+  isAttached(): boolean {
     return this.attachedTo != -1;
   }
 

@@ -36,7 +36,7 @@ export class Impostor extends BaseRole {
   private targetSelector: ((players: PlayerInstance[]) => PlayerInstance) | undefined;
   private readonly range: number;
 
-  constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor, private buttonBundle: string = "Global", private buttonAsset: string = "Assets/Mods/OfficialAssets/KillButton.png") {
+  constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor, private readonly buttonBundle: string = "Global", private readonly buttonAsset: string = "Assets/Mods/OfficialAssets/KillButton.png") {
     super(owner);
 
     this.role = role;
@@ -135,7 +135,9 @@ export class Impostor extends BaseRole {
       const isSaturated = button.isSaturated();
 
       if ((this.owner.getVent() === undefined) === wasInVent) {
-        if (!wasInVent) button.setSaturated(false);
+        if (!wasInVent) {
+          button.setSaturated(false)
+        }
 
         if (!wasInVent) {
           const players = this.owner.getLobby()
@@ -148,6 +150,7 @@ export class Impostor extends BaseRole {
         }
 
         wasInVent = (this.owner.getVent() !== undefined);
+
         while (this.owner.getVent() !== undefined) {
           if (player.isDead()) {
             break;

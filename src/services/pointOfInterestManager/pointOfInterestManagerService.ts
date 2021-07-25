@@ -9,10 +9,10 @@ import { Attachable } from "../../types/attachable";
 import { InnerCustomNetworkTransformGeneric } from "../../innerNetObjects/innerCustomNetworkTransformGeneric";
 
 export class PointOfInterestManagerService {
-  async spawnPointOfInterest(connection: Connection, asset: Asset, position: Vector2, attachedTo?: Attachable): Promise<EntityPointOfInterest> {
+  async spawnPointOfInterest(connection: Connection, asset: Asset, position: Vector2, attachedTo: Attachable): Promise<EntityPointOfInterest> {
     await Services.get(ServiceType.Resource).assertLoaded(connection, asset);
 
-    const parent = attachedTo === undefined ? undefined : InnerCustomNetworkTransformGeneric.findOwner(attachedTo);
+    const parent = InnerCustomNetworkTransformGeneric.findOwner(attachedTo);
 
     const entity = new EntityPointOfInterest(connection, asset.getId(), position, undefined, parent);
 

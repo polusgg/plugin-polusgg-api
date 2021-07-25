@@ -10,6 +10,15 @@ import { HudItem } from "../../types/enums/hudItem";
 declare const server: Server;
 
 export class HudService {
+  constructor() {
+    server.on("game.ended", game => {
+      game.getGame().getLobby().getPlayers().forEach(player => {
+        this.setHudString(player, Location.TaskText, "__unset");
+        this.setHudString(player, Location.PingTracker, "__unset");
+      })
+    })
+  }
+
   async displayNotification(notification: string): Promise<void> {
     await Promise.allSettled([...server.getConnections().values()].map(async connection => connection.writeReliable(new DisplaySystemAlertPacket(notification))));
   }

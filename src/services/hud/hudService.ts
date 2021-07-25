@@ -12,11 +12,16 @@ declare const server: Server;
 export class HudService {
   constructor() {
     server.on("game.ended", game => {
+      //@ts-expect-error
+      if (game.getReason() !== 7) {
+        return;
+      }
+
       game.getGame().getLobby().getPlayers().forEach(player => {
         this.setHudString(player, Location.TaskText, "__unset");
         this.setHudString(player, Location.PingTracker, "__unset");
-      })
-    })
+      });
+    });
   }
 
   async displayNotification(notification: string): Promise<void> {

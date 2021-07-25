@@ -15,6 +15,11 @@ export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>>
   constructor(private readonly eventName: EventName, private readonly owner: unknown) {
     this.boundFunction = this.handle.bind(this);
 
+    if (eventName === "game.ended") {
+      //@ts-expect-error
+      this.where(e => e.getReason() === 7);
+    }
+
     server.on<EventName>(eventName, this.boundFunction);
   }
 

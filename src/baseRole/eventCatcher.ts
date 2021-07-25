@@ -12,7 +12,7 @@ export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>>
   private readonly executors: Executor<ServerEvents[EventName]>[] = [];
   private readonly boundFunction: (event: ServerEvents[EventName]) => void;
 
-  constructor(private readonly eventName: EventName) {
+  constructor(private readonly eventName: EventName, private readonly owner: unknown) {
     this.boundFunction = this.handle.bind(this);
 
     server.on<EventName>(eventName, this.boundFunction);
@@ -38,7 +38,7 @@ export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>>
     let shouldPreventExecution = false;
 
     for (let i = 0; i < this.filters.length; i++) {
-      shouldPreventExecution ||= !this.filters[i](event);
+      shouldPreventExecution ||= !this.filters[i].bind(this.owner)(event);
     }
 
     if (shouldPreventExecution) {
@@ -46,7 +46,7 @@ export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>>
     }
 
     for (let i = 0; i < this.executors.length; i++) {
-      this.executors[i](event);
+      this.executors[i].bind(this.owner)(event);
     }
   }
 }

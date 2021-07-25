@@ -53,7 +53,7 @@ export class BaseRole {
   }
 
   catch<NameType extends Extract<keyof ServerEvents, string>>(eventName: NameType, ownsMethod: (event: ServerEvents[NameType]) => Ownable): EventCatcher<NameType> {
-    const catcher = new EventCatcher(eventName).where(event => this.owns(ownsMethod(event)));
+    const catcher = new EventCatcher(eventName, this).where(event => this.owns(ownsMethod.bind(this)(event)));
 
     this.caughtEvents.push(catcher);
 

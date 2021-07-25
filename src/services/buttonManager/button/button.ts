@@ -229,7 +229,13 @@ export class Button extends Emittery<ButtonEvents> {
     return this
       .getLobby()
       .getPlayers()
-      .filter(p => p.getConnection()?.getId() !== this.getOwner().getId() && p.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) <= range)
+      .filter(p => {
+        try {
+          return p.getConnection()?.getId() !== this.getOwner().getId() && p.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) <= range
+        } catch (err) {
+          return false;
+        }
+      })
       .sort((p1, p2) => p1.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) - p2.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()));
   }
 

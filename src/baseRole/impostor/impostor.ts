@@ -10,6 +10,7 @@ import { StartGameScreenData } from "../../services/roleManager/roleManagerServi
 import { ServiceType } from "../../types/enums";
 import { EdgeAlignments } from "../../types/enums/edgeAlignment";
 import { BaseRole, RoleAlignment } from "../baseRole";
+import { AllowTaskInteractionPacket } from "../../packets/root/allowTaskInteractionPacket";
 
 export class ImpostorManager extends BaseManager {
   getId(): string {
@@ -59,6 +60,10 @@ export class Impostor extends BaseRole {
   }
 
   async onReadyImpostor(): Promise<void> {
+    if (this.getAlignment() !== RoleAlignment.Crewmate) {
+      this.owner.getSafeConnection().writeReliable(new AllowTaskInteractionPacket(false));
+    }
+
     this.button = await Services.get(ServiceType.Button)
       .spawnButton(this.owner.getSafeConnection(), {
         asset: AssetBundle.loadSafeFromCache(this.buttonBundle)

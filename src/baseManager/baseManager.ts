@@ -12,7 +12,7 @@ export class BaseManager {
   constructor(protected readonly owner: LobbyInstance) { }
 
   catch<NameType extends Extract<keyof ServerEvents, string>>(eventName: NameType, ownsMethod: (event: ServerEvents[NameType]) => Ownable): EventCatcher<NameType> {
-    return new EventCatcher(eventName).where(event => this.owns(ownsMethod(event)));
+    return new EventCatcher(eventName, this).where(event => this.owns(ownsMethod(event)));
   }
 
   owns(thing: Ownable): boolean {

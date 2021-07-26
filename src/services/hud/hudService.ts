@@ -1,6 +1,7 @@
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Player } from "@nodepolus/framework/src/player";
 import { Server } from "@nodepolus/framework/src/server";
+import { GameOverReason } from "@nodepolus/framework/src/types/enums";
 import { SetStringPacket } from "../../packets/root";
 import { DisplaySystemAlertPacket } from "../../packets/root/displaySystemAlert";
 import { SetHudVisibilityPacket } from "../../packets/root/setHudVisibilityPacket";
@@ -12,8 +13,7 @@ declare const server: Server;
 export class HudService {
   constructor() {
     server.on("game.ended", game => {
-      //@ts-expect-error
-      if (game.getReason() !== 7) {
+      if (game.getReason() !== 7 as GameOverReason) {
         return;
       }
 

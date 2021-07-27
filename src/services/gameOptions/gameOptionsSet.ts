@@ -39,6 +39,7 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
     const match = options?.find(v => v.key === option.getKey());
 
     if (match !== undefined && match.value.type === option.getValue().toJson().type) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       option.getValue().load(match.value as any);
     }
 

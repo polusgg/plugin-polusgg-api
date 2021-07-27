@@ -45,6 +45,7 @@ export class EndGameService {
   }
 
   async endGame(game?: Game): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (game === undefined || game.getLobby() === undefined) {
       return;
     }
@@ -72,7 +73,7 @@ export class EndGameService {
     await this.recalculateEndGame(game);
   }
 
-  async unregisterEndGameIntent(game: Game, endGameIntentName: EndGameIntent["intentName"]): Promise<void> {
+  unregisterEndGameIntent(game: Game, endGameIntentName: EndGameIntent["intentName"]): void {
     if (!this.intents.has(game)) {
       this.intents.set(game, []);
 

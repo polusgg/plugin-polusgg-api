@@ -17,10 +17,11 @@ export class HudService {
         return;
       }
 
-      game.getGame().getLobby().getPlayers().forEach(player => {
-        this.setHudString(player, Location.TaskText, "__unset");
-        this.setHudString(player, Location.PingTracker, "__unset");
-      });
+      game.getGame().getLobby().getPlayers()
+        .forEach(player => {
+          this.setHudString(player, Location.TaskText, "__unset");
+          this.setHudString(player, Location.PingTracker, "__unset");
+        });
     });
   }
 

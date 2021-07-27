@@ -29,19 +29,19 @@ export class ResourceService {
   async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
     try {
       return await this.loadSingle(connection, assetBundle);
-    } catch(err) {
-      // failed the first attempt. 
+    } catch {
+      // failed the first attempt.
       // try again
       try {
         return await this.loadSingle(connection, assetBundle);
-      } catch(err) {
+      } catch {
         // failed the second attempt.
         // TODO: Don't cache.
         // try again
         try {
           return await this.loadSingle(connection, assetBundle);
-        } catch(err) {
-          connection.disconnect(DisconnectReason.custom("Failed to load assets. The issue has been reported to the developers."));
+        } catch (err) {
+          await connection.disconnect(DisconnectReason.custom("Failed to load assets. The issue has been reported to the developers."));
           throw err;
         }
       }

@@ -15,6 +15,7 @@ import { SpawnPositions } from "@nodepolus/framework/src/static";
 
 declare global {
   interface Object {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     log(...data: any[]);
   }
 }
@@ -28,6 +29,7 @@ export default class PolusGGApi extends BasePlugin {
       version: [1, 0, 0],
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Object.prototype.log = function logToDispleaseRoobscoob(this: any, ...data: any[]): void {
       data.unshift(this);
 

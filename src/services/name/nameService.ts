@@ -42,6 +42,7 @@ export class NameService {
 
     await playerControl.sendRpcPacket(new SetNamePacket(name), target.getLobby().getConnections());
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (target as any as { name: string }).name = name;
 
     target.getLobby().getConnections().forEach(connection => {

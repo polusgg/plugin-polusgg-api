@@ -3,13 +3,14 @@ import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/haze
 
 export class AllowTaskInteractionPacket extends BaseRootPacket {
   constructor(
-    public taskInteractionAllowed: boolean
+    public taskInteractionAllowed: boolean,
   ) {
     super(0x8D);
   }
+
   static deserialize(reader: MessageReader): AllowTaskInteractionPacket {
     return new AllowTaskInteractionPacket(
-      reader.readBoolean()
+      reader.readBoolean(),
     );
   }
 

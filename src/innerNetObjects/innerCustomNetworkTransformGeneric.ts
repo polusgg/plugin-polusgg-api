@@ -23,6 +23,23 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
     super(InnerNetObjectType.CustomNetworkTransform, parent, netId);
   }
 
+  static findOwner(object: Attachable): number {
+    if (object instanceof Player) {
+      return object.getEntity().getCustomNetworkTransform().getNetId();
+    }
+
+    if (object instanceof BaseInnerNetEntity) {
+      return object.getCustomNetworkTransform().getNetId();
+    }
+
+    if (object instanceof InnerCustomNetworkTransform || object instanceof InnerCustomNetworkTransformGeneric) {
+      return object.getNetId();
+    }
+
+    console.log(object);
+    throw new Error("Could not find owner of object");
+  }
+
   getPosition(): Vector2 {
     return this.position;
   }
@@ -117,22 +134,5 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
 
   isAttached(): boolean {
     return this.attachedTo != -1;
-  }
-
-  static findOwner(object: Attachable): number {
-    if (object instanceof Player) {
-      return object.getEntity().getCustomNetworkTransform().getNetId();
-    }
-
-    if (object instanceof BaseInnerNetEntity) {
-      return object.getCustomNetworkTransform().getNetId();
-    }
-
-    if (object instanceof InnerCustomNetworkTransform || object instanceof InnerCustomNetworkTransformGeneric) {
-      return object.getNetId();
-    }
-
-    console.log(object);
-    throw new Error("Could not find owner of object");
   }
 }

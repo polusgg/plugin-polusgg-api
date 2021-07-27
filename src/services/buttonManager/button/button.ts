@@ -129,7 +129,7 @@ export class Button extends Emittery<ButtonEvents> {
       .setColor(color)
       .serializeData();
 
-    return this.getOwner().writeReliable(new GameDataPacket([data], this.getLobby().getCode()));
+    return this.getLobby().sendRootGamePacket(new GameDataPacket([data], this.getLobby().getCode()));
   }
 
   getColor(): [number, number, number, number] {
@@ -231,7 +231,7 @@ export class Button extends Emittery<ButtonEvents> {
       .getPlayers()
       .filter(p => {
         try {
-          return p.getConnection()?.getId() !== this.getOwner().getId() && p.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) <= range
+          return p.getConnection()?.getId() !== this.getOwner().getId() && p.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) <= range;
         } catch (err) {
           return false;
         }

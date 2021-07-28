@@ -15,4 +15,5 @@ export enum ServiceType {
   Cosmetic,
   EndGame,
   Hud,
+  Emoji,
 }

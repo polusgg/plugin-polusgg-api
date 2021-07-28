@@ -56,7 +56,6 @@ export class EndGameService {
       }
     });
 
-    console.log("ending the game", game.getLobby().getGameState());
     await game.getLobby().getHostInstance().endGame(0x07);
   }
 
@@ -66,7 +65,6 @@ export class EndGameService {
     }
 
     if (!this.intents.get(game)!.some(item => item.intentName === endGameIntent.intentName)) {
-      console.log("intent registered under", endGameIntent.intentName);
       this.intents.get(game)!.push(endGameIntent);
     }
 
@@ -98,7 +96,6 @@ export class EndGameService {
 
     if (!this.exclusions.get(game)!.some(item => item.intentName === exclusion.intentName)) {
       this.exclusions.get(game)!.push(exclusion);
-      console.log("amogn", this.exclusions.get(game)!);
     }
 
     await this.recalculateEndGame(game);
@@ -137,14 +134,11 @@ export class EndGameService {
           }
         });
 
-        console.log("ending game with", intent.intentName);
         await this.endGame(game);
 
         break;
       } else if (this.exclusions.has(game)) {
         const blocked = this.exclusions.get(game)!.filter(exclusion => exclusion.intentName === intent.intentName).length;
-
-        console.log(intent.intentName, "blocked by", blocked, "exclusion");
       }
     }
   }

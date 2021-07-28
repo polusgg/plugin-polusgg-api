@@ -34,8 +34,6 @@ export class HudService {
   }
 
   async setHudString(player: PlayerInstance, location: Location, text: string): Promise<void> {
-    console.trace("Setting HUD string for", player.getId(), player.getName(), Location[location], text)
-
     await (player as Player).getConnection()?.writeReliable(new SetStringPacket(text, location));
   }
 

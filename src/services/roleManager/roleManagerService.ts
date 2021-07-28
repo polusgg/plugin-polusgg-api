@@ -111,18 +111,13 @@ export class RoleManagerService {
 
     const impostorCount = Math.min(options.getOption("Impostor Count").getValue().value, RoleManagerService.adjustImpostorCount(players.length));
 
-    console.log("pcount", players.length, impostorCount);
-
     for (let i = 0; i < impostorCount; i++) {
       if (i >= impostorAlignedRolesFromAssignment.length) {
-        console.log("pushed impostor", i);
         impostorAlignedRoles.push({ role: Impostor });
       } else {
         impostorAlignedRoles.push(impostorAlignedRolesFromAssignment[i]);
       }
     }
-
-    console.log("non-impostor count", impostorCount);
 
     for (let i = 0; i < players.length - impostorCount; i++) {
       if (i >= otherAlignedRolesFromAssignment.length) {

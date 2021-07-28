@@ -112,8 +112,6 @@ export class EndGameService {
 
     if (index !== -1) {
       this.exclusions.get(game)!.splice(index, 1);
-    } else {
-      console.warn("could not find exclusion to splice", exclusionName);
     }
 
     await this.recalculateEndGame(game);
@@ -137,8 +135,6 @@ export class EndGameService {
         await this.endGame(game);
 
         break;
-      } else if (this.exclusions.has(game)) {
-        const blocked = this.exclusions.get(game)!.filter(exclusion => exclusion.intentName === intent.intentName).length;
       }
     }
   }

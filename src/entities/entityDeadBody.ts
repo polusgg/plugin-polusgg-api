@@ -18,7 +18,7 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     hasFallen: boolean = false,
     bodyFacing: BodyDirection = BodyDirection.FacingLeft,
     alignment: EdgeAlignments = EdgeAlignments.None,
-    z: number = -50,
+    z: number = position.getY() / 1000,
     attachedTo: number = -1,
     deadBodyNetId: number = lobby.getHostInstance().getNextNetId(),
     customNetworkTransformNetId: number = lobby.getHostInstance().getNextNetId(),

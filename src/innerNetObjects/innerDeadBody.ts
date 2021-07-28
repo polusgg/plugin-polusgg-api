@@ -14,6 +14,7 @@ export class InnerDeadBody extends BaseInnerNetObject {
     parent: EntityDeadBody,
     public color: [number, number, number, number],
     public shadowColor: [number, number, number, number],
+    public playerId: number = 0xFF,
     public hasFallen: boolean = false,
     public bodyFacing: BodyDirection = BodyDirection.FacingLeft,
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
@@ -27,6 +28,7 @@ export class InnerDeadBody extends BaseInnerNetObject {
       new MessageWriter()
         .writeBoolean(this.hasFallen)
         .writeByte(this.bodyFacing)
+        .writeByte(this.playerId)
         .writeBytes(this.color)
         .writeBytes(this.shadowColor),
     );
@@ -41,6 +43,7 @@ export class InnerDeadBody extends BaseInnerNetObject {
 
     this.hasFallen = reader.readBoolean();
     this.bodyFacing = reader.readBoolean() ? BodyDirection.FacingRight : BodyDirection.FacingLeft;
+    this.playerId = reader.readByte();
     this.color = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
     this.shadowColor = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
   }
@@ -51,13 +54,14 @@ export class InnerDeadBody extends BaseInnerNetObject {
       new MessageWriter()
         .writeBoolean(this.hasFallen)
         .writeByte(this.bodyFacing)
+        .writeByte(this.playerId)
         .writeBytes(this.color)
         .writeBytes(this.shadowColor),
     );
   }
 
   clone(): InnerDeadBody {
-    return new InnerDeadBody(this.getParent(), this.color, this.shadowColor, this.hasFallen, this.bodyFacing, this.netId);
+    return new InnerDeadBody(this.getParent(), this.color, this.shadowColor, this.playerId, this.hasFallen, this.bodyFacing, this.netId);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function

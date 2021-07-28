@@ -14,6 +14,7 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     color: [number, number, number, number],
     shadowColor: [number, number, number, number],
     position: Vector2,
+    playerId: number = 0xFF,
     hasFallen: boolean = false,
     bodyFacing: BodyDirection = BodyDirection.FacingLeft,
     alignment: EdgeAlignments = EdgeAlignments.None,
@@ -25,7 +26,7 @@ export class EntityDeadBody extends BaseInnerNetEntity {
     super(0x83, lobby, GLOBAL_OWNER, SpawnFlag.None);
 
     this.innerNetObjects = [
-      new InnerDeadBody(this, color, shadowColor, hasFallen, bodyFacing, deadBodyNetId),
+      new InnerDeadBody(this, color, shadowColor, playerId, hasFallen, bodyFacing, deadBodyNetId),
       new InnerCustomNetworkTransformGeneric(this, alignment, position, z, attachedTo, customNetworkTransformNetId),
     ];
   }

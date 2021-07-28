@@ -17,17 +17,18 @@ export class DeadBodyService {
     RpcPacket.registerPacket(0x91, ClickPacket.deserialize, this.handleClickBody.bind(this));
   }
 
-  async spawnFor(forConnection: Connection, { color, shadowColor, position, hasFallen, bodyFacing, alignment, z, attachedTo }: {
+  async spawnFor(forConnection: Connection, { color, shadowColor, position, hasFallen, playerId, bodyFacing, alignment, z, attachedTo }: {
     color: [number, number, number, number] | number[];
     shadowColor: [number, number, number, number] | number[];
     position: Vector2;
+    playerId?: number;
     hasFallen?: boolean;
     bodyFacing?: BodyDirection;
     alignment?: EdgeAlignments;
     z?: number;
     attachedTo?: number;
   }): Promise<DeadBody> {
-    const entity = new EntityDeadBody(forConnection.getSafeLobby(), color as [number, number, number, number], shadowColor as [number, number, number, number], position, hasFallen, bodyFacing, alignment, z, attachedTo);
+    const entity = new EntityDeadBody(forConnection.getSafeLobby(), color as [number, number, number, number], shadowColor as [number, number, number, number], position, playerId, hasFallen, bodyFacing, alignment, z, attachedTo);
 
     await forConnection.writeReliable(new GameDataPacket([entity.serializeSpawn()], entity.getLobby().getCode()));
 
@@ -54,17 +55,18 @@ export class DeadBodyService {
     this.bodyMap.get(connection.getLobby()!)!.get(sender.getNetId())!.emit("clicked", { connection, packet });
   }
 
-  spawn(forLobby: LobbyInstance, { color, shadowColor, position, hasFallen, bodyFacing, alignment, z, attachedTo }: {
+  spawn(forLobby: LobbyInstance, { color, shadowColor, position, hasFallen, playerId, bodyFacing, alignment, z, attachedTo }: {
     color: [number, number, number, number] | number[];
     shadowColor: [number, number, number, number] | number[];
     position: Vector2;
+    playerId?: number;
     hasFallen?: boolean;
     bodyFacing?: BodyDirection;
     alignment?: EdgeAlignments;
     z?: number;
     attachedTo?: number;
   }, sendTo: Connection[] = forLobby.getConnections()): EntityDeadBody {
-    const entity = new EntityDeadBody(forLobby, color as [number, number, number, number], shadowColor as [number, number, number, number], position, hasFallen, bodyFacing, alignment, z, attachedTo);
+    const entity = new EntityDeadBody(forLobby, color as [number, number, number, number], shadowColor as [number, number, number, number], position, playerId, hasFallen, bodyFacing, alignment, z, attachedTo);
 
     forLobby.spawn(entity, sendTo);
 

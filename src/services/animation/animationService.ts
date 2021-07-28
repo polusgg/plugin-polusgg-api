@@ -21,8 +21,8 @@ export class AnimationService {
     });
   }
 
-  async beginPlayerAnimation(player: PlayerInstance, enabledFields: PlayerAnimationField[], keyframes: PlayerAnimationKeyframe[], reset: boolean = true): Promise<Promise<void>> {
-    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new BeginPlayerAnimation(Bitfield.fromNumber(enabledFields.reduce((p, a) => p | (1 << a), 0)), keyframes, reset), player.getLobby().getConnections());
+  async beginPlayerAnimation(player: PlayerInstance, enabledFields: PlayerAnimationField[], keyframes: PlayerAnimationKeyframe[], reset: boolean = true, sendTo: Connection[] = player.getLobby().getConnections()): Promise<Promise<void>> {
+    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new BeginPlayerAnimation(Bitfield.fromNumber(enabledFields.reduce((p, a) => p | (1 << a), 0)), keyframes, reset), sendTo);
 
     return new Promise(resolve => {
       setTimeout(resolve, keyframes.map(keyframe => keyframe.getDuration()).reduce((sum, current) => sum + current, 0));

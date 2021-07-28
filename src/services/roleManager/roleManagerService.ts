@@ -3,7 +3,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { Player } from "@nodepolus/framework/src/player";
 import { Server } from "@nodepolus/framework/src/server";
-import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { GameOverReason, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { shuffleArray, shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { BaseManager } from "../../baseManager/baseManager";
 import { BaseRole } from "../../baseRole";
@@ -46,7 +46,7 @@ declare const server: Server;
 export class RoleManagerService {
   constructor() {
     server.on("game.ended", event => {
-      if (event.isCancelled()) {
+      if (event.getReason() === 0x07 as GameOverReason) {
         event
           .getGame()
           .getLobby()

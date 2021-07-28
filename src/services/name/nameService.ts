@@ -15,6 +15,7 @@ export class NameService {
     });
 
     server.on("player.name.updated", event => {
+      event.doSendResponse(false);
       event.cancel();
     });
   }

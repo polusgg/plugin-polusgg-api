@@ -27,6 +27,15 @@ export class ResourceService {
   }
 
   async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
+    const preloaded = this.getLoadedAssetBundlesForConnection(connection)
+
+    if (preloaded.includes(assetBundle)) {
+      return {
+        isCached: true,
+        resourceId: assetBundle.getId(),
+      }
+    }
+
     try {
       return await this.loadSingle(connection, assetBundle);
     } catch {

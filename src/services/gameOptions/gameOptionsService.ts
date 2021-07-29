@@ -7,6 +7,7 @@ import { MaxValue } from "@nodepolus/framework/src/util/constants";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Player } from "@nodepolus/framework/src/player";
 import { Level } from "@nodepolus/framework/src/types/enums";
+import { EmojiService } from "../emojiService/emojiService";
 
 declare const server: Server;
 
@@ -106,7 +107,7 @@ export class GameOptionsService {
       });
 
       options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "Airship", "Submerged"]), GameOptionPriority.Higher - 5);
-      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher - 5);
+      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, `{0} Impostors <size=150%>${EmojiService.static("impoalign")}</size>`), GameOptionPriority.Higher - 5);
       options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);

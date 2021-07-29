@@ -27,13 +27,13 @@ export class ResourceService {
   }
 
   async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
-    const preloaded = this.getLoadedAssetBundlesForConnection(connection)
+    const preloaded = this.getLoadedAssetBundlesForConnection(connection);
 
     if (preloaded.includes(assetBundle)) {
       return {
         isCached: true,
         resourceId: assetBundle.getId(),
-      }
+      };
     }
 
     try {

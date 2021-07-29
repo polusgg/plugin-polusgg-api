@@ -6,7 +6,7 @@ import { RoleAlignment } from "../../baseRole/baseRole";
 import { Palette } from "@nodepolus/framework/src/static";
 import { Mutable } from "@nodepolus/framework/src/types";
 import { WinSoundType } from "../../types/enums/winSound";
-import { GameOverReason, GameState } from "@nodepolus/framework/src/types/enums";
+import { DeathReason, GameOverReason, GameState } from "@nodepolus/framework/src/types/enums";
 import { PlayerData } from "@nodepolus/framework/src/protocol/entities/gameData/types";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 
@@ -33,6 +33,25 @@ export class VanillaWinConditions {
               winSound: WinSoundType.CrewmateWin,
             }])),
           intentName: "crewmateTasks",
+        });
+      }
+    });
+
+    server.on("player.died", event => {
+      if (this.shouldEndGameImpostors(event.getPlayer().getLobby()) && event.getReason() === DeathReason.Unknown) {
+        endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
+          endGameData: new Map(event.getPlayer().getLobby().getPlayers()
+            .map(player => [player, {
+              title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+              subtitle: "<color=#FF1919FF>Impostors</color> won by kills",
+              color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
+              yourTeam: event.getPlayer()
+                .getLobby()
+                .getPlayers()
+                .filter(sus => sus.isImpostor()),
+              winSound: WinSoundType.ImpostorWin,
+            }])),
+          intentName: "impostorKill",
         });
       }
     });

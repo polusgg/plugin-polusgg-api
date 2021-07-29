@@ -4,7 +4,6 @@ import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { Server } from "@nodepolus/framework/src/server";
-import { GameOverReason } from "@nodepolus/framework/src/types/enums";
 import { SetStringPacket } from "../../packets/root";
 import { DisplaySystemAlertPacket } from "../../packets/root/displaySystemAlert";
 import { SetHudVisibilityPacket } from "../../packets/root/setHudVisibilityPacket";
@@ -15,20 +14,6 @@ import { HudItem } from "../../types/enums/hudItem";
 declare const server: Server;
 
 export class HudService {
-  constructor() {
-    server.on("game.ended", game => {
-      if (game.getReason() !== 7 as GameOverReason) {
-        return;
-      }
-
-      game.getGame().getLobby().getPlayers()
-        .forEach(player => {
-          this.setHudString(player, Location.TaskText, "__unset");
-          this.setHudString(player, Location.PingTracker, "__unset");
-        });
-    });
-  }
-
   async displayNotification(notification: string): Promise<void> {
     await Promise.allSettled([...server.getConnections().values()].map(async connection => connection.writeReliable(new DisplaySystemAlertPacket(notification))));
   }

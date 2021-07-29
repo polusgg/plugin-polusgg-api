@@ -6,6 +6,7 @@ import { GameOptionPriority, LobbyOptions } from "./gameOptionsSet";
 import { MaxValue } from "@nodepolus/framework/src/util/constants";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Player } from "@nodepolus/framework/src/player";
+import { Level } from "@nodepolus/framework/src/types/enums";
 
 declare const server: Server;
 
@@ -31,6 +32,27 @@ export type LobbyDefaultOptions = {
   "Task Bar Updates": EnumValue;
 };
 
+export const vanillaGameOptions = new Set([
+  "Map",
+  "Impostor Count",
+  "Emergency Meetings",
+  "Emergency Cooldown",
+  "Discussion Time",
+  "Voting Time",
+  "Anonymous Votes",
+  "Confirm Ejects",
+  "Player Speed",
+  "Crewmate Vision",
+  "Impostor Vision",
+  "Kill Cooldown",
+  "Kill Distance",
+  "Common Tasks",
+  "Long Tasks",
+  "Short Tasks",
+  "Visual Tasks",
+  "Task Bar Updates",
+]);
+
 export class GameOptionsService {
   constructor() {
     server.on("lobby.options.updated", event => {
@@ -43,7 +65,13 @@ export class GameOptionsService {
       event.getLobby().getOptions().setVersion(4);
 
       const applyOption = {
-        Map: (vanillaOptions: GameOptionsData, option: EnumValue) => { vanillaOptions.setLevels([option.index]) },
+        Map: (vanillaOptions: GameOptionsData, option: EnumValue) => {
+          if (option.index < Level.AprilSkeld) {
+            vanillaOptions.setLevels([option.index]);
+          } else {
+            vanillaOptions.setLevels([option.index + 1]);
+          }
+        },
         "Impostor Count": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setImpostorCount(option.value) },
         "Emergency Meetings": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setEmergencyMeetingCount(option.value) },
         "Emergency Cooldown": (vanillaOptions: GameOptionsData, option: NumberValue) => { vanillaOptions.setEmergencyCooldown(option.value) },
@@ -77,7 +105,7 @@ export class GameOptionsService {
         }
       });
 
-      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "dlekS ehT", "Airship", "Submerged"]), GameOptionPriority.Higher - 5);
+      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "Airship", "Submerged"]), GameOptionPriority.Higher - 5);
       options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, "{0} Impostors"), GameOptionPriority.Higher - 5);
       options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
       options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);

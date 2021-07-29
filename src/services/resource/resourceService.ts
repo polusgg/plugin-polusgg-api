@@ -95,6 +95,7 @@ export class ResourceService {
     const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number
       && (p as FetchResourceResponsePacket).resourceId == assetBundle.getId()
       && (p as FetchResourceResponsePacket).response.getType() !== 0x00,
+    10000,
     ) as FetchResourceResponsePacket;
 
     if (response.getType() == 0x01) {

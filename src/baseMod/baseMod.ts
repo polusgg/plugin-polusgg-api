@@ -2,10 +2,12 @@ import { RoleAssignmentData } from "../services/roleManager/roleManagerService";
 import { BasePlugin, PluginMetadata } from "@nodepolus/framework/src/api/plugin";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import PolusGGApi from "../..";
+import { Services } from "../services";
+import { ServiceType } from "../types/enums";
+import { EnumValue } from "../packets/root/setGameOption";
 
 export class BaseMod extends BasePlugin {
   public static owner: PolusGGApi;
-  private enabled = false;
 
   constructor(
     protected readonly modMetadata: PluginMetadata,
@@ -26,15 +28,15 @@ export class BaseMod extends BasePlugin {
   getRoles(lobby: LobbyInstance): RoleAssignmentData[] { return [] }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getEnabled(lobby: LobbyInstance): boolean { return this.enabled }
+  getEnabled(lobby: LobbyInstance): boolean { 
+    const option = Services.get(ServiceType.GameOptions).getGameOptions<{ Gamemode: EnumValue }>(lobby).getOption("Gamemode")
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
-  async onEnable(lobby: LobbyInstance): Promise<void> {
-    this.enabled = true;
+    return (option.getValue().getSelected() === this.modMetadata.name) 
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
-  async onDisable(lobby: LobbyInstance): Promise<void> {
-    this.enabled = false;
-  }
+  async onEnable(lobby: LobbyInstance): Promise<void> {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
+  async onDisable(lobby: LobbyInstance): Promise<void> {}
 }

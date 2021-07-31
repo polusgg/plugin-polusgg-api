@@ -22,6 +22,8 @@ export enum GameOptionPriority {
   Lowest = 700,
 }
 
+const TARGET_GAME_OPTIONS_VERSION = 1;
+
 export type SpecializedLobbyOptionsEvents<T extends Record<string, NumberValue | BooleanValue | EnumValue>, A extends Extract<keyof T, string>> = Record<`option.${A}.changed`, GameOption<T[A]>>;
 
 export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | EnumValue>> extends Emittery<BaseLobbyOptionsEvents & SpecializedLobbyOptionsEvents<T, Extract<keyof T, string>>> {
@@ -36,11 +38,23 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
 
     const { options } = (this.lobby.getActingHosts()[0] ?? this.lobby.getCreator()).getMeta<UserResponseStructure>("pgg.auth.self");
 
-    const match = options?.find(v => v.key === option.getKey());
+    if (options?.gamemode && options.version === TARGET_GAME_OPTIONS_VERSION) {
+      if (key !== "Gamemode") {
+        //@ts-expect-error
+        const relatedOptions = options[(this.getOption("Gamemode").getValue() as EnumValue).getSelected()];
 
-    if (match !== undefined && match.value.type === option.getValue().toJson().type) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      option.getValue().load(match.value as any);
+        const match = relatedOptions?.find(v => v.key === option.getKey());
+
+        if (match !== undefined && match.value.type === value.toJson().type) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          value.load(match.value as any);
+        }
+      } else {
+        const gamemode = options.gamemode;
+
+        //@ts-expect-error
+        value.load(gamemode.value);
+      }
     }
 
     await option.setValue(value);
@@ -62,7 +76,7 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
     Array.from((this.lobby as unknown as { metadata: Map<string, unknown> }).metadata.keys()).forEach(optionName => {
       if (optionName.startsWith("pgg.options.")) {
         //@ts-expect-error
-        record[optionName] = this.getOption(optionName.split("pgg.options.")[1]);
+        record[optionName.split("pgg.options.")[1]] = this.getOption(optionName.split("pgg.options.")[1]);
       }
     });
 

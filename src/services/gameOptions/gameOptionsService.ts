@@ -7,7 +7,6 @@ import { MaxValue } from "@nodepolus/framework/src/util/constants";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Player } from "@nodepolus/framework/src/player";
 import { Level } from "@nodepolus/framework/src/types/enums";
-import { EmojiService } from "../emojiService/emojiService";
 
 declare const server: Server;
 
@@ -106,24 +105,27 @@ export class GameOptionsService {
         }
       });
 
-      options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "Airship", "Submerged"]), GameOptionPriority.Higher - 5);
-      options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, `{0} Impostors <size=150%>${EmojiService.static("impoalign")}</size>`), GameOptionPriority.Higher - 5);
-      options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Emergency Meetings", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 4);
-      options.createOption("Meeting Settings", "Emergency Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
-      options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Crewmate Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Impostor Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher - 3);
-      options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher - 3);
-      options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 1);
-      options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher - 1);
-      options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher - 1);
-      options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 2);
-      options.createOption("Task Settings", "Task Bar Updates", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
+      // fixing a race condition :smile:
+      setTimeout(() => {
+        options.createOption("Game Settings", "Map", new EnumValue(0, ["The Skeld", "Mira HQ", "Polus", "Airship", "Submerged"]), GameOptionPriority.Higher - 5);
+        options.createOption("Game Settings", "Impostor Count", new NumberValue(1, 1, 1, 3, false, `{0} Impostors`), GameOptionPriority.Higher - 5);
+        options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 4);
+        options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 4);
+        options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
+        options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 4);
+        options.createOption("Meeting Settings", "Emergency Meetings", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 4);
+        options.createOption("Meeting Settings", "Emergency Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
+        options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
+        options.createOption("Player Settings", "Crewmate Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
+        options.createOption("Player Settings", "Impostor Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 3);
+        options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher - 3);
+        options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher - 3);
+        options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 1);
+        options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher - 1);
+        options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher - 1);
+        options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 2);
+        options.createOption("Task Settings", "Task Bar Updates", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
+      }, 100);
     });
 
     server.on("server.lobby.join", event => {

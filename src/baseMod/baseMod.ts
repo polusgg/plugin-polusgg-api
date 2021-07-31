@@ -27,11 +27,11 @@ export class BaseMod extends BasePlugin {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getRoles(lobby: LobbyInstance): RoleAssignmentData[] { return [] }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getEnabled(lobby: LobbyInstance): boolean { 
-    const option = Services.get(ServiceType.GameOptions).getGameOptions<{ Gamemode: EnumValue }>(lobby).getOption("Gamemode")
+  getEnabled(lobby: LobbyInstance): boolean {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const option = Services.get(ServiceType.GameOptions).getGameOptions<{ Gamemode: EnumValue }>(lobby).getOption("Gamemode");
 
-    return (option.getValue().getSelected() === this.modMetadata.name) 
+    return (option.getValue().getSelected() === this.modMetadata.name);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await

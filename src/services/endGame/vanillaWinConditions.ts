@@ -78,7 +78,7 @@ export class VanillaWinConditions {
     // this is going to call this code for every crewmate at least once
     server.on("meeting.ended", event => {
       if (event.getGame().getLobby().getPlayers()
-        .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !player.isDead())
+        .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !(player.isDead() || (player.getMeta<boolean | undefined>("pgg.countAsDead") ?? false)))
         .length == 0) {
         endGame.registerEndGameIntent(event.getGame(), {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
@@ -173,7 +173,7 @@ export class VanillaWinConditions {
     const playerData = gameData.getGameData().getPlayers();
 
     for (const [pid, data] of playerData) {
-      if (data.isDead() || data.isDisconnected()) {
+      if (data.isDead() || (lobby.findSafePlayerByPlayerId(data.getId()).getMeta<boolean | undefined>("pgg.countAsDead")) || data.isDisconnected()) {
         continue;
       }
 
@@ -184,6 +184,11 @@ export class VanillaWinConditions {
         aliveCrewmates.push(data);
       }
     }
+
+    console.log({
+      aliveImpostors,
+      aliveCrewmates,
+    });
 
     return aliveImpostors.length >= aliveCrewmates.length;
   }

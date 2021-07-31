@@ -71,6 +71,7 @@ export class EndGameService {
     await this.recalculateEndGame(game);
   }
 
+  //TODO Recalculate end game
   unregisterEndGameIntent(game: Game, endGameIntentName: EndGameIntent["intentName"]): void {
     if (!this.intents.has(game)) {
       this.intents.set(game, []);

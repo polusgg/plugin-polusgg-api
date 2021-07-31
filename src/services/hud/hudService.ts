@@ -8,6 +8,7 @@ import { SetStringPacket } from "../../packets/root";
 import { DisplaySystemAlertPacket } from "../../packets/root/displaySystemAlert";
 import { SetHudVisibilityPacket } from "../../packets/root/setHudVisibilityPacket";
 import { ChatVisibilityPacket } from "../../packets/rpc/gameData";
+import { CloseHudPacket } from "../../packets/rpc/playerControl";
 import { Location } from "../../types/enums";
 import { HudItem } from "../../types/enums/hudItem";
 
@@ -33,5 +34,9 @@ export class HudService {
         new ChatVisibilityPacket(visible),
       ),
     ], connection.getLobby()!.getCode()));
+  }
+
+  async closeHud(player: PlayerInstance): Promise<void> {
+    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new CloseHudPacket());
   }
 }

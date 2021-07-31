@@ -78,7 +78,7 @@ export class VanillaWinConditions {
     // this is going to call this code for every crewmate at least once
     server.on("meeting.ended", event => {
       if (event.getGame().getLobby().getPlayers()
-        .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !(player.isDead() || (player.getMeta<boolean | undefined>("pgg.countAsDead") ?? false)))
+        .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !player.getGameDataEntry().isDisconnected() && !(player.isDead() || (player.getMeta<boolean | undefined>("pgg.countAsDead") ?? false)))
         .length == 0) {
         endGame.registerEndGameIntent(event.getGame(), {
           endGameData: new Map(event.getGame().getLobby().getPlayers()

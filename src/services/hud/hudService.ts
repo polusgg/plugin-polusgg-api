@@ -11,6 +11,7 @@ import { ChatVisibilityPacket } from "../../packets/rpc/gameData";
 import { CloseHudPacket } from "../../packets/rpc/playerControl";
 import { Location } from "../../types/enums";
 import { HudItem } from "../../types/enums/hudItem";
+import { ModstampSetStringPacket } from "../../packets/root/modstampSetStringPacket";
 
 declare const server: Server;
 
@@ -21,6 +22,10 @@ export class HudService {
 
   async setHudString(player: PlayerInstance, location: Location, text: string): Promise<void> {
     await (player as Player).getConnection()?.writeReliable(new SetStringPacket(text, location));
+  }
+
+  async setModString(player: PlayerInstance, color: [number, number, number, number], text: string): Promise<void> {
+    await (player as Player).getConnection()?.writeReliable(new ModstampSetStringPacket(color, text));
   }
 
   async setHudVisibility(player: PlayerInstance, item: HudItem, enabled: boolean): Promise<void> {

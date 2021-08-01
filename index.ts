@@ -70,7 +70,9 @@ export default class PolusGGApi extends BasePlugin {
       //   value.value = (packet.value as EnumValue).index;
       // }
 
-      Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value, connection.getLobby()!.getConnections().filter(c => c != connection));
+      if (connection.isActingHost()) {
+        Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value, connection.getLobby()!.getConnections().filter(c => c != connection));
+      }
     });
 
     BaseMod.owner = this;

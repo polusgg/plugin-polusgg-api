@@ -16,7 +16,4 @@ export enum Location {
 
   // e.g. "TOTAL TASKS COMPLETED"
   TaskCompletion,
-
-  //TODO: Potentially unused with the addition of custom gameoptions api
-  GameOptions,
 }

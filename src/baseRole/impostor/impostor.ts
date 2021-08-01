@@ -130,8 +130,8 @@ export class Impostor extends BaseRole {
       //todo break out on custom predicate
       if (player.isDead() || button.isDestroyed()) {
         const players = this.owner.getLobby()
-        .getPlayers()
-        .filter(x => x !== this.owner);
+          .getPlayers()
+          .filter(x => x !== this.owner);
 
         for (let i = 0; i < players.length; i++) {
           animService.clearOutlineFor(players[i], this.owner.getSafeConnection());

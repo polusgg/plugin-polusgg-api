@@ -9,6 +9,7 @@ import { EndGameScreenData } from "../roleManager/roleManagerService";
 type EndGameIntent = {
   endGameData: Map<PlayerInstance, EndGameScreenData>;
   intentName: string;
+  callback?(): void;
 };
 
 type EndGameExclusion = {
@@ -132,6 +133,10 @@ export class EndGameService {
             this.setEndGameData(player.getSafeConnection(), data);
           }
         });
+
+        if (intent.callback !== undefined) {
+          intent.callback();
+        }
 
         await this.endGame(game);
 

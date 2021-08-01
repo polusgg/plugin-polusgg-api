@@ -225,7 +225,7 @@ Fake Tasks:`;
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {
     return {
       title: `Impostor`,
-      subtitle: `Kill the <color=#8CFFFFFF>crewmates</color>`,
+      subtitle: `Kill the <color=#8CFFFFFF>Crewmates</color>`,
       color: Palette.impostorRed(),
     };
   }

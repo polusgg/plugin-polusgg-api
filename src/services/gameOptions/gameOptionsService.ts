@@ -118,7 +118,7 @@ export class GameOptionsService {
         options.createOption("Player Settings", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 6);
         options.createOption("Player Settings", "Crewmate Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 5);
         options.createOption("Player Settings", "Impostor Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Higher - 5);
-        options.createOption("Player Settings", "Kill Cooldown", new NumberValue(15, 5, 5, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
+        options.createOption("Player Settings", "Kill Cooldown", new NumberValue(10, 2.5, 5, 60, false, "{0}s"), GameOptionPriority.Higher - 4);
         options.createOption("Player Settings", "Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Higher - 4);
         options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 3);
         options.createOption("Task Settings", "Task Bar Updates", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);

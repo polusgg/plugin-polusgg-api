@@ -125,7 +125,6 @@ export class GameOptionsService {
         options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 1);
         options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher - 1);
         options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher - 1);
-
       }, 100);
     });
 

@@ -1,6 +1,6 @@
 import { inspect } from "util";
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
-import { AlterGameTag, Level } from "@nodepolus/framework/src/types/enums";
+import { AlterGameTag } from "@nodepolus/framework/src/types/enums";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
 import { Player } from "@nodepolus/framework/src/player";
@@ -11,7 +11,8 @@ import { Services } from "./src/services";
 import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
 import { VanillaWinConditions } from "./src/services/endGame/vanillaWinConditions";
 import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
-import { SpawnPositions } from "@nodepolus/framework/src/static";
+import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
+import { Events } from "@polusgg/plugin-logger/events";
 
 declare global {
   interface Object {
@@ -21,6 +22,9 @@ declare global {
 }
 
 export default class PolusGGApi extends BasePlugin {
+  protected readonly lastIndex: Map<LobbyInstance, number> = new Map();
+  protected readonly updateGamemodeRunning: Map<LobbyInstance, boolean> = new Map();
+  protected readonly updateGamemodeQueue: Map<LobbyInstance, number[]> = new Map();
   private readonly mods: BaseMod[] = [];
 
   constructor() {
@@ -42,10 +46,6 @@ export default class PolusGGApi extends BasePlugin {
 
       return this;
     };
-
-    SpawnPositions.forPlayerOnLevel(Level.Polus, 1, 4, true).log();
-
-    "impostor".log("LMAO").log();
 
     RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
       connection.setMeta({
@@ -86,6 +86,23 @@ export default class PolusGGApi extends BasePlugin {
     this.server.on("game.started", event => {
       event.setImpostors([]);
 
+      const options = Services.get(ServiceType.GameOptions).getGameOptions(event.getGame().getLobby()).getAllOptions();
+
+      const settings = Object.fromEntries(Object.entries(options).map(([a, b]) => {
+        const v = b.getValue();
+
+        if (v instanceof EnumValue) {
+          return [a, v.getSelected()];
+        }
+
+        return [a, v.value];
+      }));
+
+      Events.fire({
+        type: "gameSettings",
+        settings,
+      });
+
       const roles = this.mods.filter(mod => mod.getEnabled(event.getGame().getLobby())).map(e => e.getRoles(event.getGame().getLobby())).flat();
       // const impostorRoleDecls = roles.filter(r => r.assignWith === RoleAlignment.Impostor);
       // const impostorCounts = impostorRoleDecls.reduce((a, r) => a + r.playerCount, 0);
@@ -117,14 +134,14 @@ export default class PolusGGApi extends BasePlugin {
 
       await this.mods[option.getValue().index].onEnable(event.getLobby());
 
-      let lastIndex = option.getValue().index;
+      this.updateGamemodeRunning.set(event.getLobby(), false);
+      this.updateGamemodeQueue.set(event.getLobby(), []);
+      this.lastIndex.set(event.getLobby(), option.getValue().index);
 
-      options.on("option.Gamemode.changed", async suboption => {
-        await this.mods[lastIndex].onDisable(event.getLobby());
+      options.on("option.Gamemode.changed", suboption => {
+        this.updateGamemodeQueue.get(suboption.getLobby())!.push(suboption.getValue().index);
 
-        lastIndex = suboption.getValue().index;
-
-        await this.mods[lastIndex].onEnable(event.getLobby());
+        this.updateGamemode(suboption.getLobby()!);
       });
     });
 
@@ -155,5 +172,46 @@ export default class PolusGGApi extends BasePlugin {
 
   registerMod(mod: BaseMod): void {
     this.mods.push(mod);
+  }
+
+  async updateGamemode(lobby: LobbyInstance): Promise<void> {
+    console.log("[UG] Called", this.updateGamemodeRunning.get(lobby));
+
+    if (this.updateGamemodeRunning.get(lobby)) {
+      return;
+    }
+
+    this.updateGamemodeRunning.set(lobby, true);
+
+    console.log("[UG] onlyInstance", this.updateGamemodeQueue.get(lobby));
+
+    if (this.lastIndex.get(lobby) === this.updateGamemodeQueue.get(lobby)![this.updateGamemodeQueue.get(lobby)!.length - 1]) {
+      this.updateGamemodeRunning.set(lobby, false);
+      this.updateGamemodeQueue.set(lobby, []);
+
+      return;
+    }
+
+    await this.mods[this.lastIndex.get(lobby)!].onDisable(lobby);
+
+    console.log("[UG] old unloaded");
+
+    this.lastIndex.set(lobby, this.updateGamemodeQueue.get(lobby)!.pop()!);
+
+    this.updateGamemodeQueue.set(lobby, []);
+
+    await this.mods[this.lastIndex.get(lobby)!].onEnable(lobby);
+
+    console.log("[UG] new loaded, queue size", this.updateGamemodeQueue.get(lobby));
+
+    this.updateGamemodeRunning.set(lobby, false);
+
+    if (this.updateGamemodeQueue.get(lobby)!.length > 0) {
+      console.log("[UG] recursing");
+
+      await this.updateGamemode(lobby);
+    }
+
+    console.log("[UG] exiting");
   }
 }

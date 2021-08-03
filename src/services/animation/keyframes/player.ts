@@ -32,7 +32,7 @@ export class PlayerAnimationKeyframe {
       angle?: number;
     },
   ) {
-    this.offset = offset ?? 0;
+    this.offset = offset === undefined ? 0 : offset;
     this.duration = duration;
     opacity = opacity ?? 1;
     this.opacity = opacity;

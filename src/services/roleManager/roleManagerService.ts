@@ -24,6 +24,7 @@ export type EndGameScreenData = {
   color: [number, number, number, number];
   winSound: WinSound;
   yourTeam: PlayerInstance[];
+  hasWon: boolean;
   displayQuit?: boolean;
   displayPlayAgain?: boolean;
 };

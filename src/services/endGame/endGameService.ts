@@ -5,6 +5,7 @@ import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { OverwriteGameOver } from "../../packets/root";
 import { WinSoundType } from "../../types/enums/winSound";
 import { EndGameScreenData } from "../roleManager/roleManagerService";
+import { Events } from "@polusgg/plugin-logger/events";
 
 type EndGameIntent = {
   endGameData: Map<PlayerInstance, EndGameScreenData>;
@@ -23,6 +24,7 @@ export class EndGameService {
     subtitle: "End game was not overwritten",
     color: [127, 127, 127, 255],
     yourTeam: [],
+    hasWon: false,
     displayQuit: true,
     displayPlayAgain: false,
     winSound: WinSoundType.Disconnect,
@@ -50,6 +52,24 @@ export class EndGameService {
     if (game === undefined || game.getLobby() === undefined) {
       return;
     }
+
+    const m = new Map<string, number>();
+    const endGames = game.getLobby().getConnections().map(c => c.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData") ?? this.defaultEndGameData);
+
+    for (let i = 0; i < endGames.length; i++) {
+      const endGame = endGames[i];
+
+      m.set(endGame.subtitle.toString(), (m.get(endGame.subtitle.toString()) ?? 0) + 1);
+    }
+
+    const largest = [...m.entries()].sort((a, b) => a[1] - b[1])[0][0];
+
+    Events.fire({
+      type: "gameEnded",
+      gameUuid: game.getMeta<string>("pgg.log.uuid"),
+      winnerUuids: game.getLobby().getConnections().filter(c => c.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData")?.hasWon ?? false).map(p => p.getMeta<string>("pgg.log.uuid")),
+      reason: largest,
+    });
 
     game.getLobby().getConnections().forEach(connection => {
       if (connection.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData") === undefined) {

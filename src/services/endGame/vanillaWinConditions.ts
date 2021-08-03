@@ -31,6 +31,7 @@ export class VanillaWinConditions {
               yourTeam: event.getPlayer().getLobby().getPlayers()
                 .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
               winSound: WinSoundType.CrewmateWin,
+              hasWon: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate,
             }])),
           intentName: "crewmateTasks",
         });
@@ -50,6 +51,7 @@ export class VanillaWinConditions {
                 .getPlayers()
                 .filter(sus => sus.isImpostor()),
               winSound: WinSoundType.ImpostorWin,
+              hasWon: player.isImpostor(),
             }])),
           intentName: "impostorKill",
         });
@@ -69,6 +71,7 @@ export class VanillaWinConditions {
                 .getPlayers()
                 .filter(sus => sus.isImpostor()),
               winSound: WinSoundType.ImpostorWin,
+              hasWon: player.isImpostor(),
             }])),
           intentName: "impostorKill",
         });
@@ -89,6 +92,7 @@ export class VanillaWinConditions {
               yourTeam: event.getGame().getLobby().getPlayers()
                 .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
               winSound: WinSoundType.CrewmateWin,
+              hasWon: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate,
             }])),
           intentName: "crewmateVote",
         });
@@ -104,6 +108,7 @@ export class VanillaWinConditions {
               yourTeam: event.getGame().getLobby().getPlayers()
                 .filter(sus => !sus.isImpostor()),
               winSound: WinSoundType.ImpostorWin,
+              hasWon: player.isImpostor(),
             }])),
           intentName: "impostorVote",
         });
@@ -125,6 +130,7 @@ export class VanillaWinConditions {
               yourTeam: event.getLobby().getPlayers()
                 .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
               winSound: WinSoundType.CrewmateWin,
+              hasWon: true,
             }])),
           intentName: "impostorDisconnected",
         });
@@ -138,6 +144,7 @@ export class VanillaWinConditions {
               yourTeam: event.getLobby().getPlayers()
                 .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor),
               winSound: WinSoundType.ImpostorWin,
+              hasWon: player.isImpostor(),
             }])),
           intentName: "crewmateDisconnected",
         });
@@ -155,6 +162,7 @@ export class VanillaWinConditions {
               yourTeam: event.getGame().getLobby().getPlayers()
                 .filter(sus => sus.isImpostor()),
               winSound: WinSoundType.ImpostorWin,
+              hasWon: player.isImpostor(),
             }])),
           intentName: "impostorSabotage",
         });
@@ -184,11 +192,6 @@ export class VanillaWinConditions {
         aliveCrewmates.push(data);
       }
     }
-
-    console.log({
-      aliveImpostors,
-      aliveCrewmates,
-    });
 
     return aliveImpostors.length >= aliveCrewmates.length;
   }

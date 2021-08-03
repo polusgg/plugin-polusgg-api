@@ -65,6 +65,14 @@ export class NumberValue {
 
     return this;
   }
+
+  equals(t: NumberValue | BooleanValue | EnumValue): boolean {
+    if (t instanceof NumberValue) {
+      return t.lower === this.lower && t.upper === this.upper && t.step === this.step && t.suffix === this.suffix && t.zeroIsInfinity === this.zeroIsInfinity && t.value === this.value;
+    }
+
+    return false;
+  }
 }
 
 export class BooleanValue {
@@ -83,6 +91,14 @@ export class BooleanValue {
     this.value = v.value;
 
     return this;
+  }
+
+  equals(t: NumberValue | BooleanValue | EnumValue): boolean {
+    if (t instanceof BooleanValue) {
+      return t.value === this.value;
+    }
+
+    return false;
   }
 }
 
@@ -115,6 +131,28 @@ export class EnumValue {
     this.index = idxOld;
 
     return this;
+  }
+
+  equals(t: NumberValue | BooleanValue | EnumValue): boolean {
+    if (t instanceof EnumValue) {
+      if (t.options.length !== this.options.length) {
+        return false;
+      }
+
+      if (t.index !== this.index) {
+        return false;
+      }
+
+      for (let i = 0; i < this.options.length; i++) {
+        if (this.options[i] !== t.options[i]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    return false;
   }
 }
 

@@ -62,14 +62,16 @@ export class EndGameService {
       m.set(endGame.subtitle.toString(), (m.get(endGame.subtitle.toString()) ?? 0) + 1);
     }
 
-    const largest = [...m.entries()].sort((a, b) => a[1] - b[1])[0][0];
+    const _largest = [...m.entries()].sort((a, b) => a[1] - b[1]);
 
-    Events.fire({
-      type: "gameEnded",
-      gameUuid: game.getMeta<string>("pgg.log.uuid"),
-      winnerUuids: game.getLobby().getConnections().filter(c => c.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData")?.hasWon ?? false).map(p => p.getMeta<string>("pgg.log.uuid")),
-      reason: largest,
-    });
+    if (_largest.length > 0) {
+      Events.fire({
+        type: "gameEnded",
+        gameUuid: game.getMeta<string>("pgg.log.uuid"),
+        winnerUuids: game.getLobby().getConnections().filter(c => c.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData")?.hasWon ?? false).map(p => p.getMeta<string>("pgg.log.uuid")),
+        reason: _largest[0][0],
+      });
+    }
 
     game.getLobby().getConnections().forEach(connection => {
       if (connection.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData") === undefined) {

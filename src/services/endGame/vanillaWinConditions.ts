@@ -106,7 +106,7 @@ export class VanillaWinConditions {
               subtitle: "<color=#FF1919FF>Impostors</color> voted out the <color=#8CFFFFFF>Crewmates</color>",
               color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
               yourTeam: event.getGame().getLobby().getPlayers()
-                .filter(sus => !sus.isImpostor()),
+                .filter(sus => sus.isImpostor()),
               winSound: WinSoundType.ImpostorWin,
               hasWon: player.isImpostor(),
             }])),
@@ -167,6 +167,38 @@ export class VanillaWinConditions {
           intentName: "impostorSabotage",
         });
       }
+
+      if (event.getReason() === GameOverReason.CrewmatesBySabotage) {
+        if (event.getGame().getLobby().getPlayers()
+          .filter(p => !p.isDead() && !p.getGameDataEntry().isDisconnected()).length === 0) {
+          endGame.registerEndGameIntent(event.getGame(), {
+            endGameData: new Map(event.getGame().getLobby().getPlayers()
+              .map(player => [player, {
+                title: "<color=#FF1919FF>Defeat</color>",
+                subtitle: "everyone died from the sabotage",
+                color: Palette.disabledGrey() as Mutable<[number, number, number, number]>,
+                yourTeam: [],
+                winSound: WinSoundType.Disconnect,
+                hasWon: false,
+              }])),
+            intentName: "nobodySabotage",
+          });
+        } else {
+          endGame.registerEndGameIntent(event.getGame(), {
+            endGameData: new Map(event.getGame().getLobby().getPlayers()
+              .map(player => [player, {
+                title: player.isImpostor() ? "<color=#FF1919FF>Defeat</color>" : "Victory",
+                subtitle: "<color=#8CFFFFFF>Crewmates</color> won by sabotage",
+                color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
+                yourTeam: event.getGame().getLobby().getPlayers()
+                  .filter(sus => !sus.isImpostor()),
+                winSound: WinSoundType.CrewmateWin,
+                hasWon: !player.isImpostor(),
+              }])),
+            intentName: "crewmateSabotage",
+          });
+        }
+      }
     });
   }
 
@@ -194,5 +226,22 @@ export class VanillaWinConditions {
     }
 
     return aliveImpostors.length >= aliveCrewmates.length;
+  }
+
+  static noImpostorsLeft(lobby: LobbyInstance): boolean {
+    if (lobby.getGameState() !== GameState.Started) {
+      return false;
+    }
+
+    const playerData = lobby.getSafeGameData().getGameData().getPlayers();
+    let i = 0;
+
+    for (const data of playerData.values()) {
+      if (data.isImpostor() && !(data.isDead() || data.isDisconnected() || lobby.findSafePlayerByPlayerId(data.getId()).getMeta<boolean | undefined>("pgg.countAsDead"))) {
+        i++;
+      }
+    }
+
+    return i == 0;
   }
 }

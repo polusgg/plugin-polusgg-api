@@ -110,7 +110,7 @@ export class RoleManagerService {
     const impostorAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData }[] = [];
     const otherAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = [];
 
-    const impostorCount = Math.min(options.getOption("Impostor Count").getValue().value, RoleManagerService.adjustImpostorCount(players.length));
+    const impostorCount = Math.min(options.getOption("<color=#ff1919>Impostor</color> Count").getValue().value, RoleManagerService.adjustImpostorCount(players.length));
 
     for (let i = 0; i < impostorCount; i++) {
       if (i >= impostorAlignedRolesFromAssignment.length) {

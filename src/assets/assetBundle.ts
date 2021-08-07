@@ -2,8 +2,7 @@ import { AssetBundleDeclaration } from "../types/assetBundleDeclaration";
 import { Asset } from "./asset";
 import got from "got";
 
-const prefixUrl = "https://client-assetbundles.polus.gg/";
-const fetchAssetBundleApi = got.extend({ prefixUrl });
+const defaultPrefixUrl = "https://client-assetbundles.polus.gg/";
 
 export class AssetBundle {
   protected static readonly cache: Map<string, AssetBundle> = new Map();
@@ -18,16 +17,16 @@ export class AssetBundle {
     }
   }
 
-  static async load(fileName: string): Promise<AssetBundle> {
-    if (this.cache.has(fileName)) {
-      return this.cache.get(fileName)!;
+  static async load(location: string, prefixUrl: string = defaultPrefixUrl): Promise<AssetBundle> {
+    if (this.cache.has(location)) {
+      return this.cache.get(location)!;
     }
 
-    const { body } = await fetchAssetBundleApi<string>(`${fileName}/${fileName}.json`);
+    const { body } = await got.extend({ prefixUrl })<string>(`${location}.json`);
 
-    const bundle = new AssetBundle(JSON.parse(body) as AssetBundleDeclaration, `${prefixUrl}${fileName}/${fileName}`);
+    const bundle = new AssetBundle(JSON.parse(body) as AssetBundleDeclaration, `${prefixUrl}/${location}`);
 
-    this.cache.set(fileName, bundle);
+    this.cache.set(location, bundle);
 
     return bundle;
   }

@@ -15,7 +15,7 @@ export class ResourceService {
   private readonly loadedBundlesMap: Map<Connection, AssetBundle[]> = new Map();
 
   constructor() {
-    AssetBundle.load("Global").then(bundle => {
+    AssetBundle.load("Global/Global").then(bundle => {
       this.globalAssetBundle = bundle;
 
       server.getLogger("ResourceService").info("Global AssetBundle loaded.");

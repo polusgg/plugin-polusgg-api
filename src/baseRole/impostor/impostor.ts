@@ -37,7 +37,7 @@ export class Impostor extends BaseRole {
   private targetSelector: ((players: PlayerInstance[]) => PlayerInstance) | undefined;
   private readonly range: number;
 
-  constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor, private readonly buttonBundle: string = "Global", private readonly buttonAsset: string = "Assets/Mods/OfficialAssets/KillButton.png") {
+  constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor, private readonly buttonBundle: string = "Global/Global", private readonly buttonAsset: string = "Assets/Mods/OfficialAssets/KillButton.png") {
     super(owner);
 
     this.role = role;

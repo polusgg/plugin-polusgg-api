@@ -7,7 +7,7 @@ export enum HudItem {
   MapDoorButtons,
   // Disables Sabotage button (which is included into Use Button)
   SabotageButton,
-  // Disables Vent button (which is included into vent Button)
+  // Disables Vent button (which is included into Use Button)
   VentButton,
   // Disables whole Use functionality of Use Button
   UseButton,
@@ -17,4 +17,6 @@ export enum HudItem {
   TaskListPopup,
   // Disables report button
   ReportButton,
+  // Disables Call Meeting button (which is included into Use button)
+  CallMeetingButton,
 }

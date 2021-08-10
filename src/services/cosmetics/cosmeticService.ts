@@ -38,8 +38,6 @@ export class CosmeticService {
   }
 
   private async playerJoined(event: PlayerJoinedEvent): Promise<void> {
-    return;
-
     const user = (event.getLobby().getActingHosts()[0] ?? event.getLobby().getCreator()).getMeta<UserResponseStructure>("pgg.auth.self");
 
     const { body: purchaseBody } = await this.fetchCosmetic<string>("purchases", {
@@ -110,6 +108,7 @@ export class CosmeticService {
           break;
         }
         case "PET": {
+          break; // PetsBroken<AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA...> (keeps screaming) (yes eslint hates this line i don't care LOL)
           AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
             resourceService.load(event.getPlayer().getSafeConnection(), bundle).then(() => {
               event.getPlayer().getSafeConnection().writeReliable(new LoadPetPacket(

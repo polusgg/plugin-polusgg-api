@@ -16,4 +16,7 @@ export enum Location {
 
   // e.g. "TOTAL TASKS COMPLETED"
   TaskCompletion,
+
+  // Sets the text on emergency minigame (button popup). Use "__unset" to revert to default. Use "%s" to display player's name in %s location
+  MeetingButtonHudText,
 }

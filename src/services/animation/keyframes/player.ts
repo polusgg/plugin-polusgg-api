@@ -9,6 +9,7 @@ export class PlayerAnimationKeyframe {
   protected hatOpacity: number;
   protected petOpacity: number;
   protected skinOpacity: number;
+  protected nameOpacity: number;
   protected primaryColor: [number, number, number, number] | number[];
   protected secondaryColor: [number, number, number, number] | number[];
   protected tertiaryColor: [number, number, number, number] | number[];
@@ -17,13 +18,14 @@ export class PlayerAnimationKeyframe {
   protected angle: number;
 
   constructor(
-    { offset, duration, opacity, hatOpacity, petOpacity, skinOpacity, primaryColor, secondaryColor, tertiaryColor, scale, position, angle }: {
+    { offset, duration, opacity, hatOpacity, petOpacity, skinOpacity, nameOpacity, primaryColor, secondaryColor, tertiaryColor, scale, position, angle }: {
       offset?: number;
       duration: number;
       opacity?: number;
       hatOpacity?: number;
       petOpacity?: number;
       skinOpacity?: number;
+      nameOpacity?: number;
       primaryColor?: [number, number, number, number] | number[];
       secondaryColor?: [number, number, number, number] | number[];
       tertiaryColor?: [number, number, number, number] | number[];
@@ -39,6 +41,7 @@ export class PlayerAnimationKeyframe {
     this.hatOpacity = hatOpacity ?? opacity;
     this.petOpacity = petOpacity ?? opacity;
     this.skinOpacity = skinOpacity ?? opacity;
+    this.nameOpacity = nameOpacity ?? opacity;
     this.primaryColor = primaryColor ?? [...Palette.white()];
     this.secondaryColor = secondaryColor ?? [...Palette.white()];
     this.tertiaryColor = tertiaryColor ?? [...Palette.playerVisor()];
@@ -55,6 +58,7 @@ export class PlayerAnimationKeyframe {
       hatOpacity: number;
       petOpacity: number;
       skinOpacity: number;
+      nameOpacity: number;
       primaryColor: [number, number, number, number] | number[];
       secondaryColor: [number, number, number, number] | number[];
       tertiaryColor: [number, number, number, number] | number[];
@@ -68,6 +72,7 @@ export class PlayerAnimationKeyframe {
       hatOpacity: 1,
       petOpacity: 1,
       skinOpacity: 1,
+      nameOpacity: 1,
       primaryColor: Palette.white() as Mutable<[number, number, number, number]>,
       secondaryColor: Palette.white() as Mutable<[number, number, number, number]>,
       tertiaryColor: Palette.white() as Mutable<[number, number, number, number]>,
@@ -93,26 +98,30 @@ export class PlayerAnimationKeyframe {
     }
 
     if (enableBits.has(4)) {
-      keyframe.primaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
+      keyframe.nameOpacity = reader.readFloat32();
     }
 
     if (enableBits.has(5)) {
-      keyframe.secondaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
+      keyframe.primaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
     }
 
     if (enableBits.has(6)) {
-      keyframe.tertiaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
+      keyframe.secondaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
     }
 
     if (enableBits.has(7)) {
-      keyframe.scale = reader.readVector2();
+      keyframe.tertiaryColor = [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()];
     }
 
     if (enableBits.has(8)) {
-      keyframe.position = reader.readVector2();
+      keyframe.scale = reader.readVector2();
     }
 
     if (enableBits.has(9)) {
+      keyframe.position = reader.readVector2();
+    }
+
+    if (enableBits.has(10)) {
       keyframe.angle = reader.readFloat32();
     }
 
@@ -140,26 +149,30 @@ export class PlayerAnimationKeyframe {
     }
 
     if (enableBits.has(4)) {
-      writer.writeBytes(this.primaryColor);
+      writer.writeFloat32(this.nameOpacity);
     }
 
     if (enableBits.has(5)) {
-      writer.writeBytes(this.secondaryColor);
+      writer.writeBytes(this.primaryColor);
     }
 
     if (enableBits.has(6)) {
-      writer.writeBytes(this.tertiaryColor);
+      writer.writeBytes(this.secondaryColor);
     }
 
     if (enableBits.has(7)) {
-      writer.writeVector2(this.scale);
+      writer.writeBytes(this.tertiaryColor);
     }
 
     if (enableBits.has(8)) {
-      writer.writeVector2(this.position);
+      writer.writeVector2(this.scale);
     }
 
     if (enableBits.has(9)) {
+      writer.writeVector2(this.position);
+    }
+
+    if (enableBits.has(10)) {
       writer.writeFloat32(this.angle);
     }
   }

@@ -3,6 +3,7 @@ export type PlayerAnimationFields = Partial<{
   hatOpacity: boolean;
   petOpacity: boolean;
   skinOpacity: boolean;
+  nameOpacity: boolean;
   primaryColor: boolean;
   secondaryColor: boolean;
   tertiaryColor: boolean;
@@ -16,6 +17,7 @@ export enum PlayerAnimationField {
   HatOpacity,
   PetOpacity,
   SkinOpacity,
+  NameOpacity,
   PrimaryColor,
   SecondaryColor,
   TertiaryColor,

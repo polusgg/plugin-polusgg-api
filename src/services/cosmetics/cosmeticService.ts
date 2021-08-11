@@ -12,6 +12,7 @@ import { LoadPetPacket } from "../../packets/root/loadPetPacket";
 import { AssetBundle } from "../../assets";
 import { ServiceType } from "../../types/enums";
 import { Services } from "../services";
+import { Item } from "../../types/item";
 
 declare const server: Server;
 
@@ -20,16 +21,46 @@ export class CosmeticService {
   constructor() {
     this.fetchCosmetic = got.extend({ prefixUrl: "http://127.0.0.1:2219/v1/" });
 
-    console.log("yeah this got called");
-
     server.on("player.joined", event => {
       if (event.getPlayer().getConnection() !== undefined) {
         this.playerJoined(event);
       }
     });
+
+    server.on("player.hat.updated", event => {
+      if (event.getNewHat() < 10_000_000) {
+        return;
+      }
+
+      const newHat = event.getPlayer().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewHat());
+
+      if (newHat === undefined) {
+        event.cancel();
+
+        if (event.getPlayer().hasMeta("pgg.cosmetic.items")) {
+          Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a hat you don't own.`);
+        }
+      }
+    });
+
+    server.on("player.pet.updated", event => {
+      if (event.getNewPet() < 10_000_000) {
+        return;
+      }
+
+      const newHat = event.getPlayer().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewPet());
+
+      if (newHat === undefined) {
+        event.cancel();
+
+        if (event.getPlayer().hasMeta("pgg.cosmetic.items")) {
+          Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a pet you don't own.`);
+        }
+      }
+    });
   }
 
-  authToken(user: UserResponseStructure) {
+  authToken(user: UserResponseStructure): string {
     return `${user.client_token}:${user.client_id}`;
   }
 
@@ -40,53 +71,67 @@ export class CosmeticService {
   private async playerJoined(event: PlayerJoinedEvent): Promise<void> {
     const user = (event.getLobby().getActingHosts()[0] ?? event.getLobby().getCreator()).getMeta<UserResponseStructure>("pgg.auth.self");
 
-    const { body: purchaseBody } = await this.fetchCosmetic<string>("purchases", {
+    const { body: itemsResponse } = await this.fetchCosmetic("item", {
       headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        Authorization: this.authToken(user),
+        authorization: this.authToken(user),
       },
     });
 
-    const purchases = JSON.parse(purchaseBody) as { ok: boolean; data: Purchase[]; cause: string };
-    const bundlePromises: Promise<Bundle>[] = [];
+    const items = JSON.parse(itemsResponse).data as Item[];
 
-    for (let i = 0; i < purchases.data.length; i++) {
-      bundlePromises.push((async (): Promise<Bundle> => {
-        const { body: bundleBody } = await this.fetchCosmetic<string>(`bundle/${purchases.data[i].bundleId}`, {
-          method: "GET",
-          headers: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            Authorization: this.authToken(user),
-          },
-        });
+    event.getPlayer().setMeta("pgg.cosmetic.items", items);
 
-        const bundle = JSON.parse(bundleBody) as { ok: boolean; data: Bundle; cause: string };
+    // console.log(`[COSMETIC] ${user.client_id} joined`);
 
-        return bundle.data;
-      })());
-    }
+    // const { body: purchaseBody } = await this.fetchCosmetic<string>("purchases", {
+    //   headers: {
+    //     // eslint-disable-next-line @typescript-eslint/naming-convention
+    //     Authorization: this.authToken(user),
+    //   },
+    // });
 
-    const bundles = await Promise.all(bundlePromises);
-    const itemIds = bundles.flatMap(bundle => bundle.items);
-    const itemPromises: Promise<Item>[] = [];
+    // const purchases = JSON.parse(purchaseBody) as { ok: boolean; data: Purchase[]; cause: string };
+    // const bundlePromises: Promise<Bundle>[] = [];
 
-    for (let i = 0; i < itemIds.length; i++) {
-      itemPromises.push((async (): Promise<Item> => {
-        const { body: itemBody } = await this.fetchCosmetic<string>(`item/${itemIds[i]}`, {
-          method: "GET",
-          headers: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            Authorization: this.authToken(user),
-          },
-        });
+    // console.log(`[COSMETIC] HAS Purchases`, purchases);
 
-        const item = JSON.parse(itemBody) as { ok: boolean; data: Item; cause: string };
+    // for (let i = 0; i < purchases.data.length; i++) {
+    //   bundlePromises.push((async (): Promise<Bundle> => {
+    //     const { body: bundleBody } = await this.fetchCosmetic<string>(`bundle/${purchases.data[i].bundleId}`, {
+    //       method: "GET",
+    //       headers: {
+    //         // eslint-disable-next-line @typescript-eslint/naming-convention
+    //         Authorization: this.authToken(user),
+    //       },
+    //     });
 
-        return item.data;
-      })());
-    }
+    //     const bundle = JSON.parse(bundleBody) as { ok: boolean; data: Bundle; cause: string };
 
-    const items = await Promise.all(itemPromises);
+    //     return bundle.data;
+    //   })());
+    // }
+
+    // const bundles = await Promise.all(bundlePromises);
+    // const itemIds = bundles.flatMap(bundle => bundle.items);
+    // const itemPromises: Promise<Item>[] = [];
+
+    // for (let i = 0; i < itemIds.length; i++) {
+    //   itemPromises.push((async (): Promise<Item> => {
+    //     const { body: itemBody } = await this.fetchCosmetic<string>(`item/${itemIds[i]}`, {
+    //       method: "GET",
+    //       headers: {
+    //         // eslint-disable-next-line @typescript-eslint/naming-convention
+    //         Authorization: this.authToken(user),
+    //       },
+    //     });
+
+    //     const item = JSON.parse(itemBody) as { ok: boolean; data: Item; cause: string };
+
+    //     return item.data;
+    //   })());
+    // }
+
+    // const items = await Promise.all(itemPromises);
     const resourceService = Services.get(ServiceType.Resource);
 
     for (let i = 0; i < items.length; i++) {
@@ -108,7 +153,7 @@ export class CosmeticService {
           break;
         }
         case "PET": {
-          break; // PetsBroken<AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA...> (keeps screaming) (yes eslint hates this line i don't care LOL)
+          // break;
           AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
             resourceService.load(event.getPlayer().getSafeConnection(), bundle).then(() => {
               event.getPlayer().getSafeConnection().writeReliable(new LoadPetPacket(

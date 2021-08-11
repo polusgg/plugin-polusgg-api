@@ -13,6 +13,7 @@ import { VanillaWinConditions } from "./src/services/endGame/vanillaWinCondition
 import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Events } from "@polusgg/plugin-logger/events";
+import { GameOptionPriority } from "./src/services/gameOptions/gameOptionsSet";
 
 declare global {
   interface Object {
@@ -100,6 +101,7 @@ export default class PolusGGApi extends BasePlugin {
 
       Events.fire({
         type: "gameSettings",
+        gameUuid: event.getGame().getMeta<string>("pgg.log.uuid"),
         settings,
       });
 
@@ -130,7 +132,7 @@ export default class PolusGGApi extends BasePlugin {
       const option = await options.createOption("", "Gamemode", new EnumValue(
         0,
         this.mods.map(mod => mod.getMetadata().name),
-      ));
+      ), GameOptionPriority.Highest);
 
       await this.mods[option.getValue().index].onEnable(event.getLobby());
 

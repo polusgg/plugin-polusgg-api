@@ -1,6 +1,6 @@
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Palette } from "@nodepolus/framework/src/static";
-import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
+import { Vector2 } from "@nodepolus/framework/src/types";
 import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { AssetBundle } from "../../assets";
 import { BaseManager } from "../../baseManager/baseManager";
@@ -31,6 +31,7 @@ export class Impostor extends BaseRole {
   };
 
   private readonly role: PlayerRole;
+  private outlineColor: [number, number, number] = Palette.impostorRed().slice(0, 3) as any;
   private button: Button | undefined;
   // todo add emittery instance as property instead of using stored callbacks
   private onClicked: ((target: PlayerInstance) => void) | undefined;
@@ -184,7 +185,7 @@ export class Impostor extends BaseRole {
 
         for (let i = 0; i < players.length; i++) {
           if (players[i] === target) {
-            animService.setOutline(players[i], Palette.impostorRed() as Mutable<[number, number, number, number]>, [this.owner.getSafeConnection()]);
+            animService.setOutline(players[i], [...this.outlineColor, 0xff], [this.owner.getSafeConnection()]);
           } else {
             animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
           }
@@ -220,6 +221,10 @@ export class Impostor extends BaseRole {
   getDescriptionText(): string {
     return `<color=#ff1919>Role: Impostor\nSabotage and kill the crewmates.</color>
 Fake Tasks:`;
+  }
+
+  setOutlineColor(c: [number, number, number]): void {
+    this.outlineColor = c;
   }
 
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {

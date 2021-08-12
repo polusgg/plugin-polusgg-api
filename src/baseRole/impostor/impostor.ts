@@ -72,7 +72,7 @@ export class Impostor extends BaseRole {
         maxTimer: this.owner.getLobby()
           .getOptions()
           .getKillCooldown(),
-        position: new Vector2(2.1, 0.7),
+        position: new Vector2(-2.1, -0.7),
         alignment: EdgeAlignments.RightBottom,
         currentTime: 15,
       });

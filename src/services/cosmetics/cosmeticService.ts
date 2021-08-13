@@ -6,7 +6,7 @@ import { UserResponseStructure } from "@polusgg/module-polusgg-auth-api/src/type
 import { PlayerJoinedEvent } from "@nodepolus/framework/src/api/events/player";
 import { Purchase } from "../../types/purchase";
 import { Bundle } from "../../types/bundle";
-import { Item } from "../../../../server-cosmetics/src/database/types";
+import { Item } from "@polusgg/module-cosmetics/src/types";
 import { LoadHatPacket } from "../../packets/root/loadHatPacket";
 import { LoadPetPacket } from "../../packets/root/loadPetPacket";
 import { AssetBundle } from "../../assets";

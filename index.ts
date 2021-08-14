@@ -148,6 +148,10 @@ export default class PolusGGApi extends BasePlugin {
 
     this.server.on("player.joined", event => {
       event.getPlayer().setMeta("pgg.api.targetable", true);
+
+      setTimeout(() => {
+        Services.get(ServiceType.Hud).updateQrCode(event.getPlayer().getSafeConnection(), { enabled: true, contents: Buffer.from(`${event.getLobby().getMeta<string>("pgg.log.uuid").split("-").join("")}${event.getPlayer().getSafeConnection().getMeta<string>("pgg.log.uuid").split("-").join("")}`, "hex").toString("base64") })
+      }, 100)
     });
 
     VanillaWinConditions.setup(this.server);

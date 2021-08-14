@@ -12,6 +12,7 @@ import { CloseHudPacket } from "../../packets/rpc/playerControl";
 import { Location } from "../../types/enums";
 import { HudItem } from "../../types/enums/hudItem";
 import { ModstampSetStringPacket } from "../../packets/root/modstampSetStringPacket";
+import { DisableQR, SetQRContents } from "../../packets/root/setQRContents";
 
 declare const server: Server;
 
@@ -43,5 +44,15 @@ export class HudService {
 
   async closeHud(player: PlayerInstance): Promise<void> {
     await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new CloseHudPacket());
+  }
+
+  async updateQrCode(c: Connection, t: { enabled: false }): Promise<void>
+  async updateQrCode(c: Connection, t: { enabled: true, contents: string }): Promise<void>
+  async updateQrCode(c: Connection, t: { enabled: false } | { enabled: true, contents: string }): Promise<void> {
+    if (t.enabled) {
+      c.writeReliable(new SetQRContents(t.contents));
+    } else {
+      c.writeReliable(new DisableQR());
+    }
   }
 }

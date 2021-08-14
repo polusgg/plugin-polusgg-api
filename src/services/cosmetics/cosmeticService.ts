@@ -16,7 +16,7 @@ declare const server: Server;
 export class CosmeticService {
   private readonly fetchCosmetic: Got;
   constructor() {
-    this.fetchCosmetic = got.extend({ prefixUrl: "http://127.0.0.1:2219/v1/" });
+    this.fetchCosmetic = got.extend({ prefixUrl: "http://cosmetics.service.polus.gg:2219/v1/" });
 
     server.on("player.joined", event => {
       if (event.getPlayer().getConnection() !== undefined) {

@@ -2,6 +2,7 @@ import { Vector2 } from "@nodepolus/framework/src/types";
 import { Asset } from "../assets";
 import { EdgeAlignments } from "./enums/edgeAlignment";
 import { Attachable } from "./attachable";
+import { KeyCode } from "./enums/keyCode";
 
 export type ButtonFields = {
   asset: Asset;
@@ -14,4 +15,5 @@ export type ButtonFields = {
   alignment: EdgeAlignments;
   z?: number;
   attachedTo?: Attachable;
+  keys?: KeyCode[];
 };

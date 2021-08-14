@@ -150,7 +150,6 @@ export class CosmeticService {
           break;
         }
         case "PET": {
-          // break;
           AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
             resourceService.load(event.getPlayer().getSafeConnection(), bundle).then(() => {
               event.getPlayer().getSafeConnection().writeReliable(new LoadPetPacket(

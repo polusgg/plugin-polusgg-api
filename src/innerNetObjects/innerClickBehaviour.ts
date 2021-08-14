@@ -7,6 +7,7 @@ import { RpcPacketType } from "@nodepolus/framework/src/types/enums";
 import { Services } from "../services";
 import { ServiceType } from "../types/enums";
 import { ClickPacket } from "../packets/rpc/clickBehaviour";
+import { KeyCode } from "../types/enums/keyCode";
 
 export class InnerClickBehaviour extends BaseInnerNetObject {
   private lastCurrentTimeSet: number;
@@ -18,6 +19,7 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     public saturated: boolean = true,
     public color: [number, number, number, number] = [255, 255, 255, 255],
     public countingDown: boolean = true,
+    public keys: KeyCode[] = [],
     netId: number = parent.getLobby().getHostInstance().getNextNetId(),
   ) {
     super(0x83, parent, netId);
@@ -91,13 +93,18 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
   }
 
   serializeData(): DataPacket {
-    return new DataPacket(this.netId, new MessageWriter()
+    const writer = new MessageWriter()
       .writeFloat32(this.maxTimer)
       .writeFloat32(this.getCurrentTime())
       .writeBoolean(this.countingDown)
       .writeBoolean(this.saturated)
-      .writeBytes(this.color),
-    );
+      .writeBytes(this.color);
+
+    for (let i = 0; i < this.keys.length; i++) {
+      writer.writeUInt16(this.keys[i]);
+    }
+
+    return new DataPacket(this.netId, writer);
   }
 
   setData(message: MessageReader | MessageWriter): void {
@@ -108,20 +115,30 @@ export class InnerClickBehaviour extends BaseInnerNetObject {
     this.countingDown = reader.readBoolean();
     this.saturated = reader.readBoolean();
     this.color = [...reader.readBytes(4).getBuffer()] as [number, number, number, number];
+    this.keys = [];
+
+    while (reader.hasBytesLeft()) {
+      this.keys.push(reader.readUInt16());
+    }
   }
 
   serializeSpawn(): SpawnPacketObject {
-    return new SpawnPacketObject(this.netId, new MessageWriter()
+    const writer = new MessageWriter()
       .writeFloat32(this.maxTimer)
       .writeFloat32(this.getCurrentTime())
       .writeBoolean(this.countingDown)
       .writeBoolean(this.saturated)
-      .writeBytes(this.color),
-    );
+      .writeBytes(this.color);
+
+    for (let i = 0; i < this.keys.length; i++) {
+      writer.writeUInt16(this.keys[i]);
+    }
+
+    return new SpawnPacketObject(this.netId, writer);
   }
 
   clone(): InnerClickBehaviour {
-    return new InnerClickBehaviour(this.parent, this.maxTimer, this.currentTime, this.saturated, this.color, this.countingDown, this.netId);
+    return new InnerClickBehaviour(this.parent, this.maxTimer, this.currentTime, this.saturated, this.color, this.countingDown, this.keys, this.netId);
   }
 
   getParent(): BaseInnerNetEntity {

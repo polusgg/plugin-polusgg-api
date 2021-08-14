@@ -32,7 +32,7 @@ export class ButtonManagerService {
     RpcPacket.registerPacket(0x86, ClickPacket.deserialize, this.handleClickButton.bind(this));
   }
 
-  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment, z, attachedTo }: ButtonFields, sendTo: Connection[] = [connection]): Promise<Button> {
+  async spawnButton(connection: Connection, { asset, position, maxTimer, currentTime, saturated, color, isCountingDown, alignment, z, attachedTo, keys }: ButtonFields, sendTo: Connection[] = [connection]): Promise<Button> {
     const lobby = connection.getLobby();
 
     if (lobby === undefined) {
@@ -43,7 +43,7 @@ export class ButtonManagerService {
 
     const parent = attachedTo === undefined ? undefined : InnerCustomNetworkTransformGeneric.findOwner(attachedTo);
 
-    const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, saturated, color, isCountingDown, z, parent);
+    const button = new EntityButton(connection, asset.getId(), maxTimer, position, alignment, currentTime, saturated, color, isCountingDown, z, parent, keys);
 
     await lobby.spawn(button, sendTo);
 

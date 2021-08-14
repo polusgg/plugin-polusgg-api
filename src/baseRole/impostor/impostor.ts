@@ -11,6 +11,7 @@ import { ServiceType } from "../../types/enums";
 import { EdgeAlignments } from "../../types/enums/edgeAlignment";
 import { BaseRole, RoleAlignment } from "../baseRole";
 import { AllowTaskInteractionPacket } from "../../packets/root/allowTaskInteractionPacket";
+import { KeyCode } from "../../types/enums/keyCode";
 
 export class ImpostorManager extends BaseManager {
   getId(): string {
@@ -31,7 +32,7 @@ export class Impostor extends BaseRole {
   };
 
   private readonly role: PlayerRole;
-  private outlineColor: [number, number, number] = Palette.impostorRed().slice(0, 3) as any;
+  private outlineColor: [number, number, number] = Palette.impostorRed().slice(0, 3) as never;
   private button: Button | undefined;
   // todo add emittery instance as property instead of using stored callbacks
   private onClicked: ((target: PlayerInstance) => void) | undefined;
@@ -75,6 +76,9 @@ export class Impostor extends BaseRole {
         position: new Vector2(-2.1, -0.7),
         alignment: EdgeAlignments.RightBottom,
         currentTime: 15,
+        keys: [
+          KeyCode.Q,
+        ],
       });
 
     this.catch("meeting.ended", event => event.getGame())

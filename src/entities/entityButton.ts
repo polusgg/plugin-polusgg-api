@@ -7,6 +7,7 @@ import { EdgeAlignments } from "../types/enums/edgeAlignment";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Attachable } from "../types/attachable";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
+import { KeyCode } from "../types/enums/keyCode";
 
 export class EntityButton extends BaseInnerNetEntity {
   constructor(
@@ -21,6 +22,7 @@ export class EntityButton extends BaseInnerNetEntity {
     isCountingDown: boolean = true,
     z: number = -9,
     attachedTo: number = -1,
+    keys: KeyCode[] = [],
     customNetworkTransformNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     graphicNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
     clickBehaviourNetId: number = owner.getLobby()!.getHostInstance().getNextNetId(),
@@ -30,7 +32,7 @@ export class EntityButton extends BaseInnerNetEntity {
     this.innerNetObjects = [
       new InnerCustomNetworkTransformGeneric(this, alignment, position, z, attachedTo, customNetworkTransformNetId),
       new InnerGraphic(this, resourceId, graphicNetId),
-      new InnerClickBehaviour(this, maxTimer, currentTime, saturated, color, isCountingDown, clickBehaviourNetId),
+      new InnerClickBehaviour(this, maxTimer, currentTime, saturated, color, isCountingDown, keys, clickBehaviourNetId),
     ];
   }
 

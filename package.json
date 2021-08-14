@@ -32,7 +32,6 @@
     "@polusgg/module-cosmetics": "latest",
     "@polusgg/plugin-logger": "latest",
     "emittery": "^0.8.1",
-    "got": "^11.8.2",
-    "server-cosmetics": "file:../server-cosmetics"
+    "got": "^11.8.2"
   }
 }

@@ -62,17 +62,16 @@ export default class PolusGGApi extends BasePlugin {
     });
 
     RootPacket.registerPacket(0x89, SetGameOption.deserialize, (connection, packet) => {
-      // TODO: Do validation on EnumValue
-      // const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby())
-      // const option = gameOptions.getOption(packet.name);
-      // const value = option.getValue();
+      const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby())
+      const option = gameOptions.getOption(packet.name);
 
-      // if (value instanceof EnumValue) {
-      //   value.value = (packet.value as EnumValue).index;
-      // }
+      if (!option.getValue().validate(packet.value)) {
+        // TODO: Cry
+        return;
+      }
 
       if (connection.isActingHost()) {
-        Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby()).setOption(packet.name, packet.value, connection.getLobby()!.getConnections().filter(c => c != connection));
+        gameOptions.setOption(packet.name, packet.value, connection.getLobby()!.getConnections().filter(c => c != connection));
       }
     });
 

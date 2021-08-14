@@ -73,6 +73,47 @@ export class NumberValue {
 
     return false;
   }
+
+  validate(t: NumberValue | BooleanValue | EnumValue): boolean {
+    if (!(t instanceof NumberValue)) {
+      return false;
+    }
+
+    if (t.lower !== this.lower) {
+      return false;
+    }
+
+    if (t.upper !== this.upper) {
+      return false;
+    }
+
+    if (t.suffix !== this.suffix) {
+      return false;
+    }
+
+    if (t.step !== this.step) {
+      return false;
+    }
+
+    if (t.zeroIsInfinity !== this.zeroIsInfinity) {
+      return false;
+    }
+
+    if (t.value > this.upper) {
+      return false;
+    }
+
+    if (t.value < this.lower) {
+      return false;
+    }
+
+    if (!Number.isInteger(Math.round((t.value / t.step) * 100000) / 100000)) {
+      console.log("Due to not being in-step");
+      return false;
+    }
+
+    return true;
+  }
 }
 
 export class BooleanValue {
@@ -99,6 +140,14 @@ export class BooleanValue {
     }
 
     return false;
+  }
+
+  validate(t: NumberValue | BooleanValue | EnumValue): boolean {
+    if (!(t instanceof BooleanValue)) {
+      return false;
+    }
+
+    return true;
   }
 }
 
@@ -153,6 +202,28 @@ export class EnumValue {
     }
 
     return false;
+  }
+
+  validate(t: NumberValue | BooleanValue | EnumValue): boolean {
+    if (!(t instanceof EnumValue)) {
+      return false;
+    }
+
+    if (t.options.length !== this.options.length) {
+      return false;
+    }
+
+    if (t.index < 0 || t.index >= this.options.length) {
+      return false;
+    }
+
+    for (let i = 0; i < this.options.length; i++) {
+      if (this.options[i] !== t.options[i]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 

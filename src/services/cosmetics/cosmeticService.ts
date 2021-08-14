@@ -4,15 +4,12 @@ import { SetPlayerBodyPacket } from "../../packets/rpc/playerControl/setPlayerBo
 import got, { Got } from "got";
 import { UserResponseStructure } from "@polusgg/module-polusgg-auth-api/src/types/userResponseStructure";
 import { PlayerJoinedEvent } from "@nodepolus/framework/src/api/events/player";
-import { Purchase } from "../../types/purchase";
-import { Bundle } from "../../types/bundle";
 import { Item } from "@polusgg/module-cosmetics/src/types";
 import { LoadHatPacket } from "../../packets/root/loadHatPacket";
 import { LoadPetPacket } from "../../packets/root/loadPetPacket";
 import { AssetBundle } from "../../assets";
 import { ServiceType } from "../../types/enums";
 import { Services } from "../services";
-import { Item } from "../../types/item";
 
 declare const server: Server;
 

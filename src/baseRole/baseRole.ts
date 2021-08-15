@@ -95,4 +95,9 @@ export class BaseRole {
   }
 
   getManagerType(): typeof BaseManager { throw new Error("needs to be overwritten") }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isPartner(role: BaseRole): boolean {
+    return false;
+  }
 }

@@ -26,7 +26,7 @@ export class Coroutine<BoundTo extends Bindable> {
     return this;
   }
 
-  begin(interval: number = 20): this {
+  begin(interval: number = 50): this {
     if (this.boundTo === undefined) {
       throw new Error("Attempted to begin coroutine without binding it first");
     }

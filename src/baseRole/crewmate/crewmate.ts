@@ -6,6 +6,7 @@ import { BaseRole, RoleAlignment } from "../baseRole";
 import { Services } from "../../services";
 import { ServiceType } from "../../types/enums";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { EmojiService } from "../../services/emojiService/emojiService";
 
 export class CrewmateManager extends BaseManager {
   getId(): string {
@@ -25,6 +26,8 @@ export class Crewmate extends BaseRole {
 
   constructor(owner: PlayerInstance) {
     super(owner);
+
+    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${EmojiService.static("crewmate")} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
 
     Services.get(ServiceType.RoleManager)
       .setBaseRole(this.owner, PlayerRole.Crewmate);

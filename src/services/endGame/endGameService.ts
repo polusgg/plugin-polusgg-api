@@ -68,7 +68,8 @@ export class EndGameService {
       Events.fire({
         type: "gameEnded",
         gameUuid: game.getMeta<string>("pgg.log.uuid"),
-        winnerUuids: game.getLobby().getConnections().filter(c => c.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData")?.hasWon ?? false).map(p => p.getMeta<string>("pgg.log.uuid")),
+        winnerUuids: game.getLobby().getConnections().filter(c => c.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData")?.hasWon ?? false)
+          .map(p => p.getMeta<string>("pgg.log.uuid")),
         reason: _largest[0][0],
       });
     }

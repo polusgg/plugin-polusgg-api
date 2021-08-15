@@ -14,6 +14,14 @@ const staticEmojiNames = <const>[
   "sheriff",
   "impervious",
   "locksmith",
+  "swooper",
+  "partner",
+  "skeld",
+  "mira",
+  "polus",
+  "submerged",
+  "morphling",
+  "airship",
 ];
 
 type StaticEmojiName = (typeof staticEmojiNames)[number];

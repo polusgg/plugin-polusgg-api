@@ -8,12 +8,13 @@ import { FetchResourceResponsePacket, ResizePacket } from "./src/packets/root";
 import { ServiceType } from "./src/types/enums";
 import { BaseMod } from "./src/baseMod/baseMod";
 import { Services } from "./src/services";
-import { EnumValue, SetGameOption } from "./src/packets/root/setGameOption";
+import { BooleanValue, EnumValue, NumberValue, SetGameOption } from "./src/packets/root/setGameOption";
 import { VanillaWinConditions } from "./src/services/endGame/vanillaWinConditions";
 import { BaseRole, RoleAlignment } from "./src/baseRole/baseRole";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Events } from "@polusgg/plugin-logger/events";
 import { GameOptionPriority } from "./src/services/gameOptions/gameOptionsSet";
+import { GameOption } from "./src/services/gameOptions/gameOption";
 
 declare global {
   interface Object {
@@ -62,8 +63,13 @@ export default class PolusGGApi extends BasePlugin {
     });
 
     RootPacket.registerPacket(0x89, SetGameOption.deserialize, (connection, packet) => {
-      const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby())
-      const option = gameOptions.getOption(packet.name);
+      const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions(connection.getSafeLobby());
+      const option = gameOptions.getOption(packet.name) as GameOption<NumberValue | BooleanValue | EnumValue> | undefined;
+
+      if (option === undefined) {
+        // TODO: Cry
+        return;
+      }
 
       if (!option.getValue().validate(packet.value)) {
         // TODO: Cry
@@ -150,8 +156,26 @@ export default class PolusGGApi extends BasePlugin {
       event.getPlayer().setMeta("pgg.api.targetable", true);
 
       setTimeout(() => {
-        Services.get(ServiceType.Hud).updateQrCode(event.getPlayer().getSafeConnection(), { enabled: true, contents: Buffer.from(`${event.getLobby().getMeta<string>("pgg.log.uuid").split("-").join("")}${event.getPlayer().getSafeConnection().getMeta<string>("pgg.log.uuid").split("-").join("")}`, "hex").toString("base64") })
-      }, 100)
+        Services.get(ServiceType.Hud).updateQrCodeState(event.getPlayer().getSafeConnection());
+      }, 100);
+    });
+
+    this.server.on("game.started", event => {
+      setTimeout(() => {
+        event.getGame().getLobby().getRealPlayers()
+          .forEach(player => {
+            Services.get(ServiceType.Hud).updateQrCodeState(player.getSafeConnection());
+          });
+      }, 100);
+    });
+
+    this.server.on("game.ended", event => {
+      setTimeout(() => {
+        event.getGame().getLobby().getRealPlayers()
+          .forEach(player => {
+            Services.get(ServiceType.Hud).updateQrCodeState(player.getSafeConnection());
+          });
+      }, 100);
     });
 
     VanillaWinConditions.setup(this.server);

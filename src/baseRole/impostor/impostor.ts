@@ -12,6 +12,7 @@ import { EdgeAlignments } from "../../types/enums/edgeAlignment";
 import { BaseRole, RoleAlignment } from "../baseRole";
 import { AllowTaskInteractionPacket } from "../../packets/root/allowTaskInteractionPacket";
 import { KeyCode } from "../../types/enums/keyCode";
+import { EmojiService } from "../../services/emojiService/emojiService";
 
 export class ImpostorManager extends BaseManager {
   getId(): string {
@@ -41,6 +42,8 @@ export class Impostor extends BaseRole {
 
   constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor, private readonly buttonBundle: string = "Global/Global", private readonly buttonAsset: string = "Assets/Mods/OfficialAssets/KillButton.png") {
     super(owner);
+
+    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${EmojiService.static("impostor")} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
 
     this.role = role;
     this.onClicked = undefined;
@@ -241,5 +244,9 @@ Fake Tasks:`;
 
   getManagerType(): typeof ImpostorManager {
     return ImpostorManager;
+  }
+
+  isPartner(role: BaseRole): boolean {
+    return this.getAlignment() === RoleAlignment.Impostor && role.getAlignment() === RoleAlignment.Impostor;
   }
 }

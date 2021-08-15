@@ -17,6 +17,7 @@ import { WinSound } from "../../types/enums/winSound";
 import { LobbyDefaultOptions } from "../gameOptions/gameOptionsService";
 import { Services } from "../services";
 import { RoleDestroyedReason } from "../../types/enums/roleDestroyedReason";
+import { EmojiService } from "../emojiService/emojiService";
 
 export type EndGameScreenData = {
   title: string | TextComponent;
@@ -153,6 +154,18 @@ export class RoleManagerService {
 
       game.getLobby().setMeta(`pgg.manager.${manager.getId()}`, manager);
     }
+
+    game.getLobby().getPlayers().forEach(player => {
+      game.getLobby().getPlayers().forEach(target => {
+        if (player.getMeta<BaseRole>("pgg.api.role").isPartner(target.getMeta<BaseRole>("pgg.api.role"))) {
+          Services.get(ServiceType.Name).setFor(
+            player.getSafeConnection(),
+            target,
+            target.getName() + EmojiService.static("partner"),
+          );
+        }
+      });
+    });
   }
 
   sendRoleScreen(player: PlayerInstance, instance: BaseRole, startGameScreen?: StartGameScreenData): void {

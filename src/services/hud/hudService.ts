@@ -13,6 +13,7 @@ import { Location } from "../../types/enums";
 import { HudItem } from "../../types/enums/hudItem";
 import { ModstampSetStringPacket } from "../../packets/root/modstampSetStringPacket";
 import { DisableQR, SetQRContents } from "../../packets/root/setQRContents";
+import { MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
 
 declare const server: Server;
 
@@ -46,13 +47,31 @@ export class HudService {
     await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new CloseHudPacket());
   }
 
-  async updateQrCode(c: Connection, t: { enabled: false }): Promise<void>
-  async updateQrCode(c: Connection, t: { enabled: true, contents: string }): Promise<void>
-  async updateQrCode(c: Connection, t: { enabled: false } | { enabled: true, contents: string }): Promise<void> {
+  async updateQrCode(c: Connection, t: { enabled: false } | { enabled: true; contents: string }): Promise<void> {
     if (t.enabled) {
       await c.writeReliable(new SetQRContents(t.contents));
     } else {
       await c.writeReliable(new DisableQR());
     }
+  }
+
+  async updateQrCodeState(c: Connection): Promise<void> {
+    const writer = new MessageWriter();
+
+    writer.writeBytes(Buffer.from(c.getSafeLobby().getMeta<string>("pgg.log.uuid").split("-")
+      .join(""), "hex"));
+
+    writer.writeBytes(Buffer.from(c.getMeta<string>("pgg.log.uuid").split("-")
+      .join(""), "hex"));
+
+    if (c.getSafeLobby().getGame()?.hasMeta("pgg.log.uuid")) {
+      writer.writeBytes(Buffer.from(c.getSafeLobby().getGame()!.getMeta<string>("pgg.log.uuid").split("-").join(""), "hex"));
+    }
+
+    await this.updateQrCode(c, {
+      enabled: true,
+      contents: writer.getBuffer().toString("base64").split("=")
+        .join(""),
+    });
   }
 }

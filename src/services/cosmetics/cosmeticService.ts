@@ -10,6 +10,7 @@ import { LoadPetPacket } from "../../packets/root/loadPetPacket";
 import { AssetBundle } from "../../assets";
 import { ServiceType } from "../../types/enums";
 import { Services } from "../services";
+import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 
 declare const server: Server;
 
@@ -19,7 +20,7 @@ export class CosmeticService {
     this.fetchCosmetic = got.extend({ prefixUrl: "http://cosmetics.service.polus.gg:2219/v1/" });
 
     server.on("player.joined", event => {
-      if (event.getPlayer().getConnection() !== undefined) {
+      if (event.getPlayer().getConnection() !== undefined && !event.isRejoining()) {
         this.playerJoined(event);
       }
     });
@@ -29,12 +30,12 @@ export class CosmeticService {
         return;
       }
 
-      const newHat = event.getPlayer().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewHat());
+      const newHat = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewHat());
 
       if (newHat === undefined) {
         event.cancel();
 
-        if (event.getPlayer().hasMeta("pgg.cosmetic.items")) {
+        if (event.getPlayer().getLobby().hasMeta("pgg.cosmetic.items")) {
           Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a hat you don't own.`);
         }
       }
@@ -45,14 +46,54 @@ export class CosmeticService {
         return;
       }
 
-      const newHat = event.getPlayer().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewPet());
+      const newHat = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewPet());
 
       if (newHat === undefined) {
         event.cancel();
 
-        if (event.getPlayer().hasMeta("pgg.cosmetic.items")) {
+        if (event.getPlayer().getLobby().hasMeta("pgg.cosmetic.items")) {
           Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a pet you don't own.`);
         }
+      }
+    });
+  }
+
+  async loadItem(item: Item, lobby: LobbyInstance) {
+    const resourceService = Services.get(ServiceType.Resource);
+    let LoadPacket: typeof LoadHatPacket | typeof LoadPetPacket;
+
+    switch (item.type) {
+      case "HAT": {
+        LoadPacket = LoadHatPacket;
+        break;
+      }
+      case "PET": {
+        LoadPacket = LoadPetPacket;
+        break;
+      }
+      default:
+        throw new Error("I don't care");
+    }
+
+    AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
+      const connections = lobby.getConnections();
+      for (let i = 0; i < connections.length; i++) {
+        const conn = connections[i];
+
+        resourceService.load(conn, bundle).then(async () => {
+          const ownedItems = conn.getMeta<Item[]>("pgg.cosmetics.ownedItems");
+          console.log(`sending ${item.name} ${item.amongUsId} to ${conn.getName()}:${conn.getId()}`)
+          await conn.writeReliable(new LoadPacket(
+            item.amongUsId,
+            item.resource.id,
+            ownedItems.some((val) => val.amongUsId),
+          ));
+
+          const player = conn.getPlayer();
+          if (player !== undefined && player.getHat() === item.amongUsId) {
+            await player.setHat(item.amongUsId);
+          }
+        });
       }
     });
   }
@@ -66,7 +107,8 @@ export class CosmeticService {
   }
 
   private async playerJoined(event: PlayerJoinedEvent): Promise<void> {
-    const user = (event.getLobby().getActingHosts()[0] ?? event.getLobby().getCreator()).getMeta<UserResponseStructure>("pgg.auth.self");
+    const lobby = event.getLobby();
+    const user = (lobby.getActingHosts()[0] ?? lobby.getCreator()).getMeta<UserResponseStructure>("pgg.auth.self");
 
     const { body: itemsResponse } = await this.fetchCosmetic("item", {
       headers: {
@@ -74,96 +116,25 @@ export class CosmeticService {
       },
     });
 
-    const items = JSON.parse(itemsResponse).data as Item[];
+    let items = JSON.parse(itemsResponse).data as Item[];
 
-    event.getPlayer().setMeta("pgg.cosmetic.items", items);
-
-    // console.log(`[COSMETIC] ${user.client_id} joined`);
-
-    // const { body: purchaseBody } = await this.fetchCosmetic<string>("purchases", {
-    //   headers: {
-    //     // eslint-disable-next-line @typescript-eslint/naming-convention
-    //     Authorization: this.authToken(user),
-    //   },
-    // });
-
-    // const purchases = JSON.parse(purchaseBody) as { ok: boolean; data: Purchase[]; cause: string };
-    // const bundlePromises: Promise<Bundle>[] = [];
-
-    // console.log(`[COSMETIC] HAS Purchases`, purchases);
-
-    // for (let i = 0; i < purchases.data.length; i++) {
-    //   bundlePromises.push((async (): Promise<Bundle> => {
-    //     const { body: bundleBody } = await this.fetchCosmetic<string>(`bundle/${purchases.data[i].bundleId}`, {
-    //       method: "GET",
-    //       headers: {
-    //         // eslint-disable-next-line @typescript-eslint/naming-convention
-    //         Authorization: this.authToken(user),
-    //       },
-    //     });
-
-    //     const bundle = JSON.parse(bundleBody) as { ok: boolean; data: Bundle; cause: string };
-
-    //     return bundle.data;
-    //   })());
-    // }
-
-    // const bundles = await Promise.all(bundlePromises);
-    // const itemIds = bundles.flatMap(bundle => bundle.items);
-    // const itemPromises: Promise<Item>[] = [];
-
-    // for (let i = 0; i < itemIds.length; i++) {
-    //   itemPromises.push((async (): Promise<Item> => {
-    //     const { body: itemBody } = await this.fetchCosmetic<string>(`item/${itemIds[i]}`, {
-    //       method: "GET",
-    //       headers: {
-    //         // eslint-disable-next-line @typescript-eslint/naming-convention
-    //         Authorization: this.authToken(user),
-    //       },
-    //     });
-
-    //     const item = JSON.parse(itemBody) as { ok: boolean; data: Item; cause: string };
-
-    //     return item.data;
-    //   })());
-    // }
-
-    // const items = await Promise.all(itemPromises);
-    const resourceService = Services.get(ServiceType.Resource);
+    items = items.concat(event.getLobby().getMeta("pgg.cosmetic.items") ?? []);
+    const final: Item[] = [];
 
     for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-
-      console.log(`loading ${item.resource.url}/${item.resource.path}`);
-
-      switch (item.type) {
-        case "HAT": {
-          AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
-            resourceService.load(event.getPlayer().getSafeConnection(), bundle).then(() => {
-              event.getPlayer().getSafeConnection().writeReliable(new LoadHatPacket(
-                item.amongUsId,
-                item.resource.id,
-                true,
-              ));
-            });
-          });
-          break;
-        }
-        case "PET": {
-          AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
-            resourceService.load(event.getPlayer().getSafeConnection(), bundle).then(() => {
-              event.getPlayer().getSafeConnection().writeReliable(new LoadPetPacket(
-                item.amongUsId,
-                item.resource.id,
-                true,
-              ));
-            });
-          });
-          break;
-        }
-        default:
-          throw new Error("I don't care");
+      if (!final.some((val) => val.id === items[i].id)) {
+        final.push(items[i]);
       }
+    }
+
+    console.log(final);
+    event.getLobby().setMeta("pgg.cosmetic.items", final);
+    event.getPlayer().getConnection()?.setMeta("pgg.cosmetics.ownedItems", items);
+
+    for (let i = 0; i < final.length; i++) {
+      setTimeout(() => {
+        this.loadItem(final[i], lobby);
+      }, 3000 * i);
     }
   }
 }

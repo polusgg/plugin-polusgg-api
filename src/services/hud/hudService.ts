@@ -50,9 +50,9 @@ export class HudService {
   async updateQrCode(c: Connection, t: { enabled: true, contents: string }): Promise<void>
   async updateQrCode(c: Connection, t: { enabled: false } | { enabled: true, contents: string }): Promise<void> {
     if (t.enabled) {
-      c.writeReliable(new SetQRContents(t.contents));
+      await c.writeReliable(new SetQRContents(t.contents));
     } else {
-      c.writeReliable(new DisableQR());
+      await c.writeReliable(new DisableQR());
     }
   }
 }

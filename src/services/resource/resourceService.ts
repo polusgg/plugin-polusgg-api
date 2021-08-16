@@ -85,7 +85,7 @@ export class ResourceService {
   }
 
   private async loadSingle(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
-    await connection.writeReliable(new FetchResourcePacket(
+    connection.writeReliable(new FetchResourcePacket(
       assetBundle.getId(),
       assetBundle.getAddress(),
       Buffer.from(assetBundle.getHash(), "hex"),
@@ -94,9 +94,7 @@ export class ResourceService {
 
     const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number
       && (p as FetchResourceResponsePacket).resourceId == assetBundle.getId()
-      && (p as FetchResourceResponsePacket).response.getType() !== 0x00,
-    10000,
-    ) as FetchResourceResponsePacket;
+      && (p as FetchResourceResponsePacket).response.getType() !== 0x00, 10000) as FetchResourceResponsePacket;
 
     if (response.getType() == 0x01) {
       this.getLoadedAssetBundlesForConnection(connection).push(assetBundle);

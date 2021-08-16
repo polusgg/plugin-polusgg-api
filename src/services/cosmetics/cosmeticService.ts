@@ -16,6 +16,7 @@ declare const server: Server;
 
 export class CosmeticService {
   private readonly fetchCosmetic: Got;
+
   constructor() {
     this.fetchCosmetic = got.extend({ prefixUrl: "http://cosmetics.service.polus.gg:2219/v1/" });
 
@@ -33,10 +34,14 @@ export class CosmeticService {
       const newHat = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewHat());
 
       if (newHat === undefined) {
-        event.cancel();
+        const connection = event.getPlayer().getConnection();
 
         if (event.getPlayer().getLobby().hasMeta("pgg.cosmetic.items")) {
-          Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a hat you don't own.`);
+          event.cancel();
+
+          if (connection !== undefined) {
+            Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a hat you don't own.`, [connection]);
+          }
         }
       }
     });
@@ -46,13 +51,17 @@ export class CosmeticService {
         return;
       }
 
-      const newHat = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewPet());
+      const newPet = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewPet());
 
-      if (newHat === undefined) {
-        event.cancel();
+      if (newPet === undefined) {
+        const connection = event.getPlayer().getConnection();
 
         if (event.getPlayer().getLobby().hasMeta("pgg.cosmetic.items")) {
-          Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a pet you don't own.`);
+          event.cancel();
+
+          if (connection !== undefined) {
+            Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a pet you don't own.`, [connection]);
+          }
         }
       }
     });
@@ -60,40 +69,55 @@ export class CosmeticService {
 
   async loadItem(item: Item, lobby: LobbyInstance) {
     const resourceService = Services.get(ServiceType.Resource);
-    let LoadPacket: typeof LoadHatPacket | typeof LoadPetPacket;
-
-    switch (item.type) {
-      case "HAT": {
-        LoadPacket = LoadHatPacket;
-        break;
-      }
-      case "PET": {
-        LoadPacket = LoadPetPacket;
-        break;
-      }
-      default:
-        throw new Error("I don't care");
-    }
 
     AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
-      const connections = lobby.getConnections();
-      for (let i = 0; i < connections.length; i++) {
-        const conn = connections[i];
+      switch (item.type) {
+        case "HAT": {
+          const connections = lobby.getConnections();
+          for (let i = 0; i < connections.length; i++) {
+            const conn = connections[i];
 
-        resourceService.load(conn, bundle).then(async () => {
-          const ownedItems = conn.getMeta<Item[]>("pgg.cosmetics.ownedItems");
-          console.log(`sending ${item.name} ${item.amongUsId} to ${conn.getName()}:${conn.getId()}`)
-          await conn.writeReliable(new LoadPacket(
-            item.amongUsId,
-            item.resource.id,
-            ownedItems.some((val) => val.amongUsId),
-          ));
+            resourceService.load(conn, bundle).then(async () => {
+              const ownedItems = conn.getMeta<Item[]>("pgg.cosmetics.ownedItems");
+              console.log(`sending ${item.name} ${item.amongUsId} to ${conn.getName()}:${conn.getId()}`)
+              await conn.writeReliable(new LoadHatPacket(
+                item.amongUsId,
+                item.resource.id,
+                ownedItems.some((val) => val.amongUsId),
+              ));
 
-          const player = conn.getPlayer();
-          if (player !== undefined && player.getHat() === item.amongUsId) {
-            await player.setHat(item.amongUsId);
+              const player = conn.getPlayer();
+              if (player !== undefined && player.getHat() === item.amongUsId) {
+                await player.setHat(item.amongUsId);
+              }
+            });
           }
-        });
+          break;
+        }
+        case "PET": {
+          const connections = lobby.getConnections();
+          for (let i = 0; i < connections.length; i++) {
+            const conn = connections[i];
+
+            resourceService.load(conn, bundle).then(async () => {
+              const ownedItems = conn.getMeta<Item[]>("pgg.cosmetics.ownedItems");
+              console.log(`sending ${item.name} ${item.amongUsId} to ${conn.getName()}:${conn.getId()}`)
+              await conn.writeReliable(new LoadPetPacket(
+                item.amongUsId,
+                item.resource.id,
+                ownedItems.some((val) => val.amongUsId),
+              ));
+
+              const player = conn.getPlayer();
+              if (player !== undefined && player.getPet() === item.amongUsId) {
+                await player.setPet(item.amongUsId);
+              }
+            });
+          }
+          break;
+        }
+        default:
+          throw new Error("I don't care");
       }
     });
   }
@@ -127,14 +151,14 @@ export class CosmeticService {
       }
     }
 
-    console.log(final);
     event.getLobby().setMeta("pgg.cosmetic.items", final);
     event.getPlayer().getConnection()?.setMeta("pgg.cosmetics.ownedItems", items);
 
     for (let i = 0; i < final.length; i++) {
-      setTimeout(() => {
-        this.loadItem(final[i], lobby);
-      }, 3000 * i);
+      this.loadItem(final[i], lobby);
+      // setTimeout(() => {
+      //   this.loadItem(final[i], lobby);
+      // }, 3000 * i);
     }
   }
 }

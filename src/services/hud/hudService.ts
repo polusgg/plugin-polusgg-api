@@ -18,8 +18,11 @@ import { MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
 declare const server: Server;
 
 export class HudService {
-  async displayNotification(notification: string): Promise<void> {
-    await Promise.allSettled([...server.getConnections().values()].map(async connection => connection.writeReliable(new DisplaySystemAlertPacket(notification))));
+  /**
+   * Warning! This by default brodacasts to the entire node, so change the sendTo parameter if you're not trying to do that.
+   */
+  async displayNotification(notification: string, sendTo: Connection[] = [...server.getConnections().values()]): Promise<void> {
+    await Promise.allSettled(sendTo.map(async connection => connection.writeReliable(new DisplaySystemAlertPacket(notification))));
   }
 
   async setHudString(player: PlayerInstance, location: Location, text: string): Promise<void> {

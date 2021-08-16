@@ -176,7 +176,7 @@ export class VanillaWinConditions {
             endGameData: new Map(event.getGame().getLobby().getPlayers()
               .map(player => [player, {
                 title: "<color=#FF1919FF>Defeat</color>",
-                subtitle: "everyone died from the sabotage",
+                subtitle: "Everyone died from the sabotage",
                 color: Palette.disabledGrey() as Mutable<[number, number, number, number]>,
                 yourTeam: [],
                 winSound: WinSoundType.Disconnect,

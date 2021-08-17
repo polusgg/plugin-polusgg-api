@@ -16,6 +16,7 @@ import { CosmeticService } from "./cosmetics/cosmeticService";
 import { EndGameService } from "./endGame/endGameService";
 import { HudService } from "./hud/hudService";
 import { EmojiService } from "./emojiService/emojiService";
+import { DiscordService } from "./discord/discordService";
 
 const serviceFromType = {
   [ServiceType.Resource]: new ResourceService(),
@@ -35,6 +36,7 @@ const serviceFromType = {
   [ServiceType.EndGame]: new EndGameService(),
   [ServiceType.Hud]: new HudService(),
   [ServiceType.Emoji]: new EmojiService(),
+  [ServiceType.Discord]: new DiscordService(),
 };
 
 export class Services {

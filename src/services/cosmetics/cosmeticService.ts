@@ -31,7 +31,8 @@ export class CosmeticService {
         return;
       }
 
-      const newHat = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewHat());
+      const newHat = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")
+        ?.find(i => i.amongUsId === event.getNewHat());
 
       if (newHat === undefined) {
         const connection = event.getPlayer().getConnection();
@@ -51,7 +52,8 @@ export class CosmeticService {
         return;
       }
 
-      const newPet = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")?.find(i => i.amongUsId === event.getNewPet());
+      const newPet = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")
+        ?.find(i => i.amongUsId === event.getNewPet());
 
       if (newPet === undefined) {
         const connection = event.getPlayer().getConnection();
@@ -67,26 +69,28 @@ export class CosmeticService {
     });
   }
 
-  async loadItem(item: Item, lobby: LobbyInstance) {
+  loadItem(item: Item, lobby: LobbyInstance): void {
     const resourceService = Services.get(ServiceType.Resource);
 
     AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
       switch (item.type) {
         case "HAT": {
           const connections = lobby.getConnections();
+
           for (let i = 0; i < connections.length; i++) {
             const conn = connections[i];
 
             resourceService.load(conn, bundle).then(async () => {
               const ownedItems = conn.getMeta<Item[]>("pgg.cosmetics.ownedItems");
-              console.log(`sending ${item.name} ${item.amongUsId} to ${conn.getName()}:${conn.getId()}`)
+
               await conn.writeReliable(new LoadHatPacket(
                 item.amongUsId,
                 item.resource.id,
-                ownedItems.some((val) => val.amongUsId),
+                ownedItems.some(val => val.amongUsId),
               ));
 
               const player = conn.getPlayer();
+
               if (player !== undefined && player.getHat() === item.amongUsId) {
                 await player.setHat(item.amongUsId);
               }
@@ -96,19 +100,21 @@ export class CosmeticService {
         }
         case "PET": {
           const connections = lobby.getConnections();
+
           for (let i = 0; i < connections.length; i++) {
             const conn = connections[i];
 
             resourceService.load(conn, bundle).then(async () => {
               const ownedItems = conn.getMeta<Item[]>("pgg.cosmetics.ownedItems");
-              console.log(`sending ${item.name} ${item.amongUsId} to ${conn.getName()}:${conn.getId()}`)
+
               await conn.writeReliable(new LoadPetPacket(
                 item.amongUsId,
                 item.resource.id,
-                ownedItems.some((val) => val.amongUsId),
+                ownedItems.some(val => val.amongUsId),
               ));
 
               const player = conn.getPlayer();
+
               if (player !== undefined && player.getPet() === item.amongUsId) {
                 await player.setPet(item.amongUsId);
               }
@@ -117,7 +123,7 @@ export class CosmeticService {
           break;
         }
         default:
-          throw new Error("I don't care");
+          throw new Error(`Unsupported item type ${item.type}`);
       }
     });
   }
@@ -142,11 +148,12 @@ export class CosmeticService {
 
     let items = JSON.parse(itemsResponse).data as Item[];
 
-    items = items.concat(event.getLobby().getMeta("pgg.cosmetic.items") ?? []);
+    items = items.concat(event.getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items") ?? []);
+
     const final: Item[] = [];
 
     for (let i = 0; i < items.length; i++) {
-      if (!final.some((val) => val.id === items[i].id)) {
+      if (!final.some(val => val.id === items[i].id)) {
         final.push(items[i]);
       }
     }

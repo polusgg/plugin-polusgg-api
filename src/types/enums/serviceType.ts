@@ -16,4 +16,5 @@ export enum ServiceType {
   EndGame,
   Hud,
   Emoji,
+  Discord,
 }

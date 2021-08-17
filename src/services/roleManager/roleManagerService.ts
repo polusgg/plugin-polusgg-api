@@ -18,6 +18,9 @@ import { LobbyDefaultOptions } from "../gameOptions/gameOptionsService";
 import { Services } from "../services";
 import { RoleDestroyedReason } from "../../types/enums/roleDestroyedReason";
 import { EmojiService } from "../emojiService/emojiService";
+import { UserResponseStructure } from "@polusgg/module-polusgg-auth-api/src/types/userResponseStructure";
+import path from "path";
+import fs from "fs";
 
 export type EndGameScreenData = {
   title: string | TextComponent;
@@ -78,7 +81,12 @@ export class RoleManagerService {
     await player.getMeta<BaseRole | undefined>("pgg.api.role")?.onDestroy(reason);
   }
 
-  getRolesAssigned(game: Game, assignmentData: RoleAssignmentData[]): { players: PlayerInstance[], allRoleAssignments: { role: typeof BaseRole; startGameScreen?: StartGameScreenData }[] }|undefined {
+  assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
+    const managers: typeof BaseManager[] = [];
+    const roleInstances: BaseRole[] = [];
+    const forcedRoleInstances: BaseRole[] = [];
+    const forcedScreen: (StartGameScreenData | undefined)[] = [];
+    const forcedPlayers: PlayerInstance[] = [];
     const assignmentArray: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = [];
     const options = Services.get(ServiceType.GameOptions).getGameOptions<LobbyDefaultOptions>(game.getLobby());
 
@@ -97,6 +105,56 @@ export class RoleManagerService {
     shuffleArray(assignmentArray);
 
     const players = shuffleArrayClone(game.getLobby().getPlayers());
+
+    const ignoredPlayers: number[] = [];
+
+    for (let i = 0; i < players.length; i++) {
+      const player = players[i];
+
+      if (player.getConnection()?.getMeta<UserResponseStructure>("pgg.auth.self")?.discord_id !== undefined) {
+        const discordId = player.getSafeConnection().getMeta<UserResponseStructure>("pgg.auth.self").discord_id!;
+        const forceRoles = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../forceRoles.json"), "utf-8"));
+
+        if (forceRoles[discordId]) {
+          const assignment = assignmentArray.find(assignment2 => assignment2.role.name === forceRoles[discordId]);
+
+          if (assignment) {
+            ignoredPlayers.push(player.getId());
+
+            const index = forcedRoleInstances.push(this.assignRole(players[i], assignment.role, true)) - 1;
+
+            managers.push(forcedRoleInstances[index].getManagerType());
+            forcedScreen.push(assignment.startGameScreen);
+            forcedPlayers.push(player);
+          } else {
+            console.log(`ForceRolesError: ${forceRoles[discordId]} is not discovered in [${assignmentArray.map(a => a.role.name).join(", ")}]`);
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < ignoredPlayers.length; i++) {
+      const ignoredPlayerId = ignoredPlayers[i];
+      const index = players.findIndex(p => p.getId() === ignoredPlayerId);
+
+      if (index === -1) {
+        console.log(`ForceRolesError: Couldn't find player.`);
+        continue;
+      }
+
+      const forceRoles = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../forceRoles.json"), "utf-8"));
+
+      const discordId = players[index].getSafeConnection().getMeta<UserResponseStructure>("pgg.auth.self").discord_id!;
+      const index2 = assignmentArray.findIndex(assignment2 => assignment2.role.name === forceRoles[discordId]);
+
+      if (index2 === -1) {
+        console.log(`ForceRolesError: Couldn't find role.`);
+        continue;
+      }
+
+      players.splice(index, 1);
+      assignmentArray.splice(index2, 1);
+    }
 
     if (players.length === 0) {
       return;
@@ -132,65 +190,6 @@ export class RoleManagerService {
     }
 
     const allRoleAssignments = [...otherAlignedRoles, ...impostorAlignedRoles];
-
-    return { players, allRoleAssignments };
-  }
-
-  assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
-    const managers: typeof BaseManager[] = [];
-    
-    const roleAssignments = this.getRolesAssigned(game, assignmentData);
-
-    if (!roleAssignments)
-      return;
-
-    const { players, allRoleAssignments } = roleAssignments;
-
-    // if (allRoleAssignments.length !== players.length) {
-    //   console.log({ impostorAlignedRoles, otherAlignedRoles });
-    //   throw new Error("Crying rn. The normalized length of all the roles did not match up with the number of players.");
-    // }
-
-    const roleInstances: BaseRole[] = new Array(allRoleAssignments.length);
-
-    for (let i = 0; i < allRoleAssignments.length; i++) {
-      roleInstances[i] = this.assignRole(players[i], allRoleAssignments[i].role, true);
-      managers.push(roleInstances[i].getManagerType());
-    }
-
-    for (let i = 0; i < roleInstances.length; i++) {
-      this.sendRoleScreen(players[i], roleInstances[i], allRoleAssignments[i].startGameScreen);
-    }
-
-    const uniqueManagers = [...new Set(managers)];
-
-    for (let i = 0; i < uniqueManagers.length; i++) {
-      const manager = new uniqueManagers[i](game.getLobby());
-
-      game.getLobby().setMeta(`pgg.manager.${manager.getId()}`, manager);
-    }
-
-    game.getLobby().getPlayers().forEach(player => {
-      const playerPartners: PlayerInstance[] = [];
-
-      game.getLobby().getPlayers().forEach(target => {
-        if (player.getMeta<BaseRole>("pgg.api.role").isPartner(target.getMeta<BaseRole>("pgg.api.role"))) {
-          playerPartners.push(target);
-        }
-      });
-
-      if (playerPartners.length > 1) {
-        for (let i = 0; i < playerPartners.length; i++) {
-          const partner = playerPartners[i];
-
-          Services.get(ServiceType.Name).setFor(
-            player.getSafeConnection(),
-            partner,
-            partner.getName() + EmojiService.static("partner"),
-          );
-        }
-      }
-    });
   }
 
   sendRoleScreen(player: PlayerInstance, instance: BaseRole, startGameScreen?: StartGameScreenData): void {

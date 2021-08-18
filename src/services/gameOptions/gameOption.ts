@@ -24,7 +24,7 @@ export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {
 
     for (let i = 0; i < sendTo.length; i++) {
       const connection = sendTo[i];
-      const sequenceId = Services.get(ServiceType.GameOptions).nextSequenceId(this.getLobby(), connection);
+      const sequenceId = Services.get(ServiceType.GameOptions).nextSequenceId(connection);
 
       proms[i] = connection.writeReliable(new SetGameOption(sequenceId, this.category, this.priority, this.key, value));
     }

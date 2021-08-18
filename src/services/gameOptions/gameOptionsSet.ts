@@ -98,7 +98,7 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
 
     for (let i = 0; i < connections.length; i++) {
       const connection = connections[i];
-      const sid = Services.get(ServiceType.GameOptions).nextSequenceId(this.lobby, connection);
+      const sid = Services.get(ServiceType.GameOptions).nextSequenceId(connection);
 
       proms[i] = connection.writeReliable(new DeleteGameOption(sid, key));
     }

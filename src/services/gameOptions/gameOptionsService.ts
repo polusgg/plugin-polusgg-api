@@ -97,7 +97,6 @@ export class GameOptionsService {
       /* eslint-enable @typescript-eslint/naming-convention */
 
       event.getLobby().setMeta("pgg.options", options);
-      event.getLobby().setMeta("pgg.optionSequenceId", new Map());
 
       options.on("option.*.changed", changedEvent => {
         if (applyOption[changedEvent.getKey()] !== undefined) {
@@ -144,7 +143,7 @@ export class GameOptionsService {
         return;
       }
 
-      event.getLobby()!.getMeta<Map<number, number>>("pgg.optionSequenceId").set(event.getConnection().getId(), -1);
+      event.getConnection().setMeta("pgg.optionSequenceId", -1);
     });
 
     server.on("player.joined", event => {
@@ -155,7 +154,7 @@ export class GameOptionsService {
       const options = this.getGameOptions(event.getLobby());
 
       Object.entries(options.getAllOptions()).forEach(([_name, option]) => {
-        const sequenceId = this.nextSequenceId(event.getLobby(), event.getPlayer().getConnection()!);
+        const sequenceId = this.nextSequenceId(event.getPlayer().getConnection()!);
 
         event.getLobby().sendRootGamePacket(new SetGameOption(sequenceId, option.getCategory(), option.getPriority(), option.getKey(), option.getValue()), [event.getPlayer().getConnection()!]);
       });
@@ -166,12 +165,10 @@ export class GameOptionsService {
     return lobby.getMeta<LobbyOptions<T>>("pgg.options");
   }
 
-  nextSequenceId(lobby: LobbyInstance, connection: Connection): number {
-    const map = lobby.getMeta<Map<number, number>>("pgg.optionSequenceId");
+  nextSequenceId(connection: Connection): number {
+    const sequenceId = connection.getMeta<number>("pgg.optionSequenceId") + 1;
 
-    const sequenceId = map.get(connection.getId())! + 1;
-
-    map.set(connection.getId(), sequenceId % MaxValue.UInt16);
+    connection.setMeta("pgg.optionSequenceId", sequenceId % MaxValue.UInt16);
 
     return sequenceId;
   }

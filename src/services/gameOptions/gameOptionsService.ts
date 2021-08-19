@@ -138,11 +138,8 @@ export class GameOptionsService {
       }, 100);
     });
 
-    server.on("server.lobby.join", event => {
-      if (event.getLobby() === undefined) {
-        return;
-      }
-
+    server.on("connection.opened", event => {
+      //always.
       event.getConnection().setMeta("pgg.optionSequenceId", -1);
     });
 

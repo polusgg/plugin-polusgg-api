@@ -190,6 +190,55 @@ export class RoleManagerService {
     }
 
     const allRoleAssignments = [...otherAlignedRoles, ...impostorAlignedRoles];
+
+    // if (allRoleAssignments.length !== players.length) {
+    //   console.log({ impostorAlignedRoles, otherAlignedRoles });
+    //   throw new Error("Crying rn. The normalized length of all the roles did not match up with the number of players.");
+    // }
+
+    for (let i = 0; i < allRoleAssignments.length; i++) {
+      const index = roleInstances.push(this.assignRole(players[i], allRoleAssignments[i].role, true)) - 1;
+
+      managers.push(roleInstances[index].getManagerType());
+    }
+
+    for (let i = 0; i < roleInstances.length; i++) {
+      this.sendRoleScreen(players[i], roleInstances[i], allRoleAssignments[i].startGameScreen);
+    }
+
+    for (let i = 0; i < forcedRoleInstances.length; i++) {
+      this.sendRoleScreen(forcedPlayers[i], forcedRoleInstances[i], forcedScreen[i]);
+    }
+
+    const uniqueManagers = [...new Set(managers)];
+
+    for (let i = 0; i < uniqueManagers.length; i++) {
+      const manager = new uniqueManagers[i](game.getLobby());
+
+      game.getLobby().setMeta(`pgg.manager.${manager.getId()}`, manager);
+    }
+
+    game.getLobby().getPlayers().forEach(player => {
+      const playerPartners: PlayerInstance[] = [];
+
+      game.getLobby().getPlayers().forEach(target => {
+        if (player.getMeta<BaseRole>("pgg.api.role").isPartner(target.getMeta<BaseRole>("pgg.api.role"))) {
+          playerPartners.push(target);
+        }
+      });
+
+      if (playerPartners.length > 1) {
+        for (let i = 0; i < playerPartners.length; i++) {
+          const partner = playerPartners[i];
+
+          Services.get(ServiceType.Name).setFor(
+            player.getSafeConnection(),
+            partner,
+            partner.getName() + EmojiService.static("partner"),
+          );
+        }
+      }
+    });
   }
 
   sendRoleScreen(player: PlayerInstance, instance: BaseRole, startGameScreen?: StartGameScreenData): void {

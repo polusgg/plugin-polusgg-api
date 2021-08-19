@@ -243,6 +243,7 @@ export class Button extends Emittery<ButtonEvents> {
     return this
       .getTargetsUnfiltered(range)
       .filter(p => p.getVent() === undefined)
+      .filter(p => !p.isDead())
       .filter(player => player.getMeta<boolean>("pgg.api.targetable"));
   }
 

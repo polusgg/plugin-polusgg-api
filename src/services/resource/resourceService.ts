@@ -51,6 +51,7 @@ export class ResourceService {
           return await this.loadSingle(connection, assetBundle);
         } catch (err) {
           await connection.disconnect(DisconnectReason.custom("Failed to load assets. The issue has been reported to the developers."));
+
           throw err;
         }
       }

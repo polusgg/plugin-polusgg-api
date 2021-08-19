@@ -25,6 +25,7 @@ export enum RoleAlignment {
 export type RoleMetadata = {
   name: string;
   alignment: RoleAlignment;
+  preventBaseEmoji?: boolean;
 };
 
 export class BaseRole {

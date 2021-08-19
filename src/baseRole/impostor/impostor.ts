@@ -9,7 +9,7 @@ import { Button } from "../../services/buttonManager";
 import { StartGameScreenData } from "../../services/roleManager/roleManagerService";
 import { ServiceType } from "../../types/enums";
 import { EdgeAlignments } from "../../types/enums/edgeAlignment";
-import { BaseRole, RoleAlignment } from "../baseRole";
+import { BaseRole, RoleAlignment, RoleMetadata } from "../baseRole";
 import { AllowTaskInteractionPacket } from "../../packets/root/allowTaskInteractionPacket";
 import { KeyCode } from "../../types/enums/keyCode";
 import { EmojiService } from "../../services/emojiService/emojiService";
@@ -27,7 +27,7 @@ export class ImpostorManager extends BaseManager {
 // impostors do not play well with reviving at the moment, if there's an event for reviving then that should be handled properly
 
 export class Impostor extends BaseRole {
-  protected readonly metadata = {
+  protected readonly metadata: RoleMetadata = {
     name: "impostor",
     alignment: RoleAlignment.Impostor,
   };
@@ -43,7 +43,11 @@ export class Impostor extends BaseRole {
   constructor(owner: PlayerInstance, role: PlayerRole = PlayerRole.Impostor, private readonly buttonBundle: string = "Global/Global", private readonly buttonAsset: string = "Assets/Mods/OfficialAssets/KillButton.png") {
     super(owner);
 
-    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${EmojiService.static("impostor")} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+    process.nextTick(() => {
+      if (!this.metadata.preventBaseEmoji) {
+        Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${EmojiService.static("impostor")} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+      }
+    });
 
     this.role = role;
     this.onClicked = undefined;

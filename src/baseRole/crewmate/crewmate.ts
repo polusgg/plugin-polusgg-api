@@ -2,7 +2,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Palette } from "@nodepolus/framework/src/static";
 import { BaseManager } from "../../baseManager/baseManager";
 import { StartGameScreenData } from "../../services/roleManager/roleManagerService";
-import { BaseRole, RoleAlignment } from "../baseRole";
+import { BaseRole, RoleAlignment, RoleMetadata } from "../baseRole";
 import { Services } from "../../services";
 import { ServiceType } from "../../types/enums";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
@@ -19,7 +19,7 @@ export class CrewmateManager extends BaseManager {
 }
 
 export class Crewmate extends BaseRole {
-  protected readonly metadata = {
+  protected readonly metadata: RoleMetadata = {
     name: "crewmate",
     alignment: RoleAlignment.Crewmate,
   };
@@ -27,7 +27,11 @@ export class Crewmate extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
-    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${EmojiService.static("crewmate")} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+    process.nextTick(() => {
+      if (!this.metadata.preventBaseEmoji) {
+        Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${EmojiService.static("crewmate")} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+      }
+    });
 
     Services.get(ServiceType.RoleManager)
       .setBaseRole(this.owner, PlayerRole.Crewmate);

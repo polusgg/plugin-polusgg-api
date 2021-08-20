@@ -53,7 +53,13 @@ export class CosmeticService {
     });
 
     server.on("player.pet.updated", async event => {
+      console.log("Client requested pet", event.getPlayer().getName(), event.getNewPet());
+
       if (event.getNewPet() < 10_000_000) {
+        if (event.getNewPet() as number === 9_999_999) {
+          event.setNewPet(event.getPlayer().getSafeConnection().getMeta<UserResponseStructure>("pgg.auth.self").cosmetics?.PET ?? 0);
+        }
+
         return;
       }
 
@@ -77,16 +83,23 @@ export class CosmeticService {
       // set the cosmetic
       const cosmetic = await AssetBundle.load(item.resource.path, item.resource.url);
 
-      Promise.all(event.getPlayer().getLobby().getConnections()
+      Promise.all([...(event.getPlayer().getLobby().getConnections()
         .filter(c => c !== connection)
         .map(async c => {
           await this.loadCosmeticForConnection(c, [cosmetic], [item], false);
           c.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetPetPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())]);
-        }));
+        })),
+      connection.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetPetPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())])]);
     });
 
     server.on("player.hat.updated", async event => {
+      console.log("Client requested hat", event.getPlayer().getName(), event.getNewHat());
+
       if (event.getNewHat() < 10_000_000) {
+        if (event.getNewHat() as number === 9_999_999) {
+          event.setNewHat(event.getPlayer().getSafeConnection().getMeta<UserResponseStructure>("pgg.auth.self").cosmetics?.HAT ?? 0);
+        }
+
         return;
       }
 
@@ -110,12 +123,13 @@ export class CosmeticService {
       // set the cosmetic
       const cosmetic = await AssetBundle.load(item.resource.path, item.resource.url);
 
-      Promise.all(event.getPlayer().getLobby().getConnections()
+      Promise.all([...event.getPlayer().getLobby().getConnections()
         .filter(c => c !== connection)
         .map(async c => {
           await this.loadCosmeticForConnection(c, [cosmetic], [item], false);
           c.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetHatPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())]);
-        }));
+        }),
+      connection.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetHatPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())])]);
     });
   }
 
@@ -129,7 +143,7 @@ export class CosmeticService {
 
   private async loadCosmeticForConnection(connection: Connection, cosmetics: AssetBundle[], items: Item[], accessible: boolean): Promise<ResourceResponse[]> {
     return Promise.all(cosmetics.map(async (cosmetic, index): Promise<ResourceResponse> => {
-      const preloaded = connection.getMeta<[Item, boolean][]>("pgg.cosmetic.loaded").find(i => i[0].resource.id === cosmetic.getId());
+      const preloaded = connection.getMeta<[Item, boolean][]>("pgg.cosmetic.loaded").find(i => i[0].amongUsId === cosmetic.getId());
 
       if (preloaded !== undefined) {
         if (!preloaded[1] && accessible) {
@@ -169,22 +183,22 @@ export class CosmeticService {
     }
 
     console.log("URS.c", userResponseStructure.cosmetics);
+    event.getConnection().setMeta("pgg.cosmetic.loaded", []);
+
+    const response = await this.fetchCosmetic.get("item/", { headers: { authorization: this.authToken(userResponseStructure) } });
+    const items: Item[] = JSON.parse(response.body).data;
+
+    event.getConnection().setMeta("pgg.cosmetic.owned", items);
 
     if (userResponseStructure.cosmetics === null) {
       return;
     }
 
     const cosmeticIds = Object.values(userResponseStructure.cosmetics) as number[];
-    const response = await this.fetchCosmetic.get("item/", { headers: { authorization: this.authToken(userResponseStructure) } });
-    const items: Item[] = JSON.parse(response.body).data;
-
-    event.getConnection().setMeta("pgg.cosmetic.owned", items);
-    event.getConnection().setMeta("pgg.cosmetic.loaded", []);
-
     const itemsToLoad = items.filter(i => cosmeticIds.includes(i.amongUsId));
     const bundles = await Promise.all(itemsToLoad.map(async i => await AssetBundle.load(i.resource.path, i.resource.url)));
 
-    await this.loadCosmeticForConnection(event.getConnection(), bundles, items, true);
+    await this.loadCosmeticForConnection(event.getConnection(), bundles, itemsToLoad, true);
 
     const players = lobby.getPlayers();
 
@@ -197,16 +211,19 @@ export class CosmeticService {
       }
 
       const ownedCosmetics = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned") ?? [];
-      const hat = ownedCosmetics.find(c => c.amongUsId === player.getHat());
-      const pet = ownedCosmetics.find(c => c.amongUsId === player.getPet());
 
-      if (hat) {
-        this.loadCosmeticForConnection(event.getConnection(), [await AssetBundle.load(hat.resource.path, hat.resource.url)], [hat], false);
-      }
+      try {
+        const hat = ownedCosmetics.find(c => c.amongUsId === player.getHat());
+        const pet = ownedCosmetics.find(c => c.amongUsId === player.getPet());
 
-      if (pet) {
-        this.loadCosmeticForConnection(event.getConnection(), [await AssetBundle.load(pet.resource.path, pet.resource.url)], [pet], false);
-      }
+        if (hat) {
+          this.loadCosmeticForConnection(event.getConnection(), [await AssetBundle.load(hat.resource.path, hat.resource.url)], [hat], false);
+        }
+
+        if (pet) {
+          this.loadCosmeticForConnection(event.getConnection(), [await AssetBundle.load(pet.resource.path, pet.resource.url)], [pet], false);
+        }
+      } catch {}
     }
   }
 
@@ -219,24 +236,31 @@ export class CosmeticService {
 
     const userResponseStructure = connection.getMeta<UserResponseStructure>("pgg.auth.self");
 
-    if (userResponseStructure.cosmetics === null) {
-      return;
-    }
+    if (userResponseStructure.cosmetics !== null) {
+      if (userResponseStructure.cosmetics.HAT !== undefined) {
+        event.getPlayer().setHat(userResponseStructure.cosmetics.HAT);
+      }
 
-    if (userResponseStructure.cosmetics.HAT !== undefined) {
-      event.getPlayer().setHat(userResponseStructure.cosmetics.HAT);
-    }
+      if (userResponseStructure.cosmetics.PET !== undefined) {
+        event.getPlayer().setPet(userResponseStructure.cosmetics.PET);
+      }
 
-    if (userResponseStructure.cosmetics.PET !== undefined) {
-      event.getPlayer().setPet(userResponseStructure.cosmetics.PET);
-    }
+      if (userResponseStructure.cosmetics.SKIN !== undefined) {
+        event.getPlayer().setSkin(userResponseStructure.cosmetics.SKIN);
+      }
 
-    if (userResponseStructure.cosmetics.SKIN !== undefined) {
-      event.getPlayer().setSkin(userResponseStructure.cosmetics.SKIN);
-    }
+      if (userResponseStructure.cosmetics.COLOR !== undefined) {
+        let requestedColor = userResponseStructure.cosmetics.COLOR;
 
-    if (userResponseStructure.cosmetics.COLOR !== undefined) {
-      event.getPlayer().setColor(userResponseStructure.cosmetics.COLOR);
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        while (event.getLobby().getPlayers().find(p => p.getColor() === requestedColor) !== undefined) {
+          requestedColor++;
+
+          if (requestedColor > 18) {
+            requestedColor = 0;
+          }
+        }
+      }
     }
 
     const response = await this.fetchCosmetic.get("item/", { headers: { authorization: this.authToken(userResponseStructure) } });

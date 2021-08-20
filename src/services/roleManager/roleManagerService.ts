@@ -47,20 +47,18 @@ declare const server: Server;
 
 export class RoleManagerService {
   constructor() {
-    server.on("game.ended", event => {
+    server.on("game.ended", async event => {
       if (event.getReason() === 0x07 as GameOverReason) {
-        event
+        await Promise.all(event
           .getGame()
           .getLobby()
           .getPlayers()
-          .forEach(p => {
-            this.onPlayerDespawned(p, RoleDestroyedReason.GameEnded);
-          });
+          .map(p => this.onPlayerDespawned(p, RoleDestroyedReason.GameEnded)));
       }
     });
 
-    server.on("player.left", event => {
-      this.onPlayerDespawned(event.getPlayer(), RoleDestroyedReason.Disconnect);
+    server.on("player.left", async event => {
+      await this.onPlayerDespawned(event.getPlayer(), RoleDestroyedReason.Disconnect);
     });
   }
 
@@ -76,8 +74,8 @@ export class RoleManagerService {
     return 3;
   }
 
-  onPlayerDespawned(player: PlayerInstance, reason: RoleDestroyedReason): void {
-    player.getMeta<BaseRole | undefined>("pgg.api.role")?.onDestroy(reason);
+  async onPlayerDespawned(player: PlayerInstance, reason: RoleDestroyedReason): Promise<void> {
+    await player.getMeta<BaseRole | undefined>("pgg.api.role")?.onDestroy(reason);
   }
 
   assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {

@@ -89,7 +89,7 @@ export class BaseRole {
     return this.owner.getLobby().getMeta<T>(`pgg.manager.${id}`);
   }
 
-  onDestroy(_destroyReason: RoleDestroyedReason): void {
+  async onDestroy(_destroyReason: RoleDestroyedReason): Promise<void> {
     for (let i = 0; i < this.caughtEvents.length; i++) {
       this.caughtEvents[i].destroy();
     }

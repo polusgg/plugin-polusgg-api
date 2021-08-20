@@ -157,7 +157,7 @@ export default class PolusGGApi extends BasePlugin {
 
       setTimeout(() => {
         Services.get(ServiceType.Hud).updateQrCodeState(event.getPlayer().getSafeConnection());
-      }, 100);
+      }, 250);
     });
 
     this.server.on("game.started", event => {

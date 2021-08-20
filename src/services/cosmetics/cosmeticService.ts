@@ -3,14 +3,20 @@ import { Server } from "@nodepolus/framework/src/server";
 import { SetPlayerBodyPacket } from "../../packets/rpc/playerControl/setPlayerBody";
 import got, { Got } from "got";
 import { UserResponseStructure } from "@polusgg/module-polusgg-auth-api/src/types/userResponseStructure";
-import { PlayerJoinedEvent } from "@nodepolus/framework/src/api/events/player";
 import { Item } from "@polusgg/module-cosmetics/src/types";
-import { LoadHatPacket } from "../../packets/root/loadHatPacket";
-import { LoadPetPacket } from "../../packets/root/loadPetPacket";
 import { AssetBundle } from "../../assets";
 import { ServiceType } from "../../types/enums";
 import { Services } from "../services";
-import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
+import { ResourceResponse } from "../../types";
+import { Connection } from "@nodepolus/framework/src/protocol/connection";
+import { ServerLobbyJoinEvent } from "@nodepolus/framework/src/api/events/server";
+import { DisconnectReason } from "@nodepolus/framework/src/types";
+import { PlayerJoinedEvent } from "@nodepolus/framework/src/api/events/player";
+import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
+import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
+import { SetHatPacket, SetPetPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
+import { LoadHatPacket } from "../../packets/root/loadHatPacket";
+import { LoadPetPacket } from "../../packets/root/loadPetPacket";
 
 declare const server: Server;
 
@@ -20,11 +26,10 @@ export class CosmeticService {
   constructor() {
     this.fetchCosmetic = got.extend({ prefixUrl: "http://cosmetics.service.polus.gg:2219/v1/" });
 
-    server.on("player.joined", event => {
-      if (event.getPlayer().getConnection() !== undefined && !event.isRejoining()) {
-        this.playerJoined(event);
-      }
-    });
+    // this.cacheBundles();
+
+    server.on("server.lobby.join", this.handlePlayerJoining.bind(this));
+    server.on("player.joined", this.handlePlayerJoin.bind(this));
 
     server.on("player.hat.updated", event => {
       if (event.getNewHat() < 10_000_000) {
@@ -47,84 +52,70 @@ export class CosmeticService {
       }
     });
 
-    server.on("player.pet.updated", event => {
+    server.on("player.pet.updated", async event => {
       if (event.getNewPet() < 10_000_000) {
         return;
       }
 
-      const newPet = event.getPlayer().getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items")
-        ?.find(i => i.amongUsId === event.getNewPet());
+      const connection = event.getPlayer().getConnection();
 
-      if (newPet === undefined) {
-        const connection = event.getPlayer().getConnection();
-
-        if (event.getPlayer().getLobby().hasMeta("pgg.cosmetic.items")) {
-          event.cancel();
-
-          if (connection !== undefined) {
-            Services.get(ServiceType.Hud).displayNotification(`You attempted to apply a pet you don't own.`, [connection]);
-          }
-        }
+      if (connection === undefined) {
+        return;
       }
+
+      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned") ?? [];
+      const item = ownedItems.find(i => i.amongUsId === event.getNewPet());
+
+      if (item === undefined) {
+        // TODO: Ban
+
+        Services.get(ServiceType.Hud).displayNotification("You attempted to equip a pet you don't own", [connection]);
+
+        return;
+      }
+
+      // set the cosmetic
+      const cosmetic = await AssetBundle.load(item.resource.path, item.resource.url);
+
+      Promise.all(event.getPlayer().getLobby().getConnections()
+        .filter(c => c !== connection)
+        .map(async c => {
+          await this.loadCosmeticForConnection(c, [cosmetic], [item], false);
+          c.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetPetPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())]);
+        }));
     });
-  }
 
-  loadItem(item: Item, lobby: LobbyInstance): void {
-    const resourceService = Services.get(ServiceType.Resource);
-
-    AssetBundle.load(item.resource.path, item.resource.url).then(bundle => {
-      switch (item.type) {
-        case "HAT": {
-          const connections = lobby.getConnections();
-
-          for (let i = 0; i < connections.length; i++) {
-            const conn = connections[i];
-
-            resourceService.load(conn, bundle).then(async () => {
-              const ownedItems = conn.getMeta<Item[]>("pgg.cosmetics.ownedItems");
-
-              await conn.writeReliable(new LoadHatPacket(
-                item.amongUsId,
-                item.resource.id,
-                ownedItems.some(val => val.amongUsId),
-              ));
-
-              const player = conn.getPlayer();
-
-              if (player !== undefined && player.getHat() === item.amongUsId) {
-                await player.setHat(item.amongUsId);
-              }
-            });
-          }
-          break;
-        }
-        case "PET": {
-          const connections = lobby.getConnections();
-
-          for (let i = 0; i < connections.length; i++) {
-            const conn = connections[i];
-
-            resourceService.load(conn, bundle).then(async () => {
-              const ownedItems = conn.getMeta<Item[]>("pgg.cosmetics.ownedItems");
-
-              await conn.writeReliable(new LoadPetPacket(
-                item.amongUsId,
-                item.resource.id,
-                ownedItems.some(val => val.amongUsId),
-              ));
-
-              const player = conn.getPlayer();
-
-              if (player !== undefined && player.getPet() === item.amongUsId) {
-                await player.setPet(item.amongUsId);
-              }
-            });
-          }
-          break;
-        }
-        default:
-          throw new Error(`Unsupported item type ${item.type}`);
+    server.on("player.hat.updated", async event => {
+      if (event.getNewHat() < 10_000_000) {
+        return;
       }
+
+      const connection = event.getPlayer().getConnection();
+
+      if (connection === undefined) {
+        return;
+      }
+
+      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned") ?? [];
+      const item = ownedItems.find(i => i.amongUsId === event.getNewHat());
+
+      if (item === undefined) {
+        // TODO: Ban
+
+        Services.get(ServiceType.Hud).displayNotification("You attempted to equip a hat you don't own", [connection]);
+
+        return;
+      }
+
+      // set the cosmetic
+      const cosmetic = await AssetBundle.load(item.resource.path, item.resource.url);
+
+      Promise.all(event.getPlayer().getLobby().getConnections()
+        .filter(c => c !== connection)
+        .map(async c => {
+          await this.loadCosmeticForConnection(c, [cosmetic], [item], false);
+          c.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetHatPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())]);
+        }));
     });
   }
 
@@ -136,36 +127,122 @@ export class CosmeticService {
     await player.getEntity().getPlayerControl().sendRpcPacket(new SetPlayerBodyPacket(body), player.getLobby().getConnections());
   }
 
-  private async playerJoined(event: PlayerJoinedEvent): Promise<void> {
+  private async loadCosmeticForConnection(connection: Connection, cosmetics: AssetBundle[], items: Item[], accessible: boolean): Promise<ResourceResponse[]> {
+    return Promise.all(cosmetics.map(async (cosmetic, index): Promise<ResourceResponse> => {
+      const preloaded = connection.getMeta<[Item, boolean][]>("pgg.cosmetic.loaded").find(i => i[0].resource.id === cosmetic.getId());
+
+      if (preloaded !== undefined) {
+        if (!preloaded[1] && accessible) {
+          await connection.writeReliable(new (preloaded[0].type === "HAT" ? LoadHatPacket : LoadPetPacket)(preloaded[0].amongUsId, preloaded[0].resource.id, accessible));
+        }
+
+        return {
+          isCached: true,
+          resourceId: cosmetic.getId(),
+        };
+      }
+
+      const res = await Services.get(ServiceType.Resource).load(connection, cosmetic);
+      const item = items[index];
+
+      connection.getMeta<[Item, boolean][]>("pgg.cosmetic.loaded").push([item, accessible]);
+      await connection.writeReliable(new (item.type === "HAT" ? LoadHatPacket : LoadPetPacket)(item.amongUsId, item.resource.id, accessible));
+
+      return res;
+    }));
+  }
+
+  private async handlePlayerJoining(event: ServerLobbyJoinEvent): Promise<void> {
     const lobby = event.getLobby();
-    const user = (lobby.getActingHosts()[0] ?? lobby.getCreator()).getMeta<UserResponseStructure>("pgg.auth.self");
 
-    const { body: itemsResponse } = await this.fetchCosmetic("item", {
-      headers: {
-        authorization: this.authToken(user),
-      },
-    });
+    if (lobby === undefined) {
+      return;
+    }
 
-    let items = JSON.parse(itemsResponse).data as Item[];
+    const userResponseStructure = event.getConnection().getMeta<UserResponseStructure | undefined>("pgg.auth.self");
 
-    items = items.concat(event.getLobby().getMeta<Item[] | undefined>("pgg.cosmetic.items") ?? []);
+    if (userResponseStructure === undefined) {
+      event.setDisconnectReason(DisconnectReason.custom("Error. Failed to join server. Code 1123"));
+      event.cancel();
 
-    const final: Item[] = [];
+      return;
+    }
 
-    for (let i = 0; i < items.length; i++) {
-      if (!final.some(val => val.id === items[i].id)) {
-        final.push(items[i]);
+    console.log("URS.c", userResponseStructure.cosmetics);
+
+    if (userResponseStructure.cosmetics === null) {
+      return;
+    }
+
+    const cosmeticIds = Object.values(userResponseStructure.cosmetics) as number[];
+    const response = await this.fetchCosmetic.get("item/", { headers: { authorization: this.authToken(userResponseStructure) } });
+    const items: Item[] = JSON.parse(response.body).data;
+
+    event.getConnection().setMeta("pgg.cosmetic.owned", items);
+    event.getConnection().setMeta("pgg.cosmetic.loaded", []);
+
+    const itemsToLoad = items.filter(i => cosmeticIds.includes(i.amongUsId));
+    const bundles = await Promise.all(itemsToLoad.map(async i => await AssetBundle.load(i.resource.path, i.resource.url)));
+
+    await this.loadCosmeticForConnection(event.getConnection(), bundles, items, true);
+
+    const players = lobby.getPlayers();
+
+    for (let i = 0; i < players.length; i++) {
+      const player = players[i];
+      const connection = player.getConnection();
+
+      if (connection === undefined) {
+        continue;
+      }
+
+      const ownedCosmetics = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned") ?? [];
+      const hat = ownedCosmetics.find(c => c.amongUsId === player.getHat());
+      const pet = ownedCosmetics.find(c => c.amongUsId === player.getPet());
+
+      if (hat) {
+        this.loadCosmeticForConnection(event.getConnection(), [await AssetBundle.load(hat.resource.path, hat.resource.url)], [hat], false);
+      }
+
+      if (pet) {
+        this.loadCosmeticForConnection(event.getConnection(), [await AssetBundle.load(pet.resource.path, pet.resource.url)], [pet], false);
       }
     }
+  }
 
-    event.getLobby().setMeta("pgg.cosmetic.items", final);
-    event.getPlayer().getConnection()?.setMeta("pgg.cosmetics.ownedItems", items);
+  private async handlePlayerJoin(event: PlayerJoinedEvent): Promise<void> {
+    const connection = event.getPlayer().getConnection();
 
-    for (let i = 0; i < final.length; i++) {
-      this.loadItem(final[i], lobby);
-      // setTimeout(() => {
-      //   this.loadItem(final[i], lobby);
-      // }, 3000 * i);
+    if (connection === undefined) {
+      return;
     }
+
+    const userResponseStructure = connection.getMeta<UserResponseStructure>("pgg.auth.self");
+
+    if (userResponseStructure.cosmetics === null) {
+      return;
+    }
+
+    if (userResponseStructure.cosmetics.HAT !== undefined) {
+      event.getPlayer().setHat(userResponseStructure.cosmetics.HAT);
+    }
+
+    if (userResponseStructure.cosmetics.PET !== undefined) {
+      event.getPlayer().setPet(userResponseStructure.cosmetics.PET);
+    }
+
+    if (userResponseStructure.cosmetics.SKIN !== undefined) {
+      event.getPlayer().setSkin(userResponseStructure.cosmetics.SKIN);
+    }
+
+    if (userResponseStructure.cosmetics.COLOR !== undefined) {
+      event.getPlayer().setColor(userResponseStructure.cosmetics.COLOR);
+    }
+
+    const response = await this.fetchCosmetic.get("item/", { headers: { authorization: this.authToken(userResponseStructure) } });
+    const items: Item[] = JSON.parse(response.body).data;
+    const bundles = await Promise.all(items.map(async i => await AssetBundle.load(i.resource.path, i.resource.url)));
+
+    await this.loadCosmeticForConnection(connection, bundles, items, true);
   }
 }

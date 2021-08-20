@@ -32,7 +32,7 @@ export class AssetBundle {
   }
 
   static loadFromCache(fileName: string): AssetBundle | undefined {
-    return this.cache.get(fileName)!;
+    return this.cache.get(fileName);
   }
 
   static loadSafeFromCache(fileName: string): AssetBundle {

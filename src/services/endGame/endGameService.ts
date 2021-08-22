@@ -6,6 +6,7 @@ import { OverwriteGameOver } from "../../packets/root";
 import { WinSoundType } from "../../types/enums/winSound";
 import { EndGameScreenData } from "../roleManager/roleManagerService";
 import { Events } from "@polusgg/plugin-logger/events";
+import Emittery from "emittery";
 
 type EndGameIntent = {
   endGameData: Map<PlayerInstance, EndGameScreenData>;
@@ -17,7 +18,9 @@ type EndGameExclusion = {
   intentName: string;
 };
 
-export class EndGameService {
+export class EndGameService extends Emittery<{
+  beforeGameEnd: Game;
+}> {
   //@TODO: Setters and getters for defaultEndGameData
   public defaultEndGameData: EndGameScreenData = {
     title: "Missing",
@@ -80,6 +83,9 @@ export class EndGameService {
       }
     });
 
+    await this.emit("beforeGameEnd", game);
+
+    console.log("Really done");
     await game.getLobby().getHostInstance().endGame(0x07);
   }
 

@@ -5,14 +5,18 @@ declare const server: Server;
 
 export type Filter<EventType> = (event: EventType) => boolean;
 
+export type AsyncFilter<EventType> = (event: EventType) => Promise<boolean>;
+
 export type Executor<EventType> = (event: EventType) => void;
 
-export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>> {
-  private readonly filters: Filter<ServerEvents[EventName]>[] = [];
-  private readonly executors: Executor<ServerEvents[EventName]>[] = [];
-  private readonly boundFunction: (event: ServerEvents[EventName]) => void;
+export type AsyncExecutor<EventType> = (event: EventType) => Promise<void>;
 
-  constructor(private readonly eventName: EventName, private readonly owner: unknown) {
+export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>> {
+  protected readonly filters: Filter<ServerEvents[EventName]>[] = [];
+  protected readonly executors: Executor<ServerEvents[EventName]>[] = [];
+  protected readonly boundFunction: (event: ServerEvents[EventName]) => void;
+
+  constructor(protected readonly eventName: EventName, protected readonly owner: unknown) {
     this.boundFunction = this.handle.bind(this);
 
     if (eventName === "game.ended") {
@@ -39,7 +43,7 @@ export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>>
     server.off<EventName>(this.eventName, this.boundFunction);
   }
 
-  private handle(event: ServerEvents[EventName]): void {
+  handle(event: ServerEvents[EventName]): void {
     let shouldPreventExecution = false;
 
     for (let i = 0; i < this.filters.length; i++) {
@@ -52,6 +56,24 @@ export class EventCatcher<EventName extends Extract<keyof ServerEvents, string>>
 
     for (let i = 0; i < this.executors.length; i++) {
       this.executors[i].bind(this.owner)(event);
+    }
+  }
+}
+
+export class AsyncEventCatcher<EventName extends Extract<keyof ServerEvents, string>> extends EventCatcher<EventName> {
+  async handle(event: ServerEvents[EventName]): Promise<void> {
+    let shouldPreventExecution = false;
+
+    for (let i = 0; i < this.filters.length; i++) {
+      shouldPreventExecution ||= !await this.filters[i].bind(this.owner)(event);
+    }
+
+    if (shouldPreventExecution) {
+      return;
+    }
+
+    for (let i = 0; i < this.executors.length; i++) {
+      await this.executors[i].bind(this.owner)(event);
     }
   }
 }

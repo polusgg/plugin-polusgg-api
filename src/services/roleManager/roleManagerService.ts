@@ -53,7 +53,7 @@ export class RoleManagerService {
           .getGame()
           .getLobby()
           .getPlayers()
-          .map(p => this.onPlayerDespawned(p, RoleDestroyedReason.GameEnded)));
+          .map(async p => this.onPlayerDespawned(p, RoleDestroyedReason.GameEnded)));
       }
     });
 
@@ -154,15 +154,25 @@ export class RoleManagerService {
     }
 
     game.getLobby().getPlayers().forEach(player => {
+      const playerPartners: PlayerInstance[] = [];
+
       game.getLobby().getPlayers().forEach(target => {
         if (player.getMeta<BaseRole>("pgg.api.role").isPartner(target.getMeta<BaseRole>("pgg.api.role"))) {
-          Services.get(ServiceType.Name).setFor(
-            player.getSafeConnection(),
-            target,
-            target.getName() + EmojiService.static("partner"),
-          );
+          playerPartners.push(target);
         }
       });
+
+      if (playerPartners.length > 1) {
+        for (let i = 0; i < playerPartners.length; i++) {
+          const partner = playerPartners[i];
+
+          Services.get(ServiceType.Name).setFor(
+            player.getSafeConnection(),
+            partner,
+            partner.getName() + EmojiService.static("partner"),
+          );
+        }
+      }
     });
   }
 

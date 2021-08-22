@@ -12,6 +12,7 @@ import { BaseManager } from "../baseManager/baseManager";
 import { RoleDestroyedReason } from "../types/enums/roleDestroyedReason";
 import { Services } from "../services";
 import { Location, ServiceType } from "../types/enums";
+import { AsyncEventCatcher } from "./eventCatcher";
 
 export type Ownable = LobbyInstance | PlayerInstance | Connection | Game | BaseInnerNetEntity | BaseInnerNetObject | undefined;
 
@@ -33,7 +34,7 @@ export class BaseRole {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly caughtEvents: EventCatcher<any>[] = [];
 
-  constructor(protected readonly owner: PlayerInstance) {
+  constructor(public readonly owner: PlayerInstance) {
     Services.get(ServiceType.Hud).setHudString(owner, Location.TaskText, this.getDescriptionText());
   }
 
@@ -53,8 +54,8 @@ export class BaseRole {
     this.metadata.alignment = alignment;
   }
 
-  catch<NameType extends Extract<keyof ServerEvents, string>>(eventName: NameType, ownsMethod: (event: ServerEvents[NameType]) => Ownable): EventCatcher<NameType> {
-    const catcher = new EventCatcher(eventName, this).where(event => this.owns(ownsMethod.bind(this)(event)));
+  catch<NameType extends Extract<keyof ServerEvents, string>>(eventName: NameType, ownsMethod: (event: ServerEvents[NameType]) => Ownable, async: boolean = false): EventCatcher<NameType> {
+    const catcher = new (async ? AsyncEventCatcher : EventCatcher)(eventName, this).where(event => this.owns(ownsMethod.bind(this)(event)));
 
     this.caughtEvents.push(catcher);
 

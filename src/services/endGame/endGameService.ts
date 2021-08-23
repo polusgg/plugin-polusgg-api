@@ -56,6 +56,8 @@ export class EndGameService extends Emittery<{
       return;
     }
 
+    await this.emit("beforeGameEnd", game);
+
     const m = new Map<string, number>();
     const endGames = game.getLobby().getConnections().map(c => c.getMeta<EndGameScreenData | undefined>("pgg.api.endGameData") ?? this.defaultEndGameData);
 
@@ -83,9 +85,6 @@ export class EndGameService extends Emittery<{
       }
     });
 
-    await this.emit("beforeGameEnd", game);
-
-    console.log("Really done");
     await game.getLobby().getHostInstance().endGame(0x07);
   }
 

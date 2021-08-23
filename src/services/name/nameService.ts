@@ -56,6 +56,6 @@ export class NameService {
   }
 
   getFor(connection: Connection, target: PlayerInstance): string {
-    return connection.getMeta<Map<PlayerInstance, string>>("pggapi.names").get(target) ?? target.getName().toString();
+    return connection.getMeta<Map<PlayerInstance, string> | undefined>("pggapi.names")?.get(target) ?? target.getName().toString();
   }
 }

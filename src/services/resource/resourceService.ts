@@ -51,8 +51,12 @@ export class ResourceService {
           return await this.loadSingle(connection, assetBundle);
         } catch (err) {
           await connection.disconnect(DisconnectReason.custom("Failed to load assets. The issue has been reported to the developers."));
+          console.error(err);
 
-          throw err;
+          return {
+            isCached: false,
+            resourceId: assetBundle.getId(),
+          };
         }
       }
     }

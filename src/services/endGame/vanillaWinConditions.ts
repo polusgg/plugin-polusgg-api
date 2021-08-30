@@ -116,40 +116,53 @@ export class VanillaWinConditions {
     });
 
     server.on("player.left", event => {
-      if (event.getLobby().getGameState() !== GameState.Started) {
-        return;
-      }
+      setTimeout(() => {
+        if (event.getLobby().getGameState() !== GameState.Started) {
+          console.log("[VWC] Early exit due to invalid gamestate", GameState[event.getLobby().getGameState()]);
 
-      if (event.getLobby().getPlayers()
-        .filter(x => x.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !x.getGameDataEntry().isDisconnected() && !(x.isDead() || (x.getMeta<boolean | undefined>("pgg.countAsDead") ?? false))).length === 0) {
-        endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
-          endGameData: new Map(event.getPlayer().getLobby().getPlayers()
-            .map(player => [player, {
-              title: "Victory",
-              subtitle: "<color=#FF1919FF>Impostor</color> disconnected",
-              color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
-              yourTeam: event.getLobby().getPlayers()
-                .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
-              winSound: WinSoundType.CrewmateWin,
-              hasWon: true,
-            }])),
-          intentName: "impostorDisconnected",
-        });
-      } else if (this.shouldEndGameImpostors(event.getLobby())) {
-        endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
-          endGameData: new Map(event.getPlayer().getLobby().getPlayers()
-            .map(player => [player, {
-              title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-              subtitle: "<color=#8CFFFFFF>Crewmates</color> disconnected",
-              color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
-              yourTeam: event.getLobby().getPlayers()
-                .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor),
-              winSound: WinSoundType.ImpostorWin,
-              hasWon: player.isImpostor(),
-            }])),
-          intentName: "crewmateDisconnected",
-        });
-      }
+          return;
+        }
+
+        console.log(event.getLobby().getPlayers().map(p => ({
+          alignment: RoleAlignment[p.getMeta<BaseRole | undefined>("pgg.api.role")!.getAlignment()],
+          gdDisconnected: p.getGameDataEntry().isDisconnected(),
+          dead: p.isDead(),
+          cad: p.getMeta<boolean | undefined>("pgg.countAsDead") ?? false,
+        })));
+
+        if (event.getLobby().getPlayers()
+          .filter(x => x.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !x.getGameDataEntry().isDisconnected() && !(x.isDead() || (x.getMeta<boolean | undefined>("pgg.countAsDead") ?? false))).length === 0) {
+          endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
+            endGameData: new Map(event.getPlayer().getLobby().getPlayers()
+              .map(player => [player, {
+                title: "Victory",
+                subtitle: "<color=#FF1919FF>Impostor</color> disconnected",
+                color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
+                yourTeam: event.getLobby().getPlayers()
+                  .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
+                winSound: WinSoundType.CrewmateWin,
+                hasWon: true,
+              }])),
+            intentName: "impostorDisconnected",
+          });
+        } else if (this.shouldEndGameImpostors(event.getLobby())) {
+          endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
+            endGameData: new Map(event.getPlayer().getLobby().getPlayers()
+              .map(player => [player, {
+                title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+                subtitle: "<color=#8CFFFFFF>Crewmates</color> disconnected",
+                color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
+                yourTeam: event.getLobby().getPlayers()
+                  .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor),
+                winSound: WinSoundType.ImpostorWin,
+                hasWon: player.isImpostor(),
+              }])),
+            intentName: "crewmateDisconnected",
+          });
+        }
+
+        console.log("[VWC] PL Fallthrough");
+      }, 500);
     });
 
     server.on("game.ended", event => {

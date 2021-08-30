@@ -43,7 +43,8 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
         //@ts-expect-error
         const relatedOptions = options[(this.getOption("Gamemode").getValue() as EnumValue).getSelected()];
 
-        const match = relatedOptions.find(v => v.key === option.getKey());
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        const match = relatedOptions?.find(v => v.key === option.getKey());
 
         if (match !== undefined && match.value.type === value.toJson().type) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

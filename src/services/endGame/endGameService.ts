@@ -7,6 +7,7 @@ import { WinSoundType } from "../../types/enums/winSound";
 import { EndGameScreenData } from "../roleManager/roleManagerService";
 import { Events } from "@polusgg/plugin-logger/events";
 import Emittery from "emittery";
+import { Server } from "@nodepolus/framework/src/server";
 
 type EndGameIntent = {
   endGameData: Map<PlayerInstance, EndGameScreenData>;
@@ -17,6 +18,8 @@ type EndGameIntent = {
 type EndGameExclusion = {
   intentName: string;
 };
+
+declare const server: Server;
 
 export class EndGameService extends Emittery<{
   beforeGameEnd: Game;
@@ -35,6 +38,18 @@ export class EndGameService extends Emittery<{
 
   protected intents: Map<Game, EndGameIntent[]> = new Map();
   protected exclusions: Map<Game, EndGameExclusion[]> = new Map();
+
+  constructor() {
+    super();
+
+    server.on("player.left", p => {
+      const game = p.getLobby().getGame();
+
+      if (game) {
+        this.recalculateEndGame(game);
+      }
+    });
+  }
 
   async setEndGameData(connection: Connection, endGameData: EndGameScreenData): Promise<void> {
     connection.setMeta("pgg.api.endGameData", endGameData);
@@ -89,6 +104,8 @@ export class EndGameService extends Emittery<{
   }
 
   async registerEndGameIntent(game: Game, endGameIntent: EndGameIntent): Promise<void> {
+    console.trace("[REGI]", endGameIntent);
+
     if (!this.intents.has(game)) {
       this.intents.set(game, []);
     }
@@ -100,7 +117,6 @@ export class EndGameService extends Emittery<{
     await this.recalculateEndGame(game);
   }
 
-  //TODO Recalculate end game
   unregisterEndGameIntent(game: Game, endGameIntentName: EndGameIntent["intentName"]): void {
     if (!this.intents.has(game)) {
       this.intents.set(game, []);
@@ -115,6 +131,8 @@ export class EndGameService extends Emittery<{
 
       return;
     }
+
+    this.recalculateEndGame(game);
 
     throw new Error(`Unable to find intent by name ${endGameIntentName}`);
   }
@@ -148,14 +166,24 @@ export class EndGameService extends Emittery<{
   }
 
   async recalculateEndGame(game: Game): Promise<void> {
+    console.trace("REG");
+
     if (!this.intents.has(game)) {
+      console.log("[EGC] Early exit due to game missing from intents map");
+
       return;
     }
+
+    console.log(`[EGC] Exclusions, ${this.exclusions.get(game)?.map(e => e.intentName).join(", ")}`);
 
     for (let i = 0; i < this.intents.get(game)!.length; i++) {
       const intent = this.intents.get(game)![i];
 
+      console.log(`[EGC] Checking exclusions for ${intent.intentName}`);
+
       if (!this.exclusions.has(game) || !this.exclusions.get(game)!.some(exclusion => exclusion.intentName === intent.intentName)) {
+        console.log(`[EGC] ${intent.intentName} Has no exclusions, ending game`);
+
         [...intent.endGameData.entries()].forEach(([player, data]) => {
           if (player.getConnection() !== undefined) {
             this.setEndGameData(player.getSafeConnection(), data);

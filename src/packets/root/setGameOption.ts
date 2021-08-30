@@ -1,34 +1,16 @@
 import { BaseRootPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
+import {
+  BooleanValueJson,
+  EnumValueJson,
+  NumberValueJson,
+} from "@polusgg/module-polusgg-auth-api/src/types/gameOptionJson";
 
 export enum GameOptionType {
   NumberValue = 0,
   BooleanValue = 1,
   EnumValue = 2,
 }
-
-export type NumberValueJson = {
-  value: number;
-  step: number;
-  lower: number;
-  upper: number;
-  zeroIsInfinity: boolean;
-  suffix: string;
-  type: "NUMBER";
-};
-
-export type BooleanValueJson = {
-  value: boolean;
-  type: "BOOLEAN";
-};
-
-export type EnumValueJson = {
-  index: number;
-  options: string[];
-  type: "ENUM";
-};
-
-export type ValueJson = NumberValueJson | BooleanValueJson | EnumValueJson;
 
 export class NumberValue {
   constructor(

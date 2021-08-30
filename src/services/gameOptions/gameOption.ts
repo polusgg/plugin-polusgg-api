@@ -1,15 +1,9 @@
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { Services } from "..";
-import { ValueJson, NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packets/root/setGameOption";
+import { NumberValue, BooleanValue, EnumValue, SetGameOption } from "../../packets/root/setGameOption";
 import { ServiceType } from "../../types/enums";
-
-export type GameOptionJson = {
-  value: ValueJson;
-  category: string;
-  priority: number;
-  key: string;
-};
+import { GameOptionJson} from "@polusgg/module-polusgg-auth-api/src/types/gameOptionJson";
 
 export class GameOption<V extends NumberValue | BooleanValue | EnumValue> {
   constructor(protected readonly lobby: LobbyInstance, protected readonly category: string, protected priority: number, protected readonly key: string, protected value: V) {}

@@ -22,6 +22,7 @@ const staticEmojiNames = <const>[
   "submerged",
   "morphling",
   "airship",
+  "poisoner",
 ];
 
 type StaticEmojiName = (typeof staticEmojiNames)[number];

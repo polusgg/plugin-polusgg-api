@@ -111,6 +111,11 @@ export class RoleManagerService {
 
     const impostorCount = Math.min(options.getOption("Impostor Count").getValue().value, RoleManagerService.adjustImpostorCount(players.length));
 
+    game.getLobby().getOptions().setImpostorCount(impostorCount);
+    (game.getLobby().getPlayers()[0] as Player).getEntity().getPlayerControl().syncSettings(
+      game.getLobby().getOptions()
+    );
+
     for (let i = 0; i < impostorCount; i++) {
       if (i >= impostorAlignedRolesFromAssignment.length) {
         impostorAlignedRoles.push({ role: Impostor });

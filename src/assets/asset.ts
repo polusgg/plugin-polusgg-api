@@ -4,6 +4,10 @@ import { AssetBundle } from "./assetBundle";
 export class Asset {
   constructor(protected readonly bundle: AssetBundle, protected readonly declaration: AssetDeclaration) {}
 
+  getDeclaration() {
+    return this.declaration;
+  }
+
   getBundle(): AssetBundle {
     return this.bundle;
   }

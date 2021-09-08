@@ -7,6 +7,10 @@ export class AudioAsset extends Asset {
     super(bundle, declaration);
   }
 
+  getDeclaration() {
+    return this.declaration;
+  }
+
   getSampleCount(): number {
     return this.declaration.details.samples;
   }

@@ -14,7 +14,6 @@ export class BaseMod extends BasePlugin {
   ) {
     super({
       ...modMetadata,
-      name: `Polus.gg Gamemode - ${modMetadata.name}`,
     });
 
     BaseMod.owner.registerMod(this);

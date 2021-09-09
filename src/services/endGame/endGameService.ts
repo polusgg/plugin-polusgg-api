@@ -104,7 +104,7 @@ export class EndGameService extends Emittery<{
   }
 
   async registerEndGameIntent(game: Game, endGameIntent: EndGameIntent): Promise<void> {
-    console.trace("[REGI]", endGameIntent);
+    // console.trace("[REGI]", endGameIntent);
 
     if (!this.intents.has(game)) {
       this.intents.set(game, []);
@@ -166,7 +166,7 @@ export class EndGameService extends Emittery<{
   }
 
   async recalculateEndGame(game: Game): Promise<void> {
-    console.trace("REG");
+    // console.trace("REG");
 
     if (!this.intents.has(game)) {
       console.log("[EGC] Early exit due to game missing from intents map");

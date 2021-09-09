@@ -2,25 +2,28 @@ import { AssetBundleDeclaration } from "../types/assetBundleDeclaration";
 import { Asset } from "./asset";
 import got from "got";
 
-const defaultPrefixUrl = "https://client-assetbundles.polus.gg/";
+const defaultPrefixUrl = "https://client-assetbundles.polus.gg";
 
 export class AssetBundle {
   protected static readonly cache: Map<string, AssetBundle> = new Map();
   protected readonly contents: Asset[] = [];
 
-  protected constructor(protected readonly declaration: AssetBundleDeclaration, protected readonly address: string) {
-    for (let i = 0; i < declaration.assets.length; i++) {
-      const assetDeclaration = declaration.assets[i];
-
-      assetDeclaration.id = declaration.assetBundleId + 1 + i;
-      this.contents.push(new Asset(this, assetDeclaration));
-    }
+  protected constructor(protected declaration: AssetBundleDeclaration, protected readonly address: string) {
+    this.loadDeclaration();
   }
 
-  static async load(location: string, prefixUrl: string = defaultPrefixUrl): Promise<AssetBundle> {
+  static async load(location: string, options?: { prefixUrl?: string, updateCache?: boolean }): Promise<AssetBundle> {
     if (this.cache.has(location)) {
-      return this.cache.get(location)!;
+      const cached = this.cache.get(location)!;
+
+      if (options?.updateCache) {
+        await cached.load();
+      }
+
+      return cached;
     }
+
+    const prefixUrl = options?.prefixUrl ?? defaultPrefixUrl;
 
     const { body } = await got.extend({ prefixUrl })<string>(`${location}.json`);
 
@@ -43,6 +46,28 @@ export class AssetBundle {
     }
 
     return res;
+  }
+
+  async load() {
+    const { body } = await got<string>(this.address + ".json");
+
+    const newDeclaration = JSON.parse(body) as AssetBundleDeclaration;
+
+    if (newDeclaration.hash === this.declaration.hash) {
+      // this should not be treated as an attack as the cdn may not be updated for this server (super unlikely bc unity invalidates cache when uploading any asset bundle)
+      throw new Error("Loaded declaration had the same hash as current!");
+    }
+
+    this.loadDeclaration();
+  }
+
+  private loadDeclaration() {
+    for (let i = 0; i < this.declaration.assets.length; i++) {
+      const assetDeclaration = this.declaration.assets[i];
+
+      assetDeclaration.id = this.declaration.assetBundleId + 1 + i;
+      this.contents.push(new Asset(this, assetDeclaration));
+    }
   }
 
   getId(): number {

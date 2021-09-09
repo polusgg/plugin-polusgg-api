@@ -6,6 +6,7 @@ import {
   FetchResourceResponseFailedPacket,
   FetchResourceResponseStartedPacket,
 } from "./fetchResource";
+import { FetchResourceResponseInvalidPacket } from "./fetchResource/fetchResourceResponseInvalidPacket";
 
 export class FetchResourcePacket extends BaseRootPacket {
   constructor(
@@ -62,6 +63,8 @@ export class FetchResourceResponsePacket extends BaseRootPacket {
         return new FetchResourceResponsePacket(resourceId, FetchResourceResponseEndedPacket.deserialize(reader));
       case 2:
         return new FetchResourceResponsePacket(resourceId, FetchResourceResponseFailedPacket.deserialize(reader));
+      case 3:
+        return new FetchResourceResponsePacket(resourceId, FetchResourceResponseInvalidPacket.deserialize(reader));
       default:
         throw new Error(`Unknown resource response type: ${type}`);
     }

@@ -21,8 +21,8 @@ export class ResourceService {
       server.getLogger("ResourceService").info("Global AssetBundle loaded.");
     });
 
-    server.on("connection.opened", event => {
-      this.load(event.getConnection(), this.globalAssetBundle);
+    server.on("connection.opened", async event => {
+      await this.load(event.getConnection(), this.globalAssetBundle);
     });
   }
 
@@ -72,7 +72,7 @@ export class ResourceService {
       return;
     }
 
-    server.getLogger("Polus.gg Resource Service").warn(`Asset "${asset.getPath().join("/")}" (${asset.getId()}) from assetBundle "${asset.getBundle().getAddress()}" (${asset.getBundle().getId()}) was asserted to be loaded, but did not exist on the connection's LoadedBundles array`);
+    server.getLogger("ResourceService").warn(`Asset "${asset.getPath().join("/")}" (${asset.getId()}) from assetBundle "${asset.getBundle().getAddress()}" (${asset.getBundle().getId()}) was asserted to be loaded, but did not exist on the connection's LoadedBundles array`);
 
     await this.load(connection, asset.getBundle());
   }
@@ -100,6 +100,19 @@ export class ResourceService {
     const { response } = await connection.awaitPacket(p => p.getType() === CustomRootPacketType.FetchResource as number
       && (p as FetchResourceResponsePacket).resourceId == assetBundle.getId()
       && (p as FetchResourceResponsePacket).response.getType() !== 0x00, 10000) as FetchResourceResponsePacket;
+
+    if (response.getType() == 0x03) {
+      server.getLogger("ResourceService").info(`Updating cache for bundle at ${assetBundle.getAddress()}`);
+
+      await assetBundle.load();
+
+      this.getLoadedAssetBundlesForConnection(connection).push(assetBundle);
+
+      return {
+        isCached: false,
+        resourceId: assetBundle.getId(),
+      };
+    }
 
     if (response.getType() == 0x01) {
       this.getLoadedAssetBundlesForConnection(connection).push(assetBundle);

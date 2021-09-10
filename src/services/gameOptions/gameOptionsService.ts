@@ -118,7 +118,7 @@ export class GameOptionsService {
           `${EmojiService.static("submerged")} Submerged`,
         ]), GameOptionPriority.Highest + 1);
         options.createOption("", "Impostor Count", new NumberValue(1, 1, 1, 3, false, `{0} Impostors`), GameOptionPriority.Highest + 2);
-        options.createOption("", "Max Player Count", new NumberValue(1, 1, 4, 15, false, `{0} Players`), GameOptionPriority.Highest + 3);
+        options.createOption("", "Max Player Count", new NumberValue(15, 1, 4, 15, false, `{0} Players`), GameOptionPriority.Highest + 3);
         options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 10);
         options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 9);
         options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, false, "{0}s"), GameOptionPriority.Higher - 7);

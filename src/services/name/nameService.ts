@@ -26,6 +26,10 @@ export class NameService {
         return;
       }
 
+      if (!connection.hasMeta("pggapi.names")) {
+        connection.setMeta("pggapi.names", new Map());
+      }
+
       connection.getMeta<Map<PlayerInstance, string>>("pggapi.names").set(target, name);
 
       await connection.writeReliable(new GameDataPacket([

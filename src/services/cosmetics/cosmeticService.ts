@@ -299,8 +299,11 @@ export class CosmeticService {
       if (userResponseStructure.cosmetics.COLOR !== undefined) {
         let requestedColor = userResponseStructure.cosmetics.COLOR;
 
+        let pleaseDontLoopThankYou = 0;
+
         // eslint-disable-next-line @typescript-eslint/no-loop-func
-        while (event.getLobby().getPlayers().find(p => p.getColor() === requestedColor) !== undefined) {
+        while (event.getLobby().getPlayers().find(p => p.getColor() === requestedColor) !== undefined && pleaseDontLoopThankYou < 20) {
+          pleaseDontLoopThankYou++;
           requestedColor++;
 
           if (requestedColor > 18) {

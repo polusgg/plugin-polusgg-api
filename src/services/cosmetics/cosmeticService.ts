@@ -49,7 +49,16 @@ export class CosmeticService {
         return;
       }
 
-      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned") ?? [];
+      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
+
+      if (ownedItems === undefined) {
+        Services.get(ServiceType.Hud).displayNotification("There was an error loading your purchased items", [connection]);
+
+        event.setNewHat(PlayerHat.None);
+
+        return;
+      }
+
       const item = ownedItems.find(i => i.amongUsId === event.getNewHat());
 
       if (item === undefined) {
@@ -89,7 +98,16 @@ export class CosmeticService {
         return;
       }
 
-      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned") ?? [];
+      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
+
+      if (ownedItems === undefined) {
+        Services.get(ServiceType.Hud).displayNotification("There was an error loading your purchased items", [connection]);
+
+        event.setNewPet(PlayerPet.None);
+
+        return;
+      }
+
       const item = ownedItems.find(i => i.amongUsId === event.getNewPet());
 
       if (item === undefined) {
@@ -109,7 +127,7 @@ export class CosmeticService {
           await this.loadCosmeticForConnection(c, [cosmetic], [item], false);
           c.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetPetPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())]);
         })),
-        connection.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetPetPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())])]);
+      connection.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetPetPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())])]);
     });
 
     server.on("player.skin.updated", async event => {
@@ -129,7 +147,16 @@ export class CosmeticService {
         return;
       }
 
-      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned") ?? [];
+      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
+
+      if (ownedItems === undefined) {
+        Services.get(ServiceType.Hud).displayNotification("There was an error loading your purchased items", [connection]);
+
+        event.setNewSkin(PlayerSkin.None);
+
+        return;
+      }
+
       const item = ownedItems.find(i => i.amongUsId === event.getNewSkin());
 
       if (item === undefined) {
@@ -149,7 +176,7 @@ export class CosmeticService {
           await this.loadCosmeticForConnection(c, [cosmetic], [item], false);
           c.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetSkinPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())]);
         })),
-        connection.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetSkinPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())])]);
+      connection.sendReliable([new GameDataPacket([new RpcPacket((event.getPlayer() as Player).getEntity().getPlayerControl().getNetId(), new SetSkinPacket(item.amongUsId))], event.getPlayer().getLobby().getCode())])]);
     });
   }
 
@@ -190,6 +217,7 @@ export class CosmeticService {
       const item = items[index];
 
       connection.getMeta<[Item, boolean][]>("pgg.cosmetic.loaded").push([item, accessible]);
+
       switch (item.type) {
         case "HAT":
           await connection.writeReliable(new LoadHatPacket(item.amongUsId, item.resource.id, accessible));

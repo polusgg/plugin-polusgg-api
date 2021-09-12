@@ -59,7 +59,7 @@ export class CosmeticService {
         return;
       }
 
-      console.log("HAT_COSMETIC_OWNED_ITEMS", event.getPlayer().getConnection()?.getMeta<UserResponseStructure>("pgg.auth.self").client_id, ownedItems, event.getNewHat());
+      // console.log("HAT_COSMETIC_OWNED_ITEMS", event.getPlayer().getConnection()?.getMeta<UserResponseStructure>("pgg.auth.self").client_id, ownedItems, event.getNewHat());
 
       const item = ownedItems.find(i => i.amongUsId === event.getNewHat());
 

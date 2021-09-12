@@ -6,6 +6,7 @@ import { ResourceResponse } from "../../types";
 import { Asset, AssetBundle } from "../../assets";
 import { Server } from "@nodepolus/framework/src/server";
 import { DisconnectReason } from "@nodepolus/framework/src/types";
+import { Mutex } from "async-mutex";
 
 declare const server: Server;
 
@@ -22,6 +23,8 @@ export class ResourceService {
     });
 
     server.on("connection.opened", async event => {
+      const connection = event.getConnection();
+      connection.setMeta("pgg.resources.loadingMutex", new Mutex());
       await this.load(event.getConnection(), this.globalAssetBundle);
     });
   }
@@ -36,30 +39,39 @@ export class ResourceService {
       };
     }
 
+    const mutex = connection.getMeta<Mutex>("pgg.resources.loadingMutex");
+    const release = await mutex.acquire();
+
+    let resourceResponse: ResourceResponse | undefined;
+
     try {
-      return await this.loadSingle(connection, assetBundle);
+      resourceResponse = await this.loadSingle(connection, assetBundle);
     } catch {
       // failed the first attempt.
       // try again
       try {
-        return await this.loadSingle(connection, assetBundle);
+        resourceResponse = await this.loadSingle(connection, assetBundle);
       } catch {
         // failed the second attempt.
         // TODO: Don't cache.
         // try again
         try {
-          return await this.loadSingle(connection, assetBundle);
+          resourceResponse = await this.loadSingle(connection, assetBundle);
         } catch (err) {
           await connection.disconnect(DisconnectReason.custom("Failed to load assets. The issue has been reported to the developers."));
           console.error(err);
 
-          return {
+          resourceResponse = {
             isCached: false,
             resourceId: assetBundle.getId(),
           };
         }
       }
     }
+
+    release();
+
+    return resourceResponse;
   }
 
   async assertLoaded(connection: Connection, asset: Asset): Promise<void> {

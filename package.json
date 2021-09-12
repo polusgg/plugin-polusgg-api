@@ -31,6 +31,7 @@
     "@polusgg/module-polusgg-auth-api": "latest",
     "@polusgg/module-cosmetics": "latest",
     "@polusgg/plugin-logger": "latest",
+    "async-mutex": "^0.3.2",
     "emittery": "^0.8.1",
     "got": "^11.8.2"
   }

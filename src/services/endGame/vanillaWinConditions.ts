@@ -123,13 +123,6 @@ export class VanillaWinConditions {
           return;
         }
 
-        console.log(event.getLobby().getPlayers().map(p => ({
-          alignment: RoleAlignment[p.getMeta<BaseRole | undefined>("pgg.api.role")!.getAlignment()],
-          gdDisconnected: p.getGameDataEntry().isDisconnected(),
-          dead: p.isDead(),
-          cad: p.getMeta<boolean | undefined>("pgg.countAsDead") ?? false,
-        })));
-
         if (event.getLobby().getPlayers()
           .filter(x => x.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor && !x.getGameDataEntry().isDisconnected() && !(x.isDead() || (x.getMeta<boolean | undefined>("pgg.countAsDead") ?? false))).length === 0) {
           endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {

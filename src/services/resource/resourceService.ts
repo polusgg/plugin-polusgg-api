@@ -30,7 +30,7 @@ export class ResourceService {
   }
 
   async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
-    const preloaded = this.getLoadedAssetBundlesForConnection(connection);
+    let preloaded = this.getLoadedAssetBundlesForConnection(connection);
 
     if (preloaded.includes(assetBundle)) {
       return {
@@ -41,6 +41,17 @@ export class ResourceService {
 
     const mutex = connection.getMeta<Mutex>("pgg.resources.loadingMutex");
     const release = await mutex.acquire();
+
+    preloaded = this.getLoadedAssetBundlesForConnection(connection);
+
+    // also do the preloaded check after the mutex is acquired to prevent accidentally loading town of polus twice?
+    if (preloaded.includes(assetBundle)) {
+      release();
+      return {
+        isCached: true,
+        resourceId: assetBundle.getId(),
+      };
+    }
 
     let resourceResponse: ResourceResponse | undefined;
 

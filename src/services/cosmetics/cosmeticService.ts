@@ -265,7 +265,7 @@ export class CosmeticService {
     }
 
     const cosmeticIds = Object.values(userResponseStructure.cosmetics) as number[];
-    const itemsToLoad = items.filter(i => cosmeticIds.includes(i.amongUsId));
+    const itemsToLoad = items.filter(i => cosmeticIds.includes(i.amongUsId) && i.type !== "PERK");
     const bundles = await Promise.all(itemsToLoad.map(async i => await AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
 
     await this.loadCosmeticForConnection(event.getConnection(), bundles, itemsToLoad, true);
@@ -311,7 +311,7 @@ export class CosmeticService {
 
     const userResponseStructure = connection.getMeta<UserResponseStructure>("pgg.auth.self");
 
-    console.log("response structure", userResponseStructure.cosmetics)
+    console.log("response structure", userResponseStructure.cosmetics);
 
     if (userResponseStructure.cosmetics !== null) {
       if (userResponseStructure.cosmetics.HAT !== undefined) {
@@ -343,8 +343,7 @@ export class CosmeticService {
       }
     }
 
-    const response = await this.fetchCosmetic.get("item/", { headers: { authorization: this.authToken(userResponseStructure) } });
-    const items: Item[] = JSON.parse(response.body).data;
+    const items = event.getPlayer().getConnection()!.getMeta<Item[]>("pgg.cosmetics.owned").filter(i => i.type !== "PERK");
     const bundles = await Promise.all(items.map(async i => await AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
 
     await this.loadCosmeticForConnection(connection, bundles, items, true);

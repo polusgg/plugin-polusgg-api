@@ -343,7 +343,8 @@ export class CosmeticService {
       }
     }
 
-    const items = event.getPlayer().getConnection()!.getMeta<Item[]>("pgg.cosmetics.owned").filter(i => i.type !== "PERK");
+    const response = await this.fetchCosmetic.get("item/", { headers: { authorization: this.authToken(userResponseStructure) } });
+    const items: Item[] = JSON.parse(response.body).data.filter(i => i.type !== "PERK");
     const bundles = await Promise.all(items.map(async i => await AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
 
     await this.loadCosmeticForConnection(connection, bundles, items, true);

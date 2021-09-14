@@ -24,17 +24,19 @@ export class ResourceService {
 
     server.on("connection.opened", async event => {
       const connection = event.getConnection();
+
       connection.setMeta("pgg.resources.loadingMutex", new Mutex());
+
       await this.load(event.getConnection(), this.globalAssetBundle);
     });
   }
 
   async load(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
-    console.log("load", assetBundle);
+    // console.log("load", assetBundle);
     let preloaded = this.getLoadedAssetBundlesForConnection(connection);
 
     if (preloaded.includes(assetBundle)) {
-      console.log("loadCached");
+      // console.log("loadCached");
       return {
         isCached: true,
         resourceId: assetBundle.getId(),
@@ -42,15 +44,16 @@ export class ResourceService {
     }
 
     const mutex = connection.getMeta<Mutex>("pgg.resources.loadingMutex");
-    console.log("beforeMutexAcquire");
+    // console.log("beforeMutexAcquire");
     const release = await mutex.acquire();
-    console.log("afterMutexAcquire");
+    // console.log("afterMutexAcquire");
 
     preloaded = this.getLoadedAssetBundlesForConnection(connection);
 
     // also do the preloaded check after the mutex is acquired to prevent accidentally loading town of polus twice?
     if (preloaded.includes(assetBundle)) {
       release();
+
       return {
         isCached: true,
         resourceId: assetBundle.getId(),
@@ -117,7 +120,7 @@ export class ResourceService {
   }
 
   private async loadSingle(connection: Connection, assetBundle: AssetBundle): Promise<ResourceResponse> {
-    console.log("LoadSingle", assetBundle);
+    // console.log("LoadSingle", assetBundle);
 
     connection.writeReliable(new FetchResourcePacket(
       assetBundle.getId(),
@@ -126,10 +129,9 @@ export class ResourceService {
       ResourceType.AssetBundle,
     ));
 
-    console.log("Awaiting", assetBundle.getId())
-    const { response } = await connection.awaitPacket(p => {console.log(p); return p.getType() === CustomRootPacketType.FetchResource as number
+    const { response } = await connection.awaitPacket(p => return p.getType() === CustomRootPacketType.FetchResource as number
       && (p as FetchResourceResponsePacket).resourceId == assetBundle.getId()
-      && (p as FetchResourceResponsePacket).response.getType() !== 0x00}, 10000) as FetchResourceResponsePacket;
+      && (p as FetchResourceResponsePacket).response.getType() !== 0x00, 10000) as FetchResourceResponsePacket;
 
     if (response.getType() == 0x03) {
       server.getLogger("ResourceService").info(`Updating cache for bundle at ${assetBundle.getAddress()}`);
@@ -147,7 +149,7 @@ export class ResourceService {
     if (response.getType() == 0x01) {
       this.getLoadedAssetBundlesForConnection(connection).push(assetBundle);
 
-      console.log("Resolving");
+      // console.log("Resolving");
       return {
         isCached: (response as FetchResourceResponseEndedPacket).didCache,
         resourceId: assetBundle.getId(),

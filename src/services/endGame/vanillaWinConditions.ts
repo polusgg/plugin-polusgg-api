@@ -118,7 +118,7 @@ export class VanillaWinConditions {
     server.on("player.left", event => {
       setTimeout(() => {
         if (event.getLobby().getGameState() !== GameState.Started) {
-          console.log("[VWC] Early exit due to invalid gamestate", GameState[event.getLobby().getGameState()]);
+          // console.log("[VWC] Early exit due to invalid gamestate", GameState[event.getLobby().getGameState()]);
 
           return;
         }
@@ -154,7 +154,7 @@ export class VanillaWinConditions {
           });
         }
 
-        console.log("[VWC] PL Fallthrough");
+        // console.log("[VWC] PL Fallthrough");
       }, 500);
     });
 

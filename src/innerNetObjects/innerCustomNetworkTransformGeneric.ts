@@ -36,7 +36,7 @@ export class InnerCustomNetworkTransformGeneric extends BaseInnerNetObject {
       return object.getNetId();
     }
 
-    console.log(object);
+    // console.log(object);
     throw new Error("Could not find owner of object");
   }
 

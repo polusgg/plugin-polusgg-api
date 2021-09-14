@@ -32,7 +32,7 @@ export class CosmeticService {
     server.on("player.joined", this.handlePlayerJoin.bind(this));
 
     server.on("player.hat.updated", async event => {
-      console.log("Client requested hat", event.getPlayer().getName().toString(), event.getNewHat());
+      // console.log("Client requested hat", event.getPlayer().getName().toString(), event.getNewHat());
 
       if (event.getNewHat() < 10_000_000) {
         if (event.getNewHat() as number === 9_999_999) {
@@ -83,7 +83,7 @@ export class CosmeticService {
     });
 
     server.on("player.pet.updated", async event => {
-      console.log("Client requested pet", event.getPlayer().getName().toString(), event.getNewPet());
+      // console.log("Client requested pet", event.getPlayer().getName().toString(), event.getNewPet());
 
       if (event.getNewPet() < 10_000_000) {
         if (event.getNewPet() as number === 9_999_999) {
@@ -132,7 +132,7 @@ export class CosmeticService {
     });
 
     server.on("player.skin.updated", async event => {
-      console.log("Client requested skin", event.getPlayer().getName().toString(), event.getNewSkin());
+      // console.log("Client requested skin", event.getPlayer().getName().toString(), event.getNewSkin());
 
       if (event.getNewSkin() < 10_000_000) {
         if (event.getNewSkin() as number === 9_999_999) {
@@ -221,9 +221,9 @@ export class CosmeticService {
 
       switch (item.type) {
         case "HAT":
-          console.log("BeforeLoadHatRes");
+          // console.log("BeforeLoadHatRes");
           await connection.writeReliable(new LoadHatPacket(item.amongUsId, item.resource.id, accessible));
-          console.log("AfterLoadHatRes");
+          // console.log("AfterLoadHatRes");
           break;
         case "PET":
           await connection.writeReliable(new LoadPetPacket(item.amongUsId, item.resource.id, accessible));
@@ -262,9 +262,9 @@ export class CosmeticService {
     const itemsToLoad = items.filter(i => cosmeticIds.includes(i.amongUsId) && i.type !== "PERK");
     const bundles = await Promise.all(itemsToLoad.map(async i => await AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
 
-    console.log("OnBeforeLoad")
+    // console.log("OnBeforeLoad")
     await this.loadCosmeticForConnection(event.getConnection(), bundles, itemsToLoad, true);
-    console.log("PostLoad")
+    // console.log("PostLoad")
 
     const players = lobby.getPlayers();
 
@@ -307,7 +307,7 @@ export class CosmeticService {
 
     const userResponseStructure = connection.getMeta<UserResponseStructure>("pgg.auth.self");
 
-    console.log("response structure", userResponseStructure.cosmetics);
+    // console.log("response structure", userResponseStructure.cosmetics);
 
     if (userResponseStructure.cosmetics !== null) {
       if (userResponseStructure.cosmetics.HAT !== undefined) {

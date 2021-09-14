@@ -90,7 +90,7 @@ export class NumberValue {
     }
 
     if (!Number.isInteger(Math.round((t.value / t.step) * 100000) / 100000)) {
-      console.log("Due to not being in-step");
+      // console.log("Due to not being in-step");
       return false;
     }
 

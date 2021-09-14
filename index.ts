@@ -204,7 +204,7 @@ export default class PolusGGApi extends BasePlugin {
   }
 
   async updateGamemode(lobby: LobbyInstance): Promise<void> {
-    console.log("[UG] Called", this.updateGamemodeRunning.get(lobby));
+    // console.log("[UG] Called", this.updateGamemodeRunning.get(lobby));
 
     if (this.updateGamemodeRunning.get(lobby)) {
       return;
@@ -212,7 +212,7 @@ export default class PolusGGApi extends BasePlugin {
 
     this.updateGamemodeRunning.set(lobby, true);
 
-    console.log("[UG] onlyInstance", this.updateGamemodeQueue.get(lobby));
+    // console.log("[UG] onlyInstance", this.updateGamemodeQueue.get(lobby));
 
     if (this.lastIndex.get(lobby) === this.updateGamemodeQueue.get(lobby)![this.updateGamemodeQueue.get(lobby)!.length - 1]) {
       this.updateGamemodeRunning.set(lobby, false);
@@ -223,7 +223,7 @@ export default class PolusGGApi extends BasePlugin {
 
     await this.mods[this.lastIndex.get(lobby)!].onDisable(lobby);
 
-    console.log("[UG] old unloaded");
+    // console.log("[UG] old unloaded");
 
     this.lastIndex.set(lobby, this.updateGamemodeQueue.get(lobby)!.pop()!);
 
@@ -231,16 +231,16 @@ export default class PolusGGApi extends BasePlugin {
 
     await this.mods[this.lastIndex.get(lobby)!].onEnable(lobby);
 
-    console.log("[UG] new loaded, queue size", this.updateGamemodeQueue.get(lobby));
+    // console.log("[UG] new loaded, queue size", this.updateGamemodeQueue.get(lobby));
 
     this.updateGamemodeRunning.set(lobby, false);
 
     if (this.updateGamemodeQueue.get(lobby)!.length > 0) {
-      console.log("[UG] recursing");
+      // console.log("[UG] recursing");
 
       await this.updateGamemode(lobby);
     }
 
-    console.log("[UG] exiting");
+    // console.log("[UG] exiting");
   }
 }

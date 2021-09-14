@@ -169,20 +169,20 @@ export class EndGameService extends Emittery<{
     // console.trace("REG");
 
     if (!this.intents.has(game)) {
-      console.log("[EGC] Early exit due to game missing from intents map");
+      // console.log("[EGC] Early exit due to game missing from intents map");
 
       return;
     }
 
-    console.log(`[EGC] Exclusions, ${this.exclusions.get(game)?.map(e => e.intentName).join(", ")}`);
+    // console.log(`[EGC] Exclusions, ${this.exclusions.get(game)?.map(e => e.intentName).join(", ")}`);
 
     for (let i = 0; i < this.intents.get(game)!.length; i++) {
       const intent = this.intents.get(game)![i];
 
-      console.log(`[EGC] Checking exclusions for ${intent.intentName}`);
+      // console.log(`[EGC] Checking exclusions for ${intent.intentName}`);
 
       if (!this.exclusions.has(game) || !this.exclusions.get(game)!.some(exclusion => exclusion.intentName === intent.intentName)) {
-        console.log(`[EGC] ${intent.intentName} Has no exclusions, ending game`);
+        // console.log(`[EGC] ${intent.intentName} Has no exclusions, ending game`);
 
         [...intent.endGameData.entries()].forEach(([player, data]) => {
           if (player.getConnection() !== undefined) {

@@ -129,9 +129,9 @@ export class ResourceService {
       ResourceType.AssetBundle,
     ));
 
-    const { response } = await connection.awaitPacket(p => return p.getType() === CustomRootPacketType.FetchResource as number
+    const { response } = await connection.awaitPacket(p => (p.getType() === CustomRootPacketType.FetchResource as number
       && (p as FetchResourceResponsePacket).resourceId == assetBundle.getId()
-      && (p as FetchResourceResponsePacket).response.getType() !== 0x00, 10000) as FetchResourceResponsePacket;
+      && (p as FetchResourceResponsePacket).response.getType() !== 0x00), 10000) as FetchResourceResponsePacket;
 
     if (response.getType() == 0x03) {
       server.getLogger("ResourceService").info(`Updating cache for bundle at ${assetBundle.getAddress()}`);

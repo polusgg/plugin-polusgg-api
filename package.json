@@ -27,10 +27,10 @@
     "typescript": "4.3.5"
   },
   "dependencies": {
-    "@nodepolus/framework": "latest",
-    "@polusgg/module-polusgg-auth-api": "latest",
-    "@polusgg/module-cosmetics": "latest",
-    "@polusgg/plugin-logger": "latest",
+    "@nodepolus/framework": "file:../nodepolus-framework",
+    "@polusgg/module-polusgg-auth-api": "file:../module-polusgg-auth-api",
+    "@polusgg/module-cosmetics": "file:../module-cosmetics",
+    "@polusgg/plugin-logger": "file:../plugin-logger",
     "async-mutex": "^0.3.2",
     "emittery": "^0.8.1",
     "got": "^11.8.2"

@@ -10,7 +10,6 @@ import { Services } from "../services";
 import { ResourceResponse } from "../../types";
 import { Connection } from "@nodepolus/framework/src/protocol/connection";
 import { ServerLobbyJoinEvent } from "@nodepolus/framework/src/api/events/server";
-import { DisconnectReason } from "@nodepolus/framework/src/types";
 import { PlayerJoinedEvent } from "@nodepolus/framework/src/api/events/player";
 import { GameDataPacket } from "@nodepolus/framework/src/protocol/packets/root";
 import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
@@ -222,7 +221,9 @@ export class CosmeticService {
 
       switch (item.type) {
         case "HAT":
+          console.log("BeforeLoadHatRes");
           await connection.writeReliable(new LoadHatPacket(item.amongUsId, item.resource.id, accessible));
+          console.log("AfterLoadHatRes");
           break;
         case "PET":
           await connection.writeReliable(new LoadPetPacket(item.amongUsId, item.resource.id, accessible));
@@ -243,14 +244,7 @@ export class CosmeticService {
       return;
     }
 
-    const userResponseStructure = event.getConnection().getMeta<UserResponseStructure | undefined>("pgg.auth.self");
-
-    if (userResponseStructure === undefined) {
-      event.setDisconnectReason(DisconnectReason.custom("Error. Failed to join server. Code 1123"));
-      event.cancel();
-
-      return;
-    }
+    const userResponseStructure = event.getConnection().getMeta<UserResponseStructure>("pgg.auth.self");
 
     // console.log("URS.c", userResponseStructure.cosmetics);
     event.getConnection().setMeta("pgg.cosmetic.loaded", []);
@@ -268,7 +262,9 @@ export class CosmeticService {
     const itemsToLoad = items.filter(i => cosmeticIds.includes(i.amongUsId) && i.type !== "PERK");
     const bundles = await Promise.all(itemsToLoad.map(async i => await AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
 
+    console.log("OnBeforeLoad")
     await this.loadCosmeticForConnection(event.getConnection(), bundles, itemsToLoad, true);
+    console.log("PostLoad")
 
     const players = lobby.getPlayers();
 

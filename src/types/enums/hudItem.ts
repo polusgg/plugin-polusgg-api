@@ -19,4 +19,6 @@ export enum HudItem {
   ReportButton,
   // Disables Call Meeting button (which is included into Use button)
   CallMeetingButton,
+  // Disables the use of the admin table
+  AdminTable
 }

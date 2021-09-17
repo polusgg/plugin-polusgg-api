@@ -260,7 +260,7 @@ export class CosmeticService {
 
     const cosmeticIds = Object.values(userResponseStructure.cosmetics) as number[];
     const itemsToLoad = items.filter(i => cosmeticIds.includes(i.amongUsId) && i.type !== "PERK");
-    const bundles = await Promise.all(itemsToLoad.map(async i => await AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
+    const bundles = await Promise.all(itemsToLoad.map(i => AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
 
     // console.log("OnBeforeLoad")
     await this.loadCosmeticForConnection(event.getConnection(), bundles, itemsToLoad, true);
@@ -294,7 +294,7 @@ export class CosmeticService {
         // if (skin) {
         //   this.loadCosmeticForConnection(event.getConnection(), [await AssetBundle.load(pet.resource.path, { prefixUrl: pet.resource.url })], [skin], false);
         // }
-      } catch {}
+      } catch { }
     }
   }
 
@@ -341,7 +341,7 @@ export class CosmeticService {
 
     const response = await this.fetchCosmetic.get("item/", { headers: { authorization: this.authToken(userResponseStructure) } });
     const items: Item[] = JSON.parse(response.body).data.filter(i => i.type !== "PERK");
-    const bundles = await Promise.all(items.map(async i => await AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
+    const bundles = await Promise.all(items.map(i => AssetBundle.load(i.resource.path, { prefixUrl: i.resource.url })));
 
     await this.loadCosmeticForConnection(connection, bundles, items, true);
   }

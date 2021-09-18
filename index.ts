@@ -1,6 +1,5 @@
 import { inspect } from "util";
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
-import { AlterGameTag } from "@nodepolus/framework/src/types/enums";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
 import { Player } from "@nodepolus/framework/src/player";
@@ -125,8 +124,6 @@ export default class PolusGGApi extends BasePlugin {
     });
 
     this.server.on("server.lobby.created", async event => {
-      event.getLobby().setGameTag(AlterGameTag.ChangePrivacy, 1);
-
       if (this.mods.length === 0) {
         return;
       }

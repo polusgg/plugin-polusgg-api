@@ -48,6 +48,8 @@ export class CosmeticService {
         return;
       }
 
+      // this doesn't work for the server setting cosmetics that the client doesn't have loaded.
+      // should be fairly easy to add but not needed rn so left out as an exercise to the reader
       const ownedItems = event.getReason() === SetCosmeticReason.ServerRequest
         ? connection.getMeta<[Item, boolean][]|undefined>("pgg.cosmetic.loaded")?.map(load => load[0])
         : connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");

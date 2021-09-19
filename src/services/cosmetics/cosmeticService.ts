@@ -16,7 +16,7 @@ import { RpcPacket } from "@nodepolus/framework/src/protocol/packets/gameData";
 import { SetHatPacket, SetPetPacket, SetSkinPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
 import { LoadHatPacket } from "../../packets/root/loadHatPacket";
 import { LoadPetPacket } from "../../packets/root/loadPetPacket";
-import { PlayerHat, PlayerPet, PlayerSkin } from "@nodepolus/framework/src/types/enums";
+import { PlayerHat, PlayerPet, PlayerSkin, SetCosmeticReason } from "@nodepolus/framework/src/types/enums";
 
 declare const server: Server;
 
@@ -48,7 +48,9 @@ export class CosmeticService {
         return;
       }
 
-      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
+      const ownedItems = event.getReason() === SetCosmeticReason.ServerRequest
+        ? connection.getMeta<[Item, boolean][]|undefined>("pgg.cosmetic.loaded")?.map(load => load[0])
+        : connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
 
       if (ownedItems === undefined) {
         Services.get(ServiceType.Hud).displayNotification("There was an error loading your purchased items", [connection]);
@@ -99,7 +101,9 @@ export class CosmeticService {
         return;
       }
 
-      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
+      const ownedItems = event.getReason() === SetCosmeticReason.ServerRequest
+        ? connection.getMeta<[Item, boolean][]|undefined>("pgg.cosmetic.loaded")?.map(load => load[0])
+        : connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
 
       if (ownedItems === undefined) {
         Services.get(ServiceType.Hud).displayNotification("There was an error loading your purchased items", [connection]);
@@ -148,7 +152,9 @@ export class CosmeticService {
         return;
       }
 
-      const ownedItems = connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
+      const ownedItems = event.getReason() === SetCosmeticReason.ServerRequest
+        ? connection.getMeta<[Item, boolean][]|undefined>("pgg.cosmetic.loaded")?.map(load => load[0])
+        : connection.getMeta<Item[] | undefined>("pgg.cosmetic.owned");
 
       if (ownedItems === undefined) {
         Services.get(ServiceType.Hud).displayNotification("There was an error loading your purchased items", [connection]);

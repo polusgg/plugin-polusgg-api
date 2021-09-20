@@ -12,6 +12,8 @@ import { Asset } from "../../../assets";
 import { ButtonCountdownUpdated } from "../events/buttonCountdownUpdated";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Attachable } from "../../../../src/types/attachable";
+import { Services } from "../..";
+import { ServiceType } from "../../../types/enums";
 
 export type ButtonEvents = ClickBehaviourEvents & {
   "button.countdown.started": ButtonCountdownUpdated;
@@ -242,9 +244,23 @@ export class Button extends Emittery<ButtonEvents> {
   getTargets(range: number): PlayerInstance[] {
     return this
       .getTargetsUnfiltered(range)
-      .filter(p => p.getVent() === undefined)
-      .filter(p => !p.isDead())
-      .filter(player => player.getMeta<boolean>("pgg.api.targetable"));
+      .filter(p => {
+        const originPosition = p.getPosition();
+
+        const lowerCheck = Services.get(ServiceType.Colliders).checkCollisionsForLevel(
+          this.getLobby().getLevel(),
+          this.getOwner().getSafePlayer().getPosition(),
+          new Vector2(originPosition.getX(), originPosition.getY() + 0.1)
+        );
+        
+        const upperCheck = Services.get(ServiceType.Colliders).checkCollisionsForLevel(
+          this.getLobby().getLevel(),
+          this.getOwner().getSafePlayer().getPosition(),
+          new Vector2(originPosition.getX(), originPosition.getY() - 0.5)
+        );
+
+        return (!upperCheck || !lowerCheck) && p.getVent() === undefined && !p.isDead() && p.getMeta<boolean>("pgg.api.targetable")
+      });
   }
 
   getTargetUnfiltered(range: number): PlayerInstance | undefined {

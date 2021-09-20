@@ -17,6 +17,7 @@ import { EndGameService } from "./endGame/endGameService";
 import { HudService } from "./hud/hudService";
 import { EmojiService } from "./emojiService/emojiService";
 import { DiscordService } from "./discord/discordService";
+import { ColliderService } from "./colliderService/colliderService";
 
 const serviceFromType = {
   [ServiceType.Resource]: new ResourceService(),
@@ -37,6 +38,7 @@ const serviceFromType = {
   [ServiceType.Hud]: new HudService(),
   [ServiceType.Emoji]: new EmojiService(),
   [ServiceType.Discord]: new DiscordService(),
+  [ServiceType.Colliders]: new ColliderService()
 };
 
 export class Services {

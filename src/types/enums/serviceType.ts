@@ -17,4 +17,5 @@ export enum ServiceType {
   Hud,
   Emoji,
   Discord,
+  Colliders
 }

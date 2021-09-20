@@ -194,6 +194,8 @@ export default class PolusGGApi extends BasePlugin {
 
       return this.getMeta<BaseRole>("pgg.api.role").getAlignment() === RoleAlignment.Impostor;
     };
+
+    Services.get(ServiceType.Colliders).registerAllColliders();
   }
 
   registerMod(mod: BaseMod): void {

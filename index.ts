@@ -14,13 +14,7 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Events } from "@polusgg/plugin-logger/events";
 import { GameOptionPriority } from "./src/services/gameOptions/gameOptionsSet";
 import { GameOption } from "./src/services/gameOptions/gameOption";
-
-declare global {
-  interface Object {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    log(...data: any[]);
-  }
-}
+import { Lobby } from "@nodepolus/framework/src/lobby";
 
 export default class PolusGGApi extends BasePlugin {
   protected readonly lastIndex: Map<LobbyInstance, number> = new Map();
@@ -33,20 +27,6 @@ export default class PolusGGApi extends BasePlugin {
       name: "Polus.gg API",
       version: [1, 0, 0],
     });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Object.prototype.log = function logToDispleaseRoobscoob(this: any, ...data: any[]): void {
-      data.unshift(this);
-
-      for (let i = 0; i < data.length; i++) {
-        process.stdout.write(inspect(data[i], { colors: true }));
-        process.stdout.write(" ");
-      }
-
-      process.stdout.write("\n");
-
-      return this;
-    };
 
     RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
       connection.setMeta({

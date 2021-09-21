@@ -1,4 +1,3 @@
-import { inspect } from "util";
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
@@ -144,6 +143,12 @@ export default class PolusGGApi extends BasePlugin {
             Services.get(ServiceType.Hud).updateQrCodeState(player.getSafeConnection());
           });
       }, 100);
+    });
+
+    this.server.on("player.chat.message", event => {
+      event.cancel();
+
+      Services.get(ServiceType.Chat).broadcastChatMessageFrom(event.getPlayer() as Player, event.getMessage().toString(), false);
     });
 
     this.server.on("game.ended", event => {

@@ -14,7 +14,6 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Events } from "@polusgg/plugin-logger/events";
 import { GameOptionPriority } from "./src/services/gameOptions/gameOptionsSet";
 import { GameOption } from "./src/services/gameOptions/gameOption";
-import { Lobby } from "@nodepolus/framework/src/lobby";
 
 declare global {
   interface Object {
@@ -165,7 +164,7 @@ export default class PolusGGApi extends BasePlugin {
     this.server.on("player.chat.message", event => {
       event.cancel();
 
-      Services.get(ServiceType.Chat).broadcastChatMessageFrom(event.getPlayer() as Player, event.getMessage().toString(), false);
+      Services.get(ServiceType.Chat).broadcastChatMessageFrom(event.getPlayer() as Player, event.getMessage().toString());
     });
 
     this.server.on("game.ended", event => {

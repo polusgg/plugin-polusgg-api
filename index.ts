@@ -1,3 +1,4 @@
+import { format } from "util";
 import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
 import { BasePlugin } from "@nodepolus/framework/src/api/plugin";
 import { RevivePacket } from "./src/packets/rpc/playerControl";
@@ -15,6 +16,13 @@ import { GameOptionPriority } from "./src/services/gameOptions/gameOptionsSet";
 import { GameOption } from "./src/services/gameOptions/gameOption";
 import { Lobby } from "@nodepolus/framework/src/lobby";
 
+declare global {
+  interface Object {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    log(...data: any[]);
+  }
+}
+
 export default class PolusGGApi extends BasePlugin {
   protected readonly lastIndex: Map<LobbyInstance, number> = new Map();
   protected readonly updateGamemodeRunning: Map<LobbyInstance, boolean> = new Map();
@@ -26,6 +34,15 @@ export default class PolusGGApi extends BasePlugin {
       name: "Polus.gg API",
       version: [1, 0, 0],
     });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Object.prototype.log = function logToDispleaseRoobscoob(this: any, ...data: any[]): void {
+      data.unshift(this);
+
+      process.stdout.write(format(...data) + "\n");
+
+      return this;
+    };
 
     RootPacket.registerPacket(0x81, ResizePacket.deserialize, (connection, packet) => {
       connection.setMeta({

@@ -1,22 +1,24 @@
 import { Lobby } from "@nodepolus/framework/src/lobby";
-import { Player } from "@nodepolus/framework/src/player";
 import { Palette } from "@nodepolus/framework/src/static";
 import { randomUUID } from "crypto";
 import { DeleteChatMessagePacket } from "../../packets/root/deleteChatMessage";
 import { ChatMessageAlign, SetChatMessagePacket } from "../../packets/root/setChatMessage";
+import { Color } from "@nodepolus/framework/src/types";
+import { PlayerInstance } from "@nodepolus/framework/src/api/player";
+import { SendQuickChatPacket } from "@nodepolus/framework/src/protocol/packets/rpc";
 
 export interface ChatMessageData {
-    sender: Player;
+    sender: PlayerInstance;
     uuid: string;
-    message: string;
+    message: string | SendQuickChatPacket;
 }
 
 export class ChatService {
-    async deleteMessageFor(receiver: Player, uuid: string) {
+    async deleteMessageFor(receiver: PlayerInstance, uuid: string) {
         receiver.getConnection()?.sendReliable([new DeleteChatMessagePacket(uuid)]);
     }
 
-    async deleteMessagesByPlayer(sender: Player) {
+    async deleteMessagesByPlayer(sender: PlayerInstance) {
         const messages = this.getMessagesByPlayer(sender);
 
         const promises: Promise<void>[] = [];
@@ -29,7 +31,7 @@ export class ChatService {
             const deleteMessage = player.getConnection()?.sendReliable([
                 ...messages.map(msg => new DeleteChatMessagePacket(msg.uuid))
             ]);
-            
+
             if (deleteMessage) {
                 promises.push(deleteMessage);
             }
@@ -51,7 +53,7 @@ export class ChatService {
         await Promise.all(promises);
     }
 
-    getMessagesByPlayer(player: Player) {
+    getMessagesByPlayer(player: PlayerInstance) {
         const cachedMessages = player.getMeta<ChatMessageData[]|undefined>("pgg.chatMessages");
         const messages = cachedMessages || [];
         if (!cachedMessages) {
@@ -68,8 +70,8 @@ export class ChatService {
         return messages;
     }
 
-    async createChatMessageFor(receiver: Player, messageUuid: string, align: ChatMessageAlign, sender: Player, message: string, quickChat: boolean) {
-        const playerBody = Palette.playerBody(sender.getColor()).light;
+    async createChatMessageFor(receiver: PlayerInstance, messageUuid: string, align: ChatMessageAlign, sender: PlayerInstance, message: string | SendQuickChatPacket, pitch?: number | null) {
+        const color = Palette.playerBody(sender.getColor());
 
         // actually log the chat message here I think
         // unless you want a generalised method which implements
@@ -82,25 +84,27 @@ export class ChatService {
             sender,
             message
         });
-        
+
         await receiver.getConnection()?.sendReliable([
             new SetChatMessagePacket(
                 messageUuid,
                 align,
                 sender.getName().toString(),
-                !sender.isDead(),
+                sender.isDead(),
+                false, //todo set whether voted
                 sender.getHat(),
+                sender.getPet(),
                 sender.getSkin(),
-                playerBody[0],
-                playerBody[1],
-                playerBody[2],
+                color.dark as Color,
+                color.light as Color,
+                //todo: set pitch to null when receiver == sender (do this elsewhere when reimplementing chat fully)
+                pitch === null ? -1000 : pitch ?? 0.5 + sender.getId() / 15,
                 message,
-                quickChat
             )
         ]);
     }
 
-    async sendChatFromTo(sender: Player, receiver: Player, message: string, quickChat: boolean) {
+    async sendChatFromTo(sender: PlayerInstance, receiver: PlayerInstance, message: string | SendQuickChatPacket) {
         const senderIsDead = sender.getMeta<boolean|undefined>("pgg.countAsDead") || sender.isDead();
         const receiverIsDead = receiver.getMeta<boolean|undefined>("pgg.countAsDead") || receiver.isDead();
 
@@ -115,12 +119,11 @@ export class ChatService {
             messageUuid,
             sender === receiver ? ChatMessageAlign.Right : ChatMessageAlign.Left,
             sender,
-            message,
-            quickChat
+            message
         );
     }
 
-    async broadcastChatMessageFrom(sender: Player, message: string, quickChat: boolean) {
+    async broadcastChatMessageFrom(sender: PlayerInstance, message: string | SendQuickChatPacket) {
         const promises: Promise<void>[] = [];
         for (const player of sender.getLobby().getPlayers()) {
 
@@ -128,7 +131,7 @@ export class ChatService {
             if (!connection)
                 continue;
 
-            promises.push(this.sendChatFromTo(sender, player as Player, message, quickChat));
+            promises.push(this.sendChatFromTo(sender, player, message));
         }
 
         await Promise.all(promises);

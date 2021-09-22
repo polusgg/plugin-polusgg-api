@@ -9,7 +9,7 @@ export enum ChatMessageAlign {
 
 export class DeleteChatMessagePacket extends BaseRootPacket {
   constructor(
-    public messageUuid: string
+    public uuid: string
   ) {
     super(0x9E);
   }
@@ -20,11 +20,11 @@ export class DeleteChatMessagePacket extends BaseRootPacket {
   }
 
   serialize(writer: MessageWriter): void {
-    const uuidBytes = Buffer.from(this.messageUuid.replace(/-/g, ""), "hex");
+    const uuidBytes = Buffer.from(this.uuid.replaceAll(/-/g, ""), "hex");
     writer.writeBytes(uuidBytes);
   }
 
   clone(): DeleteChatMessagePacket {
-    return new DeleteChatMessagePacket(this.messageUuid);
+    return new DeleteChatMessagePacket(this.uuid);
   }
 }

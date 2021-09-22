@@ -1,12 +1,6 @@
 import { MessageReader, MessageWriter } from "@nodepolus/framework/src/util/hazelMessage";
 import { BaseRootPacket } from "@nodepolus/framework/src/protocol/packets/root";
 
-export enum ChatMessageAlign {
-    Left,
-    Center,
-    Right
-}
-
 export class DeleteChatMessagePacket extends BaseRootPacket {
   constructor(
     public uuid: string

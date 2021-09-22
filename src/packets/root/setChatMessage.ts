@@ -21,6 +21,7 @@ export class SetChatMessagePacket extends BaseRootPacket {
     public skin: number,
     public backColor: Color,
     public bodyColor: Color,
+    public visorColor: Color,
     public pitch: number,
     public messageContent: string | SendQuickChatPacket,
   ) {
@@ -39,7 +40,8 @@ export class SetChatMessagePacket extends BaseRootPacket {
         reader.readPackedUInt32(),
         reader.readPackedUInt32(),
         [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()],
-      [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()],
+        [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()],
+        [reader.readByte(), reader.readByte(), reader.readByte(), reader.readByte()],
         reader.readFloat32(),
         reader.readBoolean() ? SendQuickChatPacket.deserialize(reader) : reader.readString(),
     );
@@ -57,6 +59,7 @@ export class SetChatMessagePacket extends BaseRootPacket {
     writer.writePackedUInt32(this.skin);
     writer.writeBytes(this.backColor);
     writer.writeBytes(this.bodyColor);
+    writer.writeBytes(this.visorColor);
     writer.writeFloat32(this.pitch);
     if (typeof (this.messageContent) !== "string") {
       writer.writeBoolean(true);
@@ -79,6 +82,7 @@ export class SetChatMessagePacket extends BaseRootPacket {
         this.skin,
         this.backColor,
         this.bodyColor,
+        this.visorColor,
         this.pitch,
         this.messageContent,
     );

@@ -232,6 +232,10 @@ export class Button extends Emittery<ButtonEvents> {
       .getLobby()
       .getPlayers()
       .filter(p => {
+        if (p.getGameDataEntry().isDisconnected()) {
+          return false;
+        }
+        
         try {
           return p.getConnection()?.getId() !== this.getOwner().getId() && p.getPosition().distance(this.getLobby().findSafePlayerByConnection(this.getOwner()).getPosition()) <= range;
         } catch (err) {

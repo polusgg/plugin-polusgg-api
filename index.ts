@@ -14,6 +14,7 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Events } from "@polusgg/plugin-logger/events";
 import { GameOptionPriority } from "./src/services/gameOptions/gameOptionsSet";
 import { GameOption } from "./src/services/gameOptions/gameOption";
+import { QuickChatPacketType, QuickChatPhrase, QuickChatPlayer, QuickChatSentence, SendQuickChatPacket } from "@nodepolus/framework/src/protocol/packets/rpc/sendQuickChatPacket";
 
 declare global {
   interface Object {
@@ -165,6 +166,22 @@ export default class PolusGGApi extends BasePlugin {
       event.cancel();
 
       Services.get(ServiceType.Chat).broadcastChatMessageFrom(event.getPlayer() as Player, event.getMessage().toString());
+    });
+    
+    this.server.on("player.chat.message.quick", event => {
+      event.cancel();
+      
+      let contentsType = QuickChatPacketType.None;
+      const value = event.getMessage();
+      if (value instanceof QuickChatPlayer) {
+        contentsType = QuickChatPacketType.Player;
+      } else if (value instanceof QuickChatSentence) {
+        contentsType = QuickChatPacketType.Sentence;
+      } else if (value instanceof QuickChatPhrase) {
+        contentsType = QuickChatPacketType.Phrase;
+      }
+
+      Services.get(ServiceType.Chat).broadcastChatMessageFrom(event.getPlayer() as Player, new SendQuickChatPacket(contentsType, event.getMessage()));
     });
 
     this.server.on("game.ended", event => {

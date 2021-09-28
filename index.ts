@@ -14,6 +14,7 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Events } from "@polusgg/plugin-logger/events";
 import { GameOptionPriority } from "./src/services/gameOptions/gameOptionsSet";
 import { GameOption } from "./src/services/gameOptions/gameOption";
+import { ClientVersion, DisconnectReason } from "@nodepolus/framework/src/types";
 import { QuickChatPacketType, QuickChatPhrase, QuickChatPlayer, QuickChatSentence, SendQuickChatPacket } from "@nodepolus/framework/src/protocol/packets/rpc/sendQuickChatPacket";
 
 declare global {
@@ -22,6 +23,8 @@ declare global {
     log(...data: any[]);
   }
 }
+
+const SUPPORTED_VERSION = new ClientVersion(2021, 9, 28);
 
 export default class PolusGGApi extends BasePlugin {
   protected readonly lastIndex: Map<LobbyInstance, number> = new Map();
@@ -77,6 +80,27 @@ export default class PolusGGApi extends BasePlugin {
     });
 
     BaseMod.owner = this;
+
+    this.server.on("connection.opened", event => {
+      const reader = event.getReader();
+
+      reader.readAllChildMessages(message => {
+        switch (message.getTag()) {
+          case 0:
+            const version = ClientVersion.decode(message.readUInt32());
+            if (!version.equals(SUPPORTED_VERSION, false)) {
+              event.setDisconnectReason(DisconnectReason.incorrectVersion())
+              event.cancel();
+
+              return;
+            }
+            break;
+          default:
+            event.setDisconnectReason(DisconnectReason.error())
+            event.cancel();
+        }
+      });
+    });
 
     this.server.on("game.ended", event => {
       if (event.getReason() as number !== 0x07) {

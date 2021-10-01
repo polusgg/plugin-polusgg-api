@@ -117,22 +117,22 @@ export class GameOptionsService {
           `${EmojiService.static("airship")} Airship`,
           `${EmojiService.static("submerged")} Submerged`,
         ]), GameOptionPriority.Highest + 1);
-        options.createOption("", "Impostor Count", new NumberValue(1, 1, 1, 3, false, `{0} Impostors`), GameOptionPriority.Highest + 2);
+        options.createOption("", "Impostor Count", new NumberValue(2, 1, 1, 3, false, `{0} Impostors`), GameOptionPriority.Highest + 2);
         options.createOption("", "Max Player Count", new NumberValue(15, 1, 4, 15, false, `{0} Players`), GameOptionPriority.Highest + 3);
-        options.createOption("", "Player Speed", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Highest + 4);
+        options.createOption("", "Player Speed", new NumberValue(1.25, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Highest + 4);
         options.createOption("Meeting Settings", "Anonymous Votes", new BooleanValue(false), GameOptionPriority.Higher - 10);
         options.createOption("Meeting Settings", "Confirm Ejects", new BooleanValue(false), GameOptionPriority.Higher - 9);
-        options.createOption("Meeting Settings", "Discussion Time", new NumberValue(30, 15, 0, 300, false, "{0}s"), GameOptionPriority.Higher - 7);
-        options.createOption("Meeting Settings", "Voting Time", new NumberValue(30, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 7);
-        options.createOption("Meeting Settings", "Emergency Cooldown", new NumberValue(15, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 8);
+        options.createOption("Meeting Settings", "Discussion Time", new NumberValue(15, 15, 0, 300, false, "{0}s"), GameOptionPriority.Higher - 7);
+        options.createOption("Meeting Settings", "Voting Time", new NumberValue(150, 30, 0, 300, true, "{0}s"), GameOptionPriority.Higher - 7);
+        options.createOption("Meeting Settings", "Emergency Cooldown", new NumberValue(20, 5, 0, 60, false, "{0}s"), GameOptionPriority.Higher - 8);
         options.createOption("Meeting Settings", "Emergency Meetings", new NumberValue(1, 1, 0, 9, false, "{0} Buttons"), GameOptionPriority.Higher - 8);
-        options.createOption("Role Settings", "<color=#8cffff>Crewmate</color> Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Normal - 5);
-        options.createOption("Role Settings", "<color=#ff1919>Impostor</color> Vision", new NumberValue(1, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Normal - 5);
-        options.createOption("Role Settings", "<color=#ff1919>Impostor</color> Kill Cooldown", new NumberValue(10, 2.5, 5, 60, false, "{0}s"), GameOptionPriority.Normal - 4);
+        options.createOption("Role Settings", "<color=#8cffff>Crewmate</color> Vision", new NumberValue(0.75, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Normal - 5);
+        options.createOption("Role Settings", "<color=#ff1919>Impostor</color> Vision", new NumberValue(1.25, 0.25, 0.25, 3, false, "{0}x"), GameOptionPriority.Normal - 5);
+        options.createOption("Role Settings", "<color=#ff1919>Impostor</color> Kill Cooldown", new NumberValue(30, 2.5, 5, 60, false, "{0}s"), GameOptionPriority.Normal - 4);
         options.createOption("Role Settings", "<color=#ff1919>Impostor</color> Kill Distance", new EnumValue(0, ["Short", "Normal", "Long"]), GameOptionPriority.Normal - 4);
         options.createOption("Task Settings", "Visual Tasks", new BooleanValue(false), GameOptionPriority.Higher - 3);
-        options.createOption("Task Settings", "Task Bar Updates", new EnumValue(0, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
-        options.createOption("Task Settings", "Common Tasks", new NumberValue(2, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 1);
+        options.createOption("Task Settings", "Task Bar Updates", new EnumValue(1, ["Always", "Meetings", "Never"]), GameOptionPriority.Higher - 2);
+        options.createOption("Task Settings", "Common Tasks", new NumberValue(1, 1, 0, 2, false, "{0} tasks"), GameOptionPriority.Higher - 1);
         options.createOption("Task Settings", "Long Tasks", new NumberValue(2, 1, 0, 3, false, "{0} tasks"), GameOptionPriority.Higher - 1);
         options.createOption("Task Settings", "Short Tasks", new NumberValue(3, 1, 0, 5, false, "{0} tasks"), GameOptionPriority.Higher - 1);
       }, 100);

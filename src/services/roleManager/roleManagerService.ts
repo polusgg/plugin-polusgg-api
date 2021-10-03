@@ -78,8 +78,7 @@ export class RoleManagerService {
     await player.getMeta<BaseRole | undefined>("pgg.api.role")?.onDestroy(reason);
   }
 
-  assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
-    const managers: typeof BaseManager[] = [];
+  getRolesAssigned(game: Game, assignmentData: RoleAssignmentData[]): { players: PlayerInstance[], allRoleAssignments: { role: typeof BaseRole; startGameScreen?: StartGameScreenData }[] }|undefined {
     const assignmentArray: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = [];
     const options = Services.get(ServiceType.GameOptions).getGameOptions<LobbyDefaultOptions>(game.getLobby());
 
@@ -133,6 +132,19 @@ export class RoleManagerService {
     }
 
     const allRoleAssignments = [...otherAlignedRoles, ...impostorAlignedRoles];
+
+    return { players, allRoleAssignments };
+  }
+
+  assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
+    const managers: typeof BaseManager[] = [];
+    
+    const roleAssignments = this.getRolesAssigned(game, assignmentData);
+
+    if (!roleAssignments)
+      return;
+
+    const { players, allRoleAssignments } = roleAssignments;
 
     // if (allRoleAssignments.length !== players.length) {
     //   console.log({ impostorAlignedRoles, otherAlignedRoles });

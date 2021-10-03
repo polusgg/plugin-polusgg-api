@@ -129,7 +129,11 @@ export default class PolusGGApi extends BasePlugin {
         settings,
       });
 
-      const roles = this.mods.filter(mod => mod.getEnabled(event.getGame().getLobby())).map(e => e.getRoles(event.getGame().getLobby())).flat();
+      for (const mod of this.mods) {
+        if (mod.getEnabled(event.getGame().getLobby())) {
+          mod.assignRoles(event.getGame());
+        }
+      }
       // const impostorRoleDecls = roles.filter(r => r.assignWith === RoleAlignment.Impostor);
       // const impostorCounts = impostorRoleDecls.reduce((a, r) => a + r.playerCount, 0);
 
@@ -139,8 +143,6 @@ export default class PolusGGApi extends BasePlugin {
       // }
       //
       // event.getImpostors().forEach(p => p.setRole(PlayerRole.Impostor));
-
-      Services.get(ServiceType.RoleManager).assignRoles(event.getGame(), roles);
     });
 
     this.server.on("server.lobby.created", async event => {

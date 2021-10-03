@@ -1,10 +1,10 @@
-import { RoleAssignmentData } from "../services/roleManager/roleManagerService";
 import { BasePlugin, PluginMetadata } from "@nodepolus/framework/src/api/plugin";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import PolusGGApi from "../..";
 import { Services } from "../services";
 import { ServiceType } from "../types/enums";
 import { EnumValue } from "../packets/root/setGameOption";
+import { Game } from "@nodepolus/framework/src/api/game";
 
 export class BaseMod extends BasePlugin {
   public static owner: PolusGGApi;
@@ -24,7 +24,7 @@ export class BaseMod extends BasePlugin {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRoles(lobby: LobbyInstance): RoleAssignmentData[] { return [] }
+  assignRoles(game: Game): void { return; }
 
   getEnabled(lobby: LobbyInstance): boolean {
     // eslint-disable-next-line @typescript-eslint/naming-convention

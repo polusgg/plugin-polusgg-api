@@ -78,8 +78,7 @@ export class RoleManagerService {
     await player.getMeta<BaseRole | undefined>("pgg.api.role")?.onDestroy(reason);
   }
 
-  assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
-    const managers: typeof BaseManager[] = [];
+  getRolesAssigned(game: Game, assignmentData: RoleAssignmentData[]) {
     const assignmentArray: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = [];
     const options = Services.get(ServiceType.GameOptions).getGameOptions<LobbyDefaultOptions>(game.getLobby());
 
@@ -110,12 +109,6 @@ export class RoleManagerService {
     const otherAlignedRoles: { role: typeof BaseRole; startGameScreen?: StartGameScreenData; assignWith: RoleAlignment }[] = [];
 
     const impostorCount = Math.min(options.getOption("Impostor Count").getValue().value, RoleManagerService.adjustImpostorCount(players.length));
-
-    game.getLobby().getOptions().setImpostorCount(impostorCount);
-    (game.getLobby().getPlayers()[0] as Player).getEntity().getPlayerControl().syncSettings(
-      game.getLobby().getOptions()
-    );
-
     for (let i = 0; i < impostorCount; i++) {
       if (i >= impostorAlignedRolesFromAssignment.length) {
         impostorAlignedRoles.push({ role: Impostor });
@@ -133,6 +126,29 @@ export class RoleManagerService {
     }
 
     const allRoleAssignments = [...otherAlignedRoles, ...impostorAlignedRoles];
+    
+    return { players, allRoleAssignments };
+  }
+
+  assignRoles(game: Game, assignmentData: RoleAssignmentData[]): void {
+    const managers: typeof BaseManager[] = [];
+    const options = Services.get(ServiceType.GameOptions).getGameOptions<LobbyDefaultOptions>(game.getLobby());
+
+    const roleAssignedData = this.getRolesAssigned(game, assignmentData);
+
+    if (!roleAssignedData)
+      return;
+
+    const { players, allRoleAssignments } = roleAssignedData;
+
+    const impostorCount = Math.min(options.getOption("Impostor Count").getValue().value, RoleManagerService.adjustImpostorCount(players.length));
+
+    game.getLobby().getOptions().setImpostorCount(impostorCount);
+    (game.getLobby().getPlayers()[0] as Player).getEntity().getPlayerControl().syncSettings(
+      game.getLobby().getOptions()
+    );
+
+    
 
     // if (allRoleAssignments.length !== players.length) {
     //   console.log({ impostorAlignedRoles, otherAlignedRoles });

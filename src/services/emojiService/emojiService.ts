@@ -23,7 +23,14 @@ const staticEmojiNames = <const>[
   "morphling",
   "airship",
   "poisoner",
-  "mentor"
+  "platItch",
+  "platGoogle",
+  "platSteam",
+  "platEpic",
+  "platIOS", // it's platPlaceholder ingame
+  "platUnknown",
+  "mentor",
+  "thief"
 ];
 
 type StaticEmojiName = (typeof staticEmojiNames)[number];

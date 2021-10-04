@@ -47,7 +47,10 @@ export class HudService {
   }
 
   async closeHud(player: PlayerInstance): Promise<void> {
-    await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new CloseHudPacket());
+    const connection = player.getConnection();
+    if (connection !== undefined) {
+      await (player as Player).getEntity().getPlayerControl().sendRpcPacket(new CloseHudPacket(), [connection]);
+    }
   }
 
   async updateQrCode(c: Connection, t: { enabled: false } | { enabled: true; contents: string }): Promise<void> {

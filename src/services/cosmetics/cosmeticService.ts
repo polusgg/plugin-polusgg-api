@@ -142,7 +142,7 @@ export class CosmeticService {
 
       if (event.getNewSkin() < 10_000_000) {
         if (event.getNewSkin() as number === 9_999_999) {
-          event.setNewSkin(event.getPlayer().getSafeConnection().getMeta<UserResponseStructure>("pgg.auth.self").cosmetics?.PET ?? 0);
+          event.setNewSkin(event.getPlayer().getSafeConnection().getMeta<UserResponseStructure>("pgg.auth.self").cosmetics?.SKIN ?? 0);
         }
 
         return;

@@ -220,7 +220,7 @@ export class VanillaWinConditions {
     const playerData = gameData.getGameData().getPlayers();
 
     for (const [pid, data] of playerData) {
-      if (data.isDead() || (lobby.findSafePlayerByPlayerId(data.getId()).getMeta<boolean | undefined>("pgg.countAsDead")) || data.isDisconnected()) {
+      if (data.isDisconnected() || data.isDead() || lobby.findPlayerByPlayerId(data.getId())?.getMeta<boolean | undefined>("pgg.countAsDead")) {
         continue;
       }
 

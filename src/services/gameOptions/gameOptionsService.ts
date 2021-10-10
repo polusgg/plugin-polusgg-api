@@ -111,11 +111,11 @@ export class GameOptionsService {
       // fixing a race condition :smile:
       setTimeout(() => {
         options.createOption("", "Map", new EnumValue(0, [
-          `${EmojiService.static("skeld")} The Skeld`,
-          `${EmojiService.static("mira")} Mira HQ`,
-          `${EmojiService.static("polus")} Polus`,
-          `${EmojiService.static("airship")} Airship`,
-          `${EmojiService.static("submerged")} Submerged`,
+          `<size=150%><voffset=-0.1em>${EmojiService.static("skeld")}</voffset> </size>The Skeld`,
+          `<size=150%><voffset=-0.1em>${EmojiService.static("mira")}</voffset> </size>Mira HQ`,
+          `<size=150%><voffset=-0.1em>${EmojiService.static("polus")}</voffset> </size>Polus`,
+          `<size=150%><voffset=-0.1em>${EmojiService.static("airship")}</voffset> </size>Airship`,
+          `<size=150%><voffset=-0.1em>${EmojiService.static("submerged")}</voffset> </size>Submerged`,
         ]), GameOptionPriority.Highest + 1);
         options.createOption("", "Impostor Count", new NumberValue(2, 1, 1, 3, false, `{0} Impostors`), GameOptionPriority.Highest + 2);
         options.createOption("", "Max Player Count", new NumberValue(15, 1, 4, 15, false, `{0} Players`), GameOptionPriority.Highest + 3);

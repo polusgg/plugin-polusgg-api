@@ -53,7 +53,7 @@ export class LobbyOptions<T extends Record<string, NumberValue | BooleanValue | 
       } else {
         const gamemode = options.gamemode;
 
-        value.load(gamemode.value);
+        value.load(gamemode.value as any);
       }
     }
 

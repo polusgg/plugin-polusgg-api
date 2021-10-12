@@ -24,7 +24,7 @@ declare global {
   }
 }
 
-const SUPPORTED_VERSION = new ClientVersion(2021, 9, 30);
+const SUPPORTED_VERSION = new ClientVersion(2021, 10, 12);
 
 export default class PolusGGApi extends BasePlugin {
   protected readonly lastIndex: Map<LobbyInstance, number> = new Map();

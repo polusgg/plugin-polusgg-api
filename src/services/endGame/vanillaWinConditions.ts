@@ -178,6 +178,7 @@ export class VanillaWinConditions {
       if (event.getReason() === GameOverReason.CrewmatesBySabotage) {
         if (event.getGame().getLobby().getPlayers()
           .filter(p => !p.isDead() && !p.getGameDataEntry().isDisconnected()).length === 0) {
+
           endGame.registerEndGameIntent(event.getGame(), {
             endGameData: new Map(event.getGame().getLobby().getPlayers()
               .map(player => [player, {

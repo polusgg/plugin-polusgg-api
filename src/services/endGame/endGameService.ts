@@ -142,9 +142,9 @@ export class EndGameService extends Emittery<{
       this.exclusions.set(game, []);
     }
 
-    if (!this.exclusions.get(game)!.some(item => item.intentName === exclusion.intentName)) {
+    // if (!this.exclusions.get(game)!.some(item => item.intentName === exclusion.intentName)) {
       this.exclusions.get(game)!.push(exclusion);
-    }
+    // }
 
     await this.recalculateEndGame(game);
   }

@@ -89,7 +89,7 @@ export default class PolusGGApi extends BasePlugin {
           case 0:
             const version = ClientVersion.decode(message.readUInt32());
             if (!version.equals(SUPPORTED_VERSION, false)) {
-              event.setDisconnectReason(DisconnectReason.incorrectVersion())
+              event.setDisconnectReason(DisconnectReason.custom("Mod version invalid"))
               event.cancel();
 
               return;

@@ -30,7 +30,7 @@ const staticEmojiNames = <const>[
   "platIOS", // it's platPlaceholder ingame
   "platUnknown",
   "mentor",
-  "thief"
+  "identitythief"
 ];
 
 type StaticEmojiName = (typeof staticEmojiNames)[number];
